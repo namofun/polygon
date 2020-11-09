@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
+MinimumVisualStudioVersion = 15.0.26124.0
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{71ABC5AB-083D-4FAB-80B8-F344BC633100}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		build\NugetPackage.Backend.props = build\NugetPackage.Backend.props
+		build\NugetPackage.Common.props = build\NugetPackage.Common.props
+		build\NugetPackage.props = build\NugetPackage.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{37978533-6CEF-46D7-8A00-D4C403E9A1BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{ADA4B71F-A85F-44D6-969A-976C34A660A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SatelliteSite.Host", "src\Host\SatelliteSite.Host.csproj", "{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Debug|x64.Build.0 = Debug|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Debug|x86.Build.0 = Debug|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Release|x64.ActiveCfg = Release|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Release|x64.Build.0 = Release|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Release|x86.ActiveCfg = Release|Any CPU
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AEB94C66-A8F2-4684-BE2F-8D464A512DC4} = {37978533-6CEF-46D7-8A00-D4C403E9A1BD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {000EA67D-DBD2-448C-9B2E-6393348CC090}
+	EndGlobalSection
+EndGlobal
