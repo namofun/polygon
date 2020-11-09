@@ -1,0 +1,16 @@
+<Project>
+
+  <PropertyGroup>
+    <Title>$(AssemblyName)</Title>
+    <PackageProjectUrl>https://github.com/namofun/polygon</PackageProjectUrl>
+    <Company />
+    <PackageTags>online-judge</PackageTags>
+    <PackageReleaseNotes>Problem Judging Core Module</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/namofun/polygon</RepositoryUrl>
+    <Authors>yang-er</Authors>
+    <Version>1.0.0</Version>
+    <PackageVersion>1.0.0-preview$(PreviewBuild)</PackageVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+</Project>

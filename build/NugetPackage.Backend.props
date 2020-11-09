@@ -1,0 +1,11 @@
+<Project>
+
+  <Import Project="NugetPackage.Common.props" />
+
+  <PropertyGroup>
+    <Description>Problem Judging core support. $(DescriptionAttach)</Description>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+  </PropertyGroup>
+
+</Project>
