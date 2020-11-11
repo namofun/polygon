@@ -56,6 +56,16 @@
         /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// The custom display input
+        /// </summary>
+        public string CustomInput { get; set; }
+
+        /// <summary>
+        /// The custom display output
+        /// </summary>
+        public string CustomOutput { get; set; }
+
 #pragma warning disable CS8618
         /// <summary>
         /// Construct an empty testcase for querying from database.
