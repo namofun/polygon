@@ -3,5 +3,6 @@
     <GitRepositoryDirectory>$(MSBuildThisFileDirectory).git</GitRepositoryDirectory>
     <SubstrateVersion>1.0.0-preview10</SubstrateVersion>
     <PreviewBuild>10</PreviewBuild>
+    <AspNetCoreVersion>3.1.9</AspNetCoreVersion>
   </PropertyGroup>
 </Project>

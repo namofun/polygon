@@ -5,7 +5,7 @@ namespace Polygon.Entities
     /// <summary>
     /// The entity class for details.
     /// </summary>
-    public class Detail
+    public class JudgingRun
     {
         /// <summary>
         /// The running ID
@@ -69,9 +69,9 @@ namespace Polygon.Entities
 
 #pragma warning disable CS8618
         /// <summary>
-        /// Construct an empty executable for inserting into database.
+        /// Construct an empty judging run for inserting into database.
         /// </summary>
-        public Detail()
+        public JudgingRun()
         {
         }
 #pragma warning restore CS8618

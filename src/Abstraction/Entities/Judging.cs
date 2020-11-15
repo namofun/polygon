@@ -49,13 +49,15 @@ namespace Polygon.Entities
         public Verdict Status { get; set; }
 
         /// <summary>
-        /// 执行时间，以ms为单位
+        /// The execution time
         /// </summary>
+        /// <remarks>The unit of time limit is <c>ms</c>.</remarks>
         public int? ExecuteTime { get; set; }
 
         /// <summary>
-        /// 执行内存，以kb为单位
+        /// The execution memory
         /// </summary>
+        /// <remarks>The unit of memory limit is <c>kb</c>.</remarks>
         public int? ExecuteMemory { get; set; }
 
         /// <summary>
@@ -65,24 +67,25 @@ namespace Polygon.Entities
         public string? CompileError { get; set; }
 
         /// <summary>
-        /// 重测请求编号
+        /// The rejudging ID
         /// </summary>
-        public int? RejudgeId { get; set; }
+        public int? RejudgingId { get; set; }
 
         /// <summary>
-        /// 重测时前一个活跃评测编号
+        /// The previous judging ID in rejudging
         /// </summary>
+        /// <remarks>When <see cref="RejudgingId"/> is <c>null</c>, this should also be <c>null</c>.</remarks>
         public int? PreviousJudgingId { get; set; }
 
         /// <summary>
-        /// 评测点分数总和
+        /// The total score for judging
         /// </summary>
         public int? TotalScore { get; set; }
 
         /// <summary>
-        /// 评测结果导航属性
+        /// The navigation to judging runs
         /// </summary>
-        public ICollection<Detail> Details { get; set; }
+        public ICollection<JudgingRun> Details { get; set; }
 
         /// <summary>
         /// The navigation to submission

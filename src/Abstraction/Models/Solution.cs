@@ -77,7 +77,7 @@ namespace Polygon.Models
         /// <summary>
         /// The running details
         /// </summary>
-        public ICollection<Detail> Details { get; set; }
+        public ICollection<JudgingRun> Details { get; set; }
 
         /// <summary>
         /// The name of author

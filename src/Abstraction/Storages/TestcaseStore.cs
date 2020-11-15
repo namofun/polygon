@@ -1,0 +1,94 @@
+﻿using Microsoft.Extensions.FileProviders;
+using Polygon.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+
+namespace Polygon.Storages
+{
+    /// <summary>
+    /// The store interface for <see cref="Testcase"/>.
+    /// </summary>
+    public interface ITestcaseStore
+    {
+        /// <summary>
+        /// Create an instance of entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns>The created entity.</returns>
+        Task<Testcase> CreateAsync(Testcase entity);
+
+        /// <summary>
+        /// Update the instance of entity.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns>The update task.</returns>
+        Task UpdateAsync(Testcase entity);
+
+        /// <summary>
+        /// Update the instance of entity.
+        /// </summary>
+        /// <param name="id">The entity id.</param>
+        /// <param name="expression">The update expression.</param>
+        /// <returns>The update task.</returns>
+        Task UpdateAsync(int id, Expression<Func<Testcase, Testcase>> expression);
+
+        /// <summary>
+        /// List the testcase from the problem.
+        /// </summary>
+        /// <param name="problemId">The problem ID.</param>
+        /// <param name="secret">Whether to list only secret.</param>
+        /// <returns>The testcase list.</returns>
+        Task<List<Testcase>> ListAsync(int problemId, bool? secret = null);
+        
+        /// <summary>
+        /// Find the testcase.
+        /// </summary>
+        /// <param name="tid">The testcase ID.</param>
+        /// <param name="pid">The problem ID.</param>
+        /// <returns>The find task.</returns>
+        Task<Testcase> FindAsync(int tid, int? pid = null);
+
+        /// <summary>
+        /// Batch set the score of testcases.
+        /// </summary>
+        /// <param name="pid">The problem ID.</param>
+        /// <param name="lower">The lowest rank of testcase.</param>
+        /// <param name="upper">The highest rank of testcase.</param>
+        /// <param name="score">The score for each testcase.</param>
+        /// <returns>The task for updated testcases.</returns>
+        Task<int> BatchScoreAsync(int pid, int lower, int upper, int score);
+
+        /// <summary>
+        /// Cascade delete the testcase with details.
+        /// </summary>
+        /// <param name="testcase">The testcase to delete.</param>
+        /// <returns>The task for delete.</returns>
+        Task<int> CascadeDeleteAsync(Testcase testcase);
+
+        /// <summary>
+        /// Change the rank of testcase.
+        /// </summary>
+        /// <param name="problemId">The problem ID.</param>
+        /// <param name="testcaseId">The testcase ID.</param>
+        /// <param name="up">The direction (<c>true</c> for up, <c>false</c> for down).</param>
+        /// <returns>The task for changing rank.</returns>
+        Task ChangeRankAsync(int problemId, int testcaseId, bool up);
+
+        /// <summary>
+        /// Count the testcases.
+        /// </summary>
+        /// <param name="problemId">The problem ID.</param>
+        /// <returns>The count task.</returns>
+        Task<int> CountAsync(int problemId);
+
+        /// <summary>
+        /// Get the testcase file.
+        /// </summary>
+        /// <param name="testcase">The testcase.</param>
+        /// <param name="target">The target.</param>
+        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
+        Task<IFileInfo> GetFileAsync(Testcase testcase, string target);
+    }
+}

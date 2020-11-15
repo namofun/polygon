@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "BLOB field for entity", Scope = "member", Target = "~P:Polygon.Entities.Executable.ZipFile")]
 [assembly: SuppressMessage("Style", "IDE1006:命名样式", Justification = "Navigation property", Scope = "member", Target = "~P:Polygon.Entities.Judging.s")]
-[assembly: SuppressMessage("Style", "IDE1006:命名样式", Justification = "Navigation property", Scope = "member", Target = "~P:Polygon.Entities.Detail.j")]
+[assembly: SuppressMessage("Style", "IDE1006:命名样式", Justification = "Navigation property", Scope = "member", Target = "~P:Polygon.Entities.JudgingRun.j")]
 [assembly: SuppressMessage("Style", "IDE1006:命名样式", Justification = "Navigation property", Scope = "member", Target = "~P:Polygon.Entities.Submission.j")]
 [assembly: SuppressMessage("Style", "IDE1006:命名样式", Justification = "Navigation property", Scope = "member", Target = "~P:Polygon.Entities.Submission.p")]
 [assembly: SuppressMessage("Style", "IDE1006:命名样式", Justification = "Navigation property", Scope = "member", Target = "~P:Polygon.Entities.Submission.l")]
