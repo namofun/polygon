@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Polygon.Providers
+namespace Polygon.Packaging
 {
     /// <summary>
     /// The provider interface for exporting problems from system.

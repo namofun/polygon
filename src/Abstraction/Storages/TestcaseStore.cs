@@ -2,6 +2,7 @@
 using Polygon.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -90,5 +91,14 @@ namespace Polygon.Storages
         /// <param name="target">The target.</param>
         /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
         Task<IFileInfo> GetFileAsync(Testcase testcase, string target);
+
+        /// <summary>
+        /// Set the testcase file.
+        /// </summary>
+        /// <param name="testcase">The testcase.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="source">The source.</param>
+        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
+        Task<IFileInfo> SetFileAsync(Testcase testcase, string target, Stream source);
     }
 }

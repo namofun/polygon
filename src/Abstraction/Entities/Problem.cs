@@ -70,7 +70,7 @@
         /// <summary>
         /// The argument passed to compare script
         /// </summary>
-        public string ComapreArguments { get; set; }
+        public string? ComapreArguments { get; set; }
 
         /// <summary>
         /// Whether to use the same script for run and compare

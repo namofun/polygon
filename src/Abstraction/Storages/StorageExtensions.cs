@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.FileProviders;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Polygon.Entities;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -175,6 +177,154 @@ namespace Polygon.Storages
         {
             var result = await that.GetAuthorNamesAsync(s => s.Id == submissionId);
             return result.SingleOrDefault().Value;
+        }
+
+        /// <summary>
+        /// Create an instance of entity.
+        /// </summary>
+        /// <param name="store">The store.</param>
+        /// <param name="entity">The entity.</param>
+        /// <param name="input">The input file.</param>
+        /// <param name="output">The output file.</param>
+        /// <returns>The created entity.</returns>
+        public static async Task<Testcase> CreateAsync(this ITestcaseStore store, Testcase entity, Stream input, Stream output)
+        {
+            if (!input.CanSeek || !output.CanSeek)
+            {
+                throw new InvalidOperationException("The type of input and output is not correct.");
+            }
+
+            input.Seek(0, SeekOrigin.Begin);
+            output.Seek(0, SeekOrigin.End);
+            entity.Md5sumInput = input.ToMD5().ToHexDigest(true);
+            entity.Md5sumOutput = output.ToMD5().ToHexDigest(true);
+            entity.InputLength = (int)input.Length;
+            entity.OutputLength = (int)output.Length;
+
+            await store.CreateAsync(entity);
+
+            input.Seek(0, SeekOrigin.Begin);
+            output.Seek(0, SeekOrigin.End);
+            await store.SetFileAsync(entity, "in", input);
+            await store.SetFileAsync(entity, "out", output);
+
+            return entity;
+        }
+
+        /// <summary>
+        /// Get the testcase input file.
+        /// </summary>
+        /// <param name="store">The store.</param>
+        /// <param name="testcase">The testcase.</param>
+        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
+        public static Task<IFileInfo> GetInputAsync(this ITestcaseStore store, Testcase testcase)
+        {
+            return store.GetFileAsync(testcase, "in");
+        }
+
+        /// <summary>
+        /// Get the testcase output file.
+        /// </summary>
+        /// <param name="store">The store.</param>
+        /// <param name="testcase">The testcase.</param>
+        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
+        public static Task<IFileInfo> GetOutputAsync(this ITestcaseStore store, Testcase testcase)
+        {
+            return store.GetFileAsync(testcase, "out");
+        }
+
+        /// <summary>
+        /// Set the testcase input file.
+        /// </summary>
+        /// <param name="store">The store.</param>
+        /// <param name="testcase">The testcase.</param>
+        /// <param name="source">The source.</param>
+        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
+        public static async Task<IFileInfo> SetInputAsync(this ITestcaseStore store, Testcase testcase, Stream source)
+        {
+            if (!source.CanSeek)
+            {
+                throw new InvalidOperationException("The type of file is not correct.");
+            }
+
+            source.Seek(0, SeekOrigin.Begin);
+            testcase.InputLength = (int)source.Length;
+            testcase.Md5sumInput = source.ToMD5().ToHexDigest(true);
+            await store.UpdateAsync(testcase);
+            source.Seek(0, SeekOrigin.Begin);
+            return await store.SetFileAsync(testcase, "in", source);
+        }
+
+        /// <summary>
+        /// Set the testcase output file.
+        /// </summary>
+        /// <param name="store">The store.</param>
+        /// <param name="testcase">The testcase.</param>
+        /// <param name="source">The source.</param>
+        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
+        public static async Task<IFileInfo> SetOutputAsync(this ITestcaseStore store, Testcase testcase, Stream source)
+        {
+            if (!source.CanSeek)
+            {
+                throw new InvalidOperationException("The type of file is not correct.");
+            }
+
+            source.Seek(0, SeekOrigin.Begin);
+            testcase.OutputLength = (int)source.Length;
+            testcase.Md5sumOutput = source.ToMD5().ToHexDigest(true);
+            await store.UpdateAsync(testcase);
+            source.Seek(0, SeekOrigin.Begin);
+            return await store.SetFileAsync(testcase, "out", source);
+        }
+
+        /// <summary>
+        /// Add polygon facade implemention.
+        /// </summary>
+        /// <typeparam name="TFacade">The facade implemention type.</typeparam>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The service collection.</returns>
+        public static IServiceCollection AddPolygonStorage<TFacade>(this IServiceCollection services) where TFacade : class, IPolygonFacade2
+        {
+            return services
+                .AddScoped<IPolygonFacade2, TFacade>()
+                .AddScoped<IPolygonFacade>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<IExecutableStore>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<IInternalErrorStore>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<IJudgehostStore>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<IJudgingStore>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<ILanguageStore>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<IProblemStore>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<IRejudgingStore>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<ISubmissionStore>(s => s.GetRequiredService<IPolygonFacade2>())
+                .AddScoped<ITestcaseStore>(s => s.GetRequiredService<IPolygonFacade2>());
+        }
+
+        public static IServiceCollection AddPolygonStorage<
+            TExecutableStore, TInternalErrorStore, TJudgehostStore,
+            TJudgingStore, TLanguageStore, TProblemStore,
+            TRejudgingStore, TSubmissionStore, TTestcaseStore>(
+            this IServiceCollection services)
+            where TExecutableStore : class, IExecutableStore
+            where TInternalErrorStore : class, IInternalErrorStore
+            where TJudgehostStore : class, IJudgehostStore
+            where TJudgingStore : class, IJudgingStore
+            where TLanguageStore : class, ILanguageStore
+            where TProblemStore : class, IProblemStore
+            where TRejudgingStore : class, IRejudgingStore
+            where TSubmissionStore : class, ISubmissionStore
+            where TTestcaseStore : class, ITestcaseStore
+        {
+            return services
+                .AddScoped<IPolygonFacade, CompositePolygonFacade>()
+                .AddScoped<IExecutableStore, TExecutableStore>()
+                .AddScoped<IInternalErrorStore, TInternalErrorStore>()
+                .AddScoped<IJudgehostStore, TJudgehostStore>()
+                .AddScoped<IJudgingStore, TJudgingStore>()
+                .AddScoped<ILanguageStore, TLanguageStore>()
+                .AddScoped<IProblemStore, TProblemStore>()
+                .AddScoped<IRejudgingStore, TRejudgingStore>()
+                .AddScoped<ISubmissionStore, TSubmissionStore>()
+                .AddScoped<ITestcaseStore, TTestcaseStore>();
         }
     }
 }
