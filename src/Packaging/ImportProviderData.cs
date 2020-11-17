@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Packaging
 {
-    public class DataImportProvider : ImportProviderBase
+    public sealed class DataImportProvider : ImportProviderBase
     {
         public DataImportProvider(IPolygonFacade facade, ILogger<DataImportProvider> logger) : base(facade, logger)
         {

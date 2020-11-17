@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Polygon.Entities;
 using Polygon.Storages;
 using System;
@@ -12,7 +11,7 @@ using System.Xml.Linq;
 
 namespace Polygon.Packaging
 {
-    public class CodeforcesImportProvider : ImportProviderBase
+    public sealed class CodeforcesImportProvider : ImportProviderBase
     {
         const int LINUX644 = -2119958528;
 
@@ -64,15 +63,14 @@ namespace Polygon.Packaging
             ImportContext ctx, byte[] contents, string ext, bool cmp)
         {
             var execName = $"p{ctx.Id}{(cmp ? "cmp" : "run")}";
-            IFileInfo testlib = StaticFiles.GetFileInfo("static/testlib.h");
-            if (!testlib.Exists) throw new InvalidOperationException("testlib.h not found");
 
             var stream = new MemoryStream();
             using (var newzip = new ZipArchive(stream, ZipArchiveMode.Create, true))
             {
                 var f = newzip.CreateEntryFromByteArray(contents, "main" + ext);
                 f.ExternalAttributes = LINUX644;
-                var f2 = newzip.CreateEntryFromFile(testlib.PhysicalPath, "testlib.h");
+                using var testlib = ResourcesDictionary.GetTestlib();
+                var f2 = await newzip.CreateEntryFromStream(testlib, "testlib.h");
                 f2.ExternalAttributes = LINUX644;
             }
 

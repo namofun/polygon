@@ -1,4 +1,5 @@
 ﻿using Markdig;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Polygon.Entities;
 using Polygon.Storages;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Packaging
 {
-    public class KattisImportProvider : ImportProviderBase
+    public sealed class KattisImportProvider : ImportProviderBase
     {
         #region Static Visitors
 
@@ -146,10 +147,12 @@ namespace Polygon.Packaging
         #endregion
 
         private IMarkdownService Markdown { get; }
+        private IWwwrootFileProvider Files { get; }
 
-        public KattisImportProvider(IPolygonFacade facade, ILogger<KattisImportProvider> logger, IMarkdownService markdown) : base(facade, logger)
+        public KattisImportProvider(IPolygonFacade facade, ILogger<KattisImportProvider> logger, IMarkdownService markdown, IWwwrootFileProvider files) : base(facade, logger)
         {
             Markdown = markdown;
+            Files = files;
         }
 
         private async Task<Executable?> GetOutputValidatorAsync(ImportContext ctx, ZipArchive zip)
@@ -299,7 +302,7 @@ namespace Polygon.Packaging
                 string mdcontent = await entry.ReadAsStringAsync();
 
                 var tags = $"p{ctx.Id}";
-                var content = await (Markdown, StaticFiles).ImportWithImagesAsync(mdcontent, tags);
+                var content = await Files.ImportWithImagesAsync(Markdown, mdcontent, tags);
                 await ctx.WriteAsync($"{mdfile}.md", content);
 
                 Log($"Adding statement section 'problem_statement/{mdfile}.md'.");

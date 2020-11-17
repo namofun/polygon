@@ -2,7 +2,7 @@
 using System.IO.Compression;
 using System.Text;
 
-namespace Polygon.Providers
+namespace Polygon.Packaging
 {
     /// <summary>
     /// The statement writer interface, which provide features to convert the statement to HTML or TeX files.

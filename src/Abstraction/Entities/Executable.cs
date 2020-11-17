@@ -19,7 +19,7 @@
         /// <summary>
         /// The executable zip byte array
         /// </summary>
-        /// <remarks>The maximum file size is 1MB.</remarks>
+        /// <remarks>The maximum file size is 1MB. When this is model class, this field is <c>null</c>.</remarks>
         public byte[]? ZipFile { get; set; }
 
         /// <summary>

@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SatelliteSite.PolygonModule
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Abstraction", "src\Abstraction\Polygon.Abstraction.csproj", "{51DE2D04-D85D-4B4B-B430-4C426A0EA505}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polygon.DataAccess", "src\DataAccess\Polygon.DataAccess.csproj", "{DCCB613C-C11E-45FA-8AA6-002BE8C3A973}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.DataAccess", "src\DataAccess\Polygon.DataAccess.csproj", "{DCCB613C-C11E-45FA-8AA6-002BE8C3A973}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polygon.Packaging", "src\Packaging\Polygon.Packaging.csproj", "{48B8FFCA-410D-4CE8-9E97-51FDBBE83D6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Packaging", "src\Packaging\Polygon.Packaging.csproj", "{48B8FFCA-410D-4CE8-9E97-51FDBBE83D6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polygon.Packaging.Tests", "test\Polygon.Packaging.Tests\Polygon.Packaging.Tests.csproj", "{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,18 @@ Global
 		{48B8FFCA-410D-4CE8-9E97-51FDBBE83D6C}.Release|x64.Build.0 = Release|Any CPU
 		{48B8FFCA-410D-4CE8-9E97-51FDBBE83D6C}.Release|x86.ActiveCfg = Release|Any CPU
 		{48B8FFCA-410D-4CE8-9E97-51FDBBE83D6C}.Release|x86.Build.0 = Release|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Debug|x64.Build.0 = Debug|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Debug|x86.Build.0 = Debug|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Release|x64.ActiveCfg = Release|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Release|x64.Build.0 = Release|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Release|x86.ActiveCfg = Release|Any CPU
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +119,7 @@ Global
 		{51DE2D04-D85D-4B4B-B430-4C426A0EA505} = {37978533-6CEF-46D7-8A00-D4C403E9A1BD}
 		{DCCB613C-C11E-45FA-8AA6-002BE8C3A973} = {37978533-6CEF-46D7-8A00-D4C403E9A1BD}
 		{48B8FFCA-410D-4CE8-9E97-51FDBBE83D6C} = {37978533-6CEF-46D7-8A00-D4C403E9A1BD}
+		{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D} = {ADA4B71F-A85F-44D6-969A-976C34A660A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {000EA67D-DBD2-448C-9B2E-6393348CC090}

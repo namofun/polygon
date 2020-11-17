@@ -10,7 +10,7 @@ using System.Xml.Linq;
 
 namespace Polygon.Packaging
 {
-    public class FpsImportProvider : ImportProviderBase
+    public sealed class FpsImportProvider : ImportProviderBase
     {
         public FpsImportProvider(IPolygonFacade facade, ILogger<FpsImportProvider> logger) : base(facade, logger)
         {

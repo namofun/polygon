@@ -1,4 +1,5 @@
 ﻿using Markdig;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Polygon.Entities;
 using Polygon.Models;
@@ -10,9 +11,10 @@ using System.Xml.Linq;
 
 namespace Polygon.Packaging
 {
-    public class XmlImportProvider : ImportProviderBase
+    public sealed class XmlImportProvider : ImportProviderBase
     {
         public IMarkdownService Markdown { get; }
+        private IWwwrootFileProvider Files { get; }
 
         static readonly Dictionary<string, string> nodes = new Dictionary<string, string>
         {
@@ -24,9 +26,10 @@ namespace Polygon.Packaging
 
         static readonly (string, bool)[] testcaseGroups = new[] { ("samples", false), ("test_cases", true) };
 
-        public XmlImportProvider(IPolygonFacade facade, ILogger<XmlImportProvider> logger, IMarkdownService markdown) : base(facade, logger)
+        public XmlImportProvider(IPolygonFacade facade, ILogger<XmlImportProvider> logger, IMarkdownService markdown, IWwwrootFileProvider files) : base(facade, logger)
         {
             Markdown = markdown;
+            Files = files;
         }
 
         public override async Task<List<Problem>> ImportAsync(Stream stream, string uploadFileName, string username)
@@ -61,7 +64,7 @@ namespace Polygon.Packaging
                 if (string.IsNullOrEmpty(element.Value)) continue;
                 string mdcontent = element.Value;
                 var tags = $"p{ctx.Id}";
-                string content = await (Markdown, StaticFiles).ImportWithImagesAsync(mdcontent, tags);
+                string content = await Files.ImportWithImagesAsync(Markdown, mdcontent, tags);
                 await ctx.WriteAsync(fileName, content);
             }
 

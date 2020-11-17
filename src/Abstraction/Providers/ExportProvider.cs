@@ -1,5 +1,4 @@
 ﻿using Polygon.Entities;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Polygon.Packaging
@@ -13,7 +12,7 @@ namespace Polygon.Packaging
         /// Export the problem.
         /// </summary>
         /// <param name="problem">The problem entity.</param>
-        /// <returns>A <see cref="ValueTask"/> for exporting results.</returns>
-        ValueTask<(Stream stream, string mime, string fileName)> ExportAsync(Problem problem);
+        /// <returns>A <see cref="Task"/> for exporting results.</returns>
+        Task<ExportResult> ExportAsync(Problem problem);
     }
 }

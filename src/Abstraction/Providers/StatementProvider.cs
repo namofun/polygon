@@ -2,7 +2,7 @@
 using Polygon.Models;
 using System.Threading.Tasks;
 
-namespace Polygon.Providers
+namespace Polygon.Packaging
 {
     /// <summary>
     /// The statement provider interface.
