@@ -46,8 +46,8 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="error">The internal error.</param>
         /// <param name="status">The target error status.</param>
-        /// <returns>The task for disabled object.</returns>
-        Task<InternalErrorDisable> ResolveAsync(InternalError error, InternalErrorStatus status);
+        /// <returns>The task for disabled object. If status is <see cref="InternalErrorStatus.Resolved"/>, then return the disabled entity.</returns>
+        Task<InternalErrorDisable?> ResolveAsync(InternalError error, InternalErrorStatus status);
 
         /// <summary>
         /// Count the open internal error alerts.

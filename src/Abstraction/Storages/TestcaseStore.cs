@@ -88,7 +88,7 @@ namespace Polygon.Storages
         /// Get the testcase file.
         /// </summary>
         /// <param name="testcase">The testcase.</param>
-        /// <param name="target">The target.</param>
+        /// <param name="target">The target. (<c>in</c> or <c>out</c>)</param>
         /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
         Task<IFileInfo> GetFileAsync(Testcase testcase, string target);
 
@@ -96,7 +96,7 @@ namespace Polygon.Storages
         /// Set the testcase file.
         /// </summary>
         /// <param name="testcase">The testcase.</param>
-        /// <param name="target">The target.</param>
+        /// <param name="target">The target. (<c>in</c> or <c>out</c>)</param>
         /// <param name="source">The source.</param>
         /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
         Task<IFileInfo> SetFileAsync(Testcase testcase, string target, Stream source);

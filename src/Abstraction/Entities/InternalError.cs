@@ -79,5 +79,18 @@ namespace Polygon.Entities
         {
         }
 #pragma warning restore CS8618
+
+        /// <summary>
+        /// Construct a summary internal error for querying from database.
+        /// </summary>
+        public InternalError(int id, InternalErrorStatus status, DateTimeOffset time, string desc)
+        {
+            Id = id;
+            Status = status;
+            Time = time;
+            Description = desc;
+            JudgehostLog = string.Empty;
+            Disabled = "{}";
+        }
     }
 }

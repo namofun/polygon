@@ -87,7 +87,7 @@ namespace Polygon.Storages
         /// <returns>The submission list.</returns>
         Task<IEnumerable<T>> ListAsync<T>(
             Expression<Func<Submission, T>> projection,
-            Expression<Func<Submission, bool>> predicate = null);
+            Expression<Func<Submission, bool>>? predicate = null);
 
         /// <summary>
         /// List the paginated solutions satisfying some conditions.

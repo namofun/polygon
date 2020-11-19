@@ -32,7 +32,7 @@ namespace Polygon.Storages
         /// <param name="id">The entity id.</param>
         /// <param name="expression">The update expression.</param>
         /// <returns>The update task.</returns>
-        Task UpdateAsync(string id, Expression<Func<Rejudging, Rejudging>> expression);
+        Task UpdateAsync(int id, Expression<Func<Rejudging, Rejudging>> expression);
 
         /// <summary>
         /// Delete the instance of entity.
@@ -81,7 +81,7 @@ namespace Polygon.Storages
         /// <returns>The task for batch rejudge submissions, returning the count of submissions being rejudged.</returns>
         Task<int> BatchRejudgeAsync(
             Expression<Func<Submission, Judging, bool>> predicate,
-            Rejudging rejudge = null,
+            Rejudging? rejudge = null,
             bool fullTest = false);
 
         /// <summary>

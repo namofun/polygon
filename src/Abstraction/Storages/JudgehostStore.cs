@@ -19,27 +19,12 @@ namespace Polygon.Storages
         Task<Judgehost> CreateAsync(Judgehost entity);
 
         /// <summary>
-        /// Update the instance of entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <returns>The update task.</returns>
-        Task UpdateAsync(Judgehost entity);
-
-        /// <summary>
-        /// Update the instance of entity.
-        /// </summary>
-        /// <param name="id">The entity id.</param>
-        /// <param name="expression">The update expression.</param>
-        /// <returns>The update task.</returns>
-        Task UpdateAsync(string id, Expression<Func<Judgehost, Judgehost>> expression);
-
-        /// <summary>
         /// Toggle the activity of judgehost.
         /// </summary>
-        /// <param name="hostname">The host name.</param>
+        /// <param name="hostname">The host name. If <c>null</c>, toggle all.</param>
         /// <param name="active">The active result.</param>
-        /// <returns>The toggle task.</returns>
-        Task<int> ToggleAsync(string hostname, bool active);
+        /// <returns>The toggle task, returning the toggled count.</returns>
+        Task<int> ToggleAsync(string? hostname, bool active);
 
         /// <summary>
         /// List judgehosts.

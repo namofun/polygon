@@ -40,7 +40,7 @@ namespace Polygon.Storages
         /// <param name="id">The entity id.</param>
         /// <param name="expression">The update expression.</param>
         /// <returns>The update task.</returns>
-        Task UpdateAsync(string id, Expression<Func<Judging, Judging>> expression);
+        Task UpdateAsync(int id, Expression<Func<Judging, Judging>> expression);
 
         /// <summary>
         /// Count the judgings with predicate.
@@ -119,7 +119,7 @@ namespace Polygon.Storages
         /// <param name="judgingId">The judging ID.</param>
         /// <param name="selector">The result selector.</param>
         /// <returns>The task for fetching judging runs.</returns>
-        Task<IEnumerable<T>> GetDetailsAsync<T>(int problemId, int judgingId, Expression<Func<Testcase, JudgingRun, T>> selector);
+        Task<IEnumerable<T>> GetDetailsAsync<T>(int problemId, int judgingId, Expression<Func<Testcase, JudgingRun?, T>> selector);
 
         /// <summary>
         /// Fetch the details DTO.

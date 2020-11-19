@@ -36,7 +36,7 @@ namespace Polygon.Entities
         /// <summary>
         /// The source code
         /// </summary>
-        /// <remarks>This field is base64 encoded.</remarks>
+        /// <remarks>This field is base64 encoded. Maximum source size is 192KB.</remarks>
         public string SourceCode { get; set; }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Polygon.Entities
         /// <summary>
         /// The navigation to judgings
         /// </summary>
-        public ICollection<Judging> j { get; set; }
+        public ICollection<Judging> Judgings { get; set; }
 
         /// <summary>
         /// The navigation to problem
