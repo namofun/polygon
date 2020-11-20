@@ -1,4 +1,7 @@
-﻿namespace Polygon.Storages
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+
+namespace Polygon.Storages
 {
     /// <summary>
     /// The big facade interface.
@@ -53,53 +56,38 @@
     /// <inheritdoc cref="IPolygonFacade" />
     internal class CompositePolygonFacade : IPolygonFacade
     {
-        /// <inheritdoc />
-        public IProblemStore Problems { get; }
+        private readonly Lazy<IProblemStore> _problems;
+        private readonly Lazy<ITestcaseStore> _testcases;
+        private readonly Lazy<ISubmissionStore> _submissions;
+        private readonly Lazy<IExecutableStore> _executables;
+        private readonly Lazy<IInternalErrorStore> _errors;
+        private readonly Lazy<IJudgehostStore> _judgehosts;
+        private readonly Lazy<IJudgingStore> _judgings;
+        private readonly Lazy<ILanguageStore> _languages;
+        private readonly Lazy<IRejudgingStore> _rejudgings;
 
-        /// <inheritdoc />
-        public ITestcaseStore Testcases { get; }
+        public IProblemStore Problems => _problems.Value;
+        public ITestcaseStore Testcases => _testcases.Value;
+        public ISubmissionStore Submissions => _submissions.Value;
+        public IExecutableStore Executables => _executables.Value;
+        public IInternalErrorStore InternalErrors => _errors.Value;
+        public IJudgehostStore Judgehosts => _judgehosts.Value;
+        public IJudgingStore Judgings => _judgings.Value;
+        public ILanguageStore Languages => _languages.Value;
+        public IRejudgingStore Rejudgings => _rejudgings.Value;
 
-        /// <inheritdoc />
-        public ISubmissionStore Submissions { get; }
-
-        /// <inheritdoc />
-        public IExecutableStore Executables { get; }
-
-        /// <inheritdoc />
-        public IInternalErrorStore InternalErrors { get; }
-
-        /// <inheritdoc />
-        public IJudgehostStore Judgehosts { get; }
-
-        /// <inheritdoc />
-        public IJudgingStore Judgings { get; }
-
-        /// <inheritdoc />
-        public ILanguageStore Languages { get; }
-
-        /// <inheritdoc />
-        public IRejudgingStore Rejudgings { get; }
-
-        public CompositePolygonFacade(
-            IProblemStore a,
-            ITestcaseStore b,
-            ISubmissionStore c,
-            IExecutableStore d,
-            IInternalErrorStore e,
-            IJudgehostStore f,
-            IJudgingStore g,
-            ILanguageStore h,
-            IRejudgingStore i)
+        public CompositePolygonFacade(IServiceProvider serviceProvider)
         {
-            Problems = a;
-            Testcases = b;
-            Submissions = c;
-            Executables = d;
-            InternalErrors = e;
-            Judgehosts = f;
-            Judgings = g;
-            Languages = h;
-            Rejudgings = i;
+            Lazy<T> Resolve<T>() => new Lazy<T>(serviceProvider.GetRequiredService<T>);
+            _rejudgings = Resolve<IRejudgingStore>();
+            _submissions = Resolve<ISubmissionStore>();
+            _testcases = Resolve<ITestcaseStore>();
+            _problems = Resolve<IProblemStore>();
+            _languages = Resolve<ILanguageStore>();
+            _judgings = Resolve<IJudgingStore>();
+            _judgehosts = Resolve<IJudgehostStore>();
+            _executables = Resolve<IExecutableStore>();
+            _errors = Resolve<IInternalErrorStore>();
         }
     }
 }
