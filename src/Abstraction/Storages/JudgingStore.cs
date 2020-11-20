@@ -53,7 +53,7 @@ namespace Polygon.Storages
         /// Make a summary for such judging.
         /// </summary>
         /// <param name="judgingId">The judging ID.</param>
-        /// <returns>The summary, where <see cref="JudgingRun.Id"/> is the count of correct judging run.</returns>
+        /// <returns>The summary, where <see cref="JudgingRun.Id"/> is the correct score and <see cref="JudgingRun.TestcaseId"/> is judged testcase count.</returns>
         Task<JudgingRun> SummarizeAsync(int judgingId);
 
         /// <summary>

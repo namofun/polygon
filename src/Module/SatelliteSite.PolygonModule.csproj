@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -10,6 +10,13 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="SatelliteSite.Substrate" Version="$(SubstrateVersion)" />
     <PackageReference Include="SatelliteSite.IdentityModule" Version="$(SubstrateVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />
+    <ProjectReference Include="..\DataAccess\Polygon.DataAccess.csproj" />
+    <ProjectReference Include="..\Packaging\Polygon.Packaging.csproj" />
+    <ProjectReference Include="..\Judgement\Polygon.Judgement.csproj" />
   </ItemGroup>
 
 </Project>
