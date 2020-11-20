@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Polygon.Entities;
+using Polygon.Events;
 using Polygon.Models;
 using System;
 using System.Collections.Generic;
@@ -33,17 +34,6 @@ namespace Polygon.Storages
 
             await Context.SaveChangesAsync();
 
-            Context.Add(new SatelliteSite.Entities.Auditlog
-            {
-                ContestId = contestId,
-                Time = s.Entity.Time.DateTime,
-                DataId = $"{s.Entity.Id}",
-                DataType = SatelliteSite.Entities.AuditlogType.Submission,
-                Action = "added",
-                ExtraInfo = $"via {via}",
-                UserName = username,
-            });
-
             bool fullTest = fullJudge || expected.HasValue;
 
             Judgings.Add(new Judging
@@ -54,9 +44,8 @@ namespace Polygon.Storages
                 Status = Verdict.Pending,
             });
 
-            // TODO: contest event????
-
             await Context.SaveChangesAsync();
+            await Mediator.Publish(new SubmissionCreatedEvent(s.Entity, via, username));
             return s.Entity;
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
 namespace Polygon.Storages
@@ -42,11 +43,14 @@ namespace Polygon.Storages
 
         public IProblemFileProvider ProblemFiles { get; }
 
-        public PolygonFacade(TContext context, IJudgingFileProvider jf, IProblemFileProvider pf)
+        public IMediator Mediator { get; }
+
+        public PolygonFacade(TContext context, IJudgingFileProvider jf, IProblemFileProvider pf, IMediator mediator)
         {
             Context = context;
             JudgingFiles = jf;
             ProblemFiles = pf;
+            Mediator = mediator;
         }
 
         private async Task<T> CreateEntityAsync<T>(T entity) where T : class
