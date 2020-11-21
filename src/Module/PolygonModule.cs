@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Polygon.Packaging;
 using Polygon.Storages;
 using SatelliteSite;
 using SatelliteSite.IdentityModule.Entities;
@@ -50,6 +51,7 @@ namespace SatelliteSite.PolygonModule
             services.ConfigureSwaggerGen(options => options.OperationFilter<SwaggerFixFilter>());
             services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TRole, TContext>>();
             services.AddPolygonStorage<PolygonFacade<TUser, TRole, TContext>>();
+            services.AddPolygonPackaging();
 
             services.AddPolygonFileDirectory().Configure<IWebHostEnvironment>((options, environment) =>
             {
