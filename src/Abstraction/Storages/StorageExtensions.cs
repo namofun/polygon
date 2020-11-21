@@ -79,10 +79,10 @@ namespace Polygon.Storages
         /// <param name="problemId">The problem ID.</param>
         /// <param name="judgingId">The judging ID.</param>
         /// <returns>The task for fetching pairs.</returns>
-        public static async Task<IEnumerable<(JudgingRun, Testcase)>> GetDetailsAsync(this IJudgingStore that, int problemId, int judgingId)
+        public static async Task<IEnumerable<(JudgingRun?, Testcase)>> GetDetailsAsync(this IJudgingStore that, int problemId, int judgingId)
         {
             var result = await that.GetDetailsAsync(problemId, judgingId, (t, d) => new { t, d });
-            return result.Select(a => (a.d, a.t));
+            return result.Select(a => ((JudgingRun?)a.d, a.t));
         }
 
         /// <summary>
