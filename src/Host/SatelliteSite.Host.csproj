@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Module\SatelliteSite.PolygonModule.csproj" />
+    <ProjectReference Include="..\Seeds\Polygon.Seeds.csproj" />
   </ItemGroup>
 
   <ItemGroup>

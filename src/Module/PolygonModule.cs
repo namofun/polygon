@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Polygon.Storages;
 using SatelliteSite;
 using SatelliteSite.IdentityModule.Entities;
+using System.IO;
 
 [assembly: RoleDefinition(10, "Judgehost", "judgehost", "(Internal/System) Judgehost")]
 [assembly: RoleDefinition(11, "Problem", "prob", "Problem Provider")]
@@ -45,6 +48,14 @@ namespace SatelliteSite.PolygonModule
         public override void RegisterServices(IServiceCollection services)
         {
             services.ConfigureSwaggerGen(options => options.OperationFilter<SwaggerFixFilter>());
+            services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TRole, TContext>>();
+            services.AddPolygonStorage<PolygonFacade<TUser, TRole, TContext>>();
+
+            services.AddPolygonFileDirectory().Configure<IWebHostEnvironment>((options, environment) =>
+            {
+                options.JudgingDirectory = Path.Combine(environment.ContentRootPath, "Runs");
+                options.ProblemDirectory = Path.Combine(environment.ContentRootPath, "Problems");
+            });
         }
     }
 }

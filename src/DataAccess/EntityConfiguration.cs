@@ -30,6 +30,8 @@ namespace Polygon.Storages
     {
         public void Configure(EntityTypeBuilder<Executable> entity)
         {
+            entity.ToTable("PolygonExecutables");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -52,6 +54,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<InternalError> entity)
         {
+            entity.ToTable("PolygonErrors");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -71,6 +75,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<Judgehost> entity)
         {
+            entity.ToTable("PolygonJudgehosts");
+
             entity.HasKey(e => e.ServerName);
 
             entity.Property(e => e.ServerName)
@@ -81,6 +87,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<Judging> entity)
         {
+            entity.ToTable("PolygonJudgings");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -119,6 +127,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<JudgingRun> entity)
         {
+            entity.ToTable("PolygonJudgingRuns");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -149,6 +159,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<Language> entity)
         {
+            entity.ToTable("PolygonLanguages");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -180,6 +192,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<Problem> entity)
         {
+            entity.ToTable("PolygonProblems");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -222,6 +236,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<Rejudging> entity)
         {
+            entity.ToTable("PolygonRejudgings");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -254,6 +270,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<Submission> entity)
         {
+            entity.ToTable("PolygonSubmissions");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
@@ -298,6 +316,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<SubmissionStatistics> entity)
         {
+            entity.ToTable("PolygonStatistics");
+
             entity.HasKey(e => new { e.ContestId, e.TeamId, e.ProblemId });
 
             entity.HasIndex(e => e.ProblemId);
@@ -313,6 +333,8 @@ namespace Polygon.Storages
 
         public void Configure(EntityTypeBuilder<Testcase> entity)
         {
+            entity.ToTable("PolygonTestcases");
+
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.Id)
