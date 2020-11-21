@@ -1,45 +1,28 @@
 ﻿using MediatR;
 using Polygon.Entities;
 using Polygon.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace Polygon.Judgement
 {
     public class InternalErrorOccurrence : IRequest<(InternalError, InternalErrorDisable)>
     {
-        /// <summary>
-        /// The description of the internal error
-        /// </summary>
-        [Required]
-        public string description { get; set; }
+        public string Description { get; }
 
-        /// <summary>
-        /// The log of the judgehost
-        /// </summary>
-        [Required]
-        public string judgehostlog { get; set; }
+        public string JudgehostLog { get; }
 
-        /// <summary>
-        /// The object to disable in JSON format
-        /// </summary>
-        [Required]
-        public string disabled { get; set; }
+        public string Disabled { get; }
 
-        /// <summary>
-        /// The contest ID associated with this internal error
-        /// </summary>
-        public int? cid { get; set; }
+        public int? ContestId { get; }
 
-        /// <summary>
-        /// The ID of the judging that was being worked on
-        /// </summary>
-        public int? judgingid { get; set; }
+        public int? JudgingId { get; }
 
-
-#pragma warning disable CS8618
-        public InternalErrorOccurrence()
+        public InternalErrorOccurrence(string desc, string log, string disabled, int? cid, int? jid)
         {
+            Description = desc;
+            JudgehostLog = log;
+            Disabled = disabled;
+            ContestId = cid;
+            JudgingId = jid;
         }
-#pragma warning restore CS8618
     }
 }

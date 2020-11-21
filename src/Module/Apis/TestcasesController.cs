@@ -22,6 +22,7 @@ namespace SatelliteSite.PolygonModule.Apis
         /// </summary>
         /// <param name="id">The ID of the entity to get</param>
         /// <param name="mediator"></param>
+        /// <response code="200">Information about the next testcase to run</response>
         [HttpGet("[action]/{id}")]
         public async Task<ActionResult<TestcaseToJudge>> NextToJudge(
             [FromRoute] int id,

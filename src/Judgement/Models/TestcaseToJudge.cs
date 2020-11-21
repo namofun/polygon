@@ -3,9 +3,6 @@ using System.Text.Json.Serialization;
 
 namespace Polygon.Judgement
 {
-    /// <summary>
-    /// The testcase to judge.
-    /// </summary>
     public class TestcaseToJudge
     {
         [JsonPropertyName("testcaseid")]

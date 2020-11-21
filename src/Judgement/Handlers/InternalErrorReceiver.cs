@@ -11,17 +11,17 @@ namespace Polygon.Judgement
     {
         public async Task<(InternalError, InternalErrorDisable)> Handle(InternalErrorOccurrence model, CancellationToken cancellationToken)
         {
-            var toDisable = model.disabled.AsJson<InternalErrorDisable>();
+            var toDisable = model.Disabled.AsJson<InternalErrorDisable>();
             var kind = toDisable.Kind;
 
             var ie = await Facade.InternalErrors.CreateAsync(
                 new InternalError
                 {
-                    JudgehostLog = model.judgehostlog,
-                    JudgingId = model.judgingid,
-                    ContestId = model.cid,
-                    Description = model.description,
-                    Disabled = model.disabled,
+                    JudgehostLog = model.JudgehostLog,
+                    JudgingId = model.JudgingId,
+                    ContestId = model.ContestId,
+                    Description = model.Description,
+                    Disabled = model.Disabled,
                     Status = InternalErrorStatus.Open,
                     Time = DateTimeOffset.Now,
                 });
@@ -34,7 +34,7 @@ namespace Polygon.Judgement
                 Telemetry.TrackDependency(
                     dependencyTypeName: "Language",
                     dependencyName: langid,
-                    data: model.description,
+                    data: model.Description,
                     startTime: DateTimeOffset.Now,
                     duration: TimeSpan.Zero,
                     success: false);
@@ -47,7 +47,7 @@ namespace Polygon.Judgement
                 Telemetry.TrackDependency(
                     dependencyTypeName: "JudgeHost",
                     dependencyName: hostname,
-                    data: model.description,
+                    data: model.Description,
                     startTime: DateTimeOffset.Now,
                     duration: TimeSpan.Zero,
                     success: false);
@@ -60,7 +60,7 @@ namespace Polygon.Judgement
                 Telemetry.TrackDependency(
                     dependencyTypeName: "Problem",
                     dependencyName: $"p{probid}",
-                    data: model.description,
+                    data: model.Description,
                     startTime: DateTimeOffset.Now,
                     duration: TimeSpan.Zero,
                     success: false);
@@ -70,16 +70,16 @@ namespace Polygon.Judgement
                 Telemetry.TrackDependency(
                     dependencyTypeName: "Unresolved",
                     dependencyName: kind,
-                    data: model.description,
+                    data: model.Description,
                     startTime: DateTimeOffset.Now,
                     duration: TimeSpan.Zero,
                     success: false);
             }
 
-            if (model.judgingid.HasValue)
+            if (model.JudgingId.HasValue)
             {
                 var js = await Facade.Judgings.FindAsync(
-                    predicate: j => j.Id == model.judgingid.Value,
+                    predicate: j => j.Id == model.JudgingId.Value,
                     selector: j => new { j, j.s.ProblemId, j.s.ContestId, j.s.TeamId, j.s.Time });
                 if (js == null) throw new InvalidOperationException("Unknown Error Occurred.");
                 var request = new ReturnToQueueRequest(js.j, js.ContestId, js.ProblemId, js.TeamId, js.Time);

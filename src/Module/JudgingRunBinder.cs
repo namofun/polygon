@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Polygon.Judgement;
+using SatelliteSite.PolygonModule.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

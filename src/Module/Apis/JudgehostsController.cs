@@ -125,8 +125,8 @@ namespace SatelliteSite.PolygonModule.Apis
         /// <param name="hostname">The hostname of the judgehost that wants to update the judging</param>
         /// <param name="judgingId">The ID of the judging to update</param>
         /// <param name="mediator"></param>
-        /// <response code="200">When the judging has been updated</response>
         /// <param name="model">Model</param>
+        /// <response code="200">When the judging has been updated</response>
         [HttpPut("[action]/{hostname}/{judgingId}")]
         [RequestSizeLimit(1 << 30)]
         [RequestFormLimits2(1 << 30)]
@@ -137,7 +137,7 @@ namespace SatelliteSite.PolygonModule.Apis
             [FromForm] UpdateCompilation model,
             [FromServices] IMediator mediator)
         {
-            var request = new UpdateCompilationRequest(model, judgingId, hostname);
+            var request = new UpdateCompilationRequest(model.compile_success, model.output_compile, judgingId, hostname);
             var result = await mediator.Send(request);
             if (result == null) return BadRequest();
             return Ok();
@@ -163,7 +163,10 @@ namespace SatelliteSite.PolygonModule.Apis
             [FromServices] IMediator mediator)
         {
             if (batch is null) return BadRequest();
-            var request = new AddJudgingRunRequest(hostname, judgingId, batch);
+            var request = new AddJudgingRunRequest(
+                hostname: hostname,
+                judgingid: judgingId,
+                batchParser: (j, t) => batch.Select(b => b.ParseInfo(j, t)));
             var result = await mediator.Send(request);
             if (result) return Ok(); else return BadRequest();
         }
@@ -180,11 +183,12 @@ namespace SatelliteSite.PolygonModule.Apis
         [Consumes("application/x-www-form-urlencoded")]
         [AuditPoint(AuditlogType.InternalError)]
         public async Task<ActionResult<int>> InternalError(
-            [FromForm] InternalErrorOccurrence model,
+            [FromForm] InternalErrorModel model,
             [FromServices] IMediator mediator)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var (ie, disable) = await mediator.Send(model);
+            var request = new InternalErrorOccurrence(model.description, model.judgehostlog, model.disabled, model.cid, model.judgingid);
+            var (ie, disable) = await mediator.Send(request);
             await HttpContext.AuditAsync("added", $"{ie.Id}", $"for {disable.Kind}");
             return ie.Id;
         }

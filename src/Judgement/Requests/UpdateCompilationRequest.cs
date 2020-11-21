@@ -13,10 +13,10 @@ namespace Polygon.Judgement
 
         public int JudgingId { get; }
 
-        public UpdateCompilationRequest(UpdateCompilation model, int jid, string host)
+        public UpdateCompilationRequest(int succ, string outp, int jid, string host)
         {
-            Success = model.compile_success;
-            CompilerOutput = model.output_compile;
+            Success = succ;
+            CompilerOutput = outp;
             Judgehost = host;
             JudgingId = jid;
         }

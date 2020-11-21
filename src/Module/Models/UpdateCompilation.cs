@@ -1,4 +1,4 @@
-﻿namespace Polygon.Judgement
+﻿namespace SatelliteSite.PolygonModule.Models
 {
     public class UpdateCompilation
     {
@@ -10,6 +10,6 @@
         /// <summary>
         /// Output contents from compiler
         /// </summary>
-        public string output_compile { get; set; } = string.Empty;
+        public string output_compile { get; set; }
     }
 }

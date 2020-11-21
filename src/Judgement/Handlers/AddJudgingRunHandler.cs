@@ -24,17 +24,16 @@ namespace Polygon.Judgement
 
             var (judging, pid, cid, uid, time) = (js.j, js.ProblemId, js.ContestId, js.TeamId, js.Time);
 
-            foreach (var run in request.Batch)
+            foreach (var (run, output_run, output_error) in request.Batch(request.JudgingId, host.PollTime!.Value))
             {
-                var detail = await Facade.Judgings.InsertAsync(
-                    run.ParseInfo(request.JudgingId, host.PollTime!.Value));
+                var detail = await Facade.Judgings.InsertAsync(run);
 
-                if (run.output_error != null || run.output_run != null)
+                if (output_error != null || output_run != null)
                 {
                     try
                     {
-                        var stderr = Convert.FromBase64String(run.output_error ?? string.Empty);
-                        var stdout = Convert.FromBase64String(run.output_run ?? string.Empty);
+                        var stderr = Convert.FromBase64String(output_error ?? string.Empty);
+                        var stdout = Convert.FromBase64String(output_run ?? string.Empty);
                         await Facade.Judgings.SetRunFileAsync(judging.Id, detail.Id, "out", stdout);
                         await Facade.Judgings.SetRunFileAsync(judging.Id, detail.Id, "err", stderr);
                     }

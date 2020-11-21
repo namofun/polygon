@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Polygon.Entities;
+using System;
 using System.Collections.Generic;
 
 namespace Polygon.Judgement
@@ -9,13 +11,14 @@ namespace Polygon.Judgement
 
         public int JudgingId { get; }
 
-        public List<JudgingRunModel> Batch { get; }
+        public Func<int, DateTimeOffset, IEnumerable<(JudgingRun, string? Output, string? Error)>> Batch { get; }
 
-        public AddJudgingRunRequest(string hostname, int jid, List<JudgingRunModel> batch)
+        public AddJudgingRunRequest(string hostname, int judgingid,
+            Func<int, DateTimeOffset, IEnumerable<(JudgingRun, string? Output, string? Error)>> batchParser)
         {
             HostName = hostname;
-            JudgingId = jid;
-            Batch = batch;
+            JudgingId = judgingid;
+            Batch = batchParser;
         }
     }
 }

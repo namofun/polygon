@@ -9,70 +9,70 @@ namespace Polygon.Judgement
     public class NextJudging
     {
         [JsonPropertyName("submitid")]
-        public int SubmissionId { get; }
+        public int SubmissionId { get; set; }
 
         [JsonPropertyName("cid")]
-        public int ContestId { get; }
+        public int ContestId { get; set; }
 
         [JsonPropertyName("teamid")]
-        public int TeamId { get; }
+        public int TeamId { get; set; }
 
         [JsonPropertyName("probid")]
-        public int ProblemId { get; }
+        public int ProblemId { get; set; }
 
         [JsonPropertyName("langid")]
-        public string LanguageId { get; }
+        public string LanguageId { get; set; }
 
         [JsonPropertyName("rejudgingid")]
-        public int? RejudgingId { get; }
+        public int? RejudgingId { get; set; }
 
         [JsonPropertyName("entry_point")]
-        public string? EntryPoint { get; }
+        public string? EntryPoint { get; set; }
 
         [JsonPropertyName("origsubmitid")]
-        public int? OriginalSubmissionId { get; }
+        public int? OriginalSubmissionId { get; set; }
 
         [JsonPropertyName("maxruntime")]
-        public double MaxRunTime { get; }
+        public double MaxRunTime { get; set; }
 
         [JsonPropertyName("memlimit")]
-        public int MemoryLimit { get; }
+        public int MemoryLimit { get; set; }
 
         [JsonPropertyName("outputlimit")]
-        public int OutputLimit { get; }
+        public int OutputLimit { get; set; }
 
         [JsonPropertyName("run")]
-        public string Run { get; }
+        public string Run { get; set; }
 
         [JsonPropertyName("compare")]
-        public string Compare { get; }
+        public string Compare { get; set; }
 
         [JsonPropertyName("compare_args")]
-        public string CompareArguments { get; }
+        public string CompareArguments { get; set; }
 
         [JsonPropertyName("compile_script")]
-        public string Compile { get; }
+        public string Compile { get; set; }
 
         [JsonPropertyName("combined_run_compare")]
-        public bool CombinedRunCompare { get; }
+        public bool CombinedRunCompare { get; set; }
 
         [JsonPropertyName("compare_md5sum")]
-        public string CompareMd5sum { get; }
+        public string CompareMd5sum { get; set; }
 
         [JsonPropertyName("run_md5sum")]
-        public string RunMd5sum { get; }
+        public string RunMd5sum { get; set; }
 
         [JsonPropertyName("compile_script_md5sum")]
-        public string CompileMd5sum { get; }
+        public string CompileMd5sum { get; set; }
 
         [JsonPropertyName("judgingid")]
-        public int JudgingId { get; }
+        public int JudgingId { get; set; }
 
         [JsonPropertyName("full_judge")]
-        public bool FullJudge { get; }
+        public bool FullJudge { get; set; }
 
         [JsonPropertyName("testcases")]
-        public Dictionary<string, TestcaseToJudge> Testcases { get; }
+        public Dictionary<string, TestcaseToJudge> Testcases { get; set; }
 
         public NextJudging(JudgingBeginEvent r, Dictionary<string, string> md5s, List<Testcase> testcases)
         {
