@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Polygon.Entities;
 using Polygon.Models;
+using Polygon.Storages;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -78,11 +79,9 @@ namespace Polygon.Judgement
 
             if (model.JudgingId.HasValue)
             {
-                var js = await Facade.Judgings.FindAsync(
-                    predicate: j => j.Id == model.JudgingId.Value,
-                    selector: j => new { j, j.s.ProblemId, j.s.ContestId, j.s.TeamId, j.s.Time });
-                if (js == null) throw new InvalidOperationException("Unknown Error Occurred.");
-                var request = new ReturnToQueueRequest(js.j, js.ContestId, js.ProblemId, js.TeamId, js.Time);
+                var (j, p, c, u, t) = await Facade.Judgings.FindAsync(model.JudgingId.Value);
+                if (j == null) throw new InvalidOperationException("Unknown Error Occurred.");
+                var request = new ReturnToQueueRequest(j, c, p, u, t);
                 await Handle(request, cancellationToken);
             }
 

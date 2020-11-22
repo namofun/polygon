@@ -7,6 +7,6 @@ namespace Polygon.Storages
         /// <summary>
         /// The problem ID associated with problem related roles
         /// </summary>
-        public int? ProblemId { get; }
+        public int? ProblemId { get; set; }
     }
 }

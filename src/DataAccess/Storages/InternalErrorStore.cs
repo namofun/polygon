@@ -41,8 +41,8 @@ namespace Polygon.Storages
         Task<IPagedList<InternalError>> IInternalErrorStore.ListAsync(int page, int count)
         {
             return InternalErrors
-                .Select(e => new InternalError(e.Id, e.Status, e.Time, e.Description))
                 .OrderByDescending(e => e.Id)
+                .Select(e => new InternalError(e.Id, e.Status, e.Time, e.Description))
                 .ToPagedListAsync(page, count);
         }
 

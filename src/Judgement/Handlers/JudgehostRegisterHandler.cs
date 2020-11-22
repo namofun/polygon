@@ -21,14 +21,13 @@ namespace Polygon.Judgement
                     new Judgehost
                     {
                         ServerName = hostname,
-                        PollTime = DateTimeOffset.Now,
                         Active = true,
                     });
 
                 await Auditlogger.LogAsync(
                     type: AuditlogType.Judgehost,
                     userName: request.UserName,
-                    now: item.PollTime!.Value,
+                    now: DateTimeOffset.Now,
                     action: "registered",
                     target: hostname,
                     extra: $"on {request.Ip}",
@@ -38,7 +37,7 @@ namespace Polygon.Judgement
                     dependencyTypeName: "JudgeHost",
                     dependencyName: item.ServerName,
                     data: "registed",
-                    startTime: item.PollTime!.Value,
+                    startTime: DateTimeOffset.Now,
                     duration: TimeSpan.Zero,
                     success: true);
 
@@ -46,7 +45,6 @@ namespace Polygon.Judgement
             }
             else
             {
-                await Facade.Judgehosts.NotifyPollAsync(item);
                 var stat = new List<UnfinishedJudging>();
 
                 var oldJudgings = await Facade.Judgings.ListAsync(

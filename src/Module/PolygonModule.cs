@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Markdig;
+using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -52,11 +54,90 @@ namespace SatelliteSite.PolygonModule
             services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TRole, TContext>>();
             services.AddPolygonStorage<PolygonFacade<TUser, TRole, TContext>>();
             services.AddPolygonPackaging();
+            services.AddMarkdown();
+
+            services.AddMediatR(
+                typeof(Polygon.Judgement.DOMjudgeLikeHandlers),
+                typeof(Polygon.Storages.Handlers.Auditlogging));
 
             services.AddPolygonFileDirectory().Configure<IWebHostEnvironment>((options, environment) =>
             {
                 options.JudgingDirectory = Path.Combine(environment.ContentRootPath, "Runs");
                 options.ProblemDirectory = Path.Combine(environment.ContentRootPath, "Problems");
+            });
+        }
+
+        public override void RegisterMenu(IMenuContributor menus)
+        {
+            menus.Submenu(MenuNameDefaults.DashboardConfigurations, menu =>
+            {
+                menu.HasEntry(400)
+                    .HasTitle(string.Empty, "Problems")
+                    .HasLink("Dashboard", "Problems", "List")
+                    .RequireRoles("Administrator,Problem");
+
+                menu.HasEntry(401)
+                    .HasTitle(string.Empty, "Executables")
+                    .HasLink("Dashboard", "Executables", "List")
+                    .RequireRoles("Administrator");
+
+                menu.HasEntry(402)
+                    .HasTitle(string.Empty, "Judgehosts")
+                    .HasLink("Dashboard", "Judgehosts", "List")
+                    .RequireRoles("Administrator");
+
+                menu.HasEntry(403)
+                    .HasTitle(string.Empty, "Internal Errors")
+                    .HasLink("Dashboard", "InternalErrors", "List")
+                    .RequireRoles("Administrator");
+
+                menu.HasEntry(404)
+                    .HasTitle(string.Empty, "Languages")
+                    .HasLink("Dashboard", "Languages", "List")
+                    .RequireRoles("Administrator");
+
+                menu.HasEntry(405)
+                    .HasTitle(string.Empty, "Submissions")
+                    .HasLink("Dashboard", "Problems", "Status")
+                    .RequireRoles("Administrator");
+            });
+
+            menus.Submenu(MenuNameDefaults.DashboardDocuments, menu =>
+            {
+                menu.HasEntry(150)
+                    .HasTitle(string.Empty, "DOMjudge Judgehost API")
+                    .HasLink("/api/doc/domjudge");
+            });
+
+            menus.Menu(MenuNameDefaults.DashboardNavbar, menu =>
+            {
+                menu.HasSubmenu(100, menu =>
+                {
+                    menu.HasLink("#")
+                        .HasTitle("fas fa-gavel", "Judgings")
+                        .RequireRoles("Administrator")
+                        .HasBadge("num-alerts-judgehosts", BootstrapColor.warning)
+                        .HasBadge("num-alerts-internalerrors", BootstrapColor.danger)
+                        .ActiveWhenController("Judgehosts,InternalErrors");
+
+                    menu.HasEntry(0)
+                        .HasIdentifier("menu_judgehosts")
+                        .HasLink("Dashboard", "Judgehosts", "List")
+                        .HasTitle("fas fa-server fa-fw", "judgehosts")
+                        .HasBadge("num-alerts-judgehosts-sub", BootstrapColor.warning);
+
+                    menu.HasEntry(1)
+                        .HasIdentifier("menu_internal_error")
+                        .HasLink("Dashboard", "InternalErrors", "List")
+                        .HasTitle("fas fa-bolt fa-fw", "internal error")
+                        .HasBadge("num-alerts-internalerrors-sub", BootstrapColor.warning);
+                });
+
+                menu.HasEntry(300)
+                    .HasTitle("fas fa-book-open", "Problems")
+                    .HasLink("Dashboard", "Problems", "List")
+                    .ActiveWhenController("Problems")
+                    .RequireRoles("Administrator,Problem");
             });
         }
     }

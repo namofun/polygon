@@ -1,0 +1,41 @@
+﻿@model InternalError
+@{
+    ViewData["Title"] = "Internal error e" + Model.Id;
+    ViewData["RefreshSpan"] = 15;
+}
+
+@section Header {
+    <h2 class="mt-2">Internal error e@(Model.Id)</h2>
+}
+
+<table class="table table-sm table-striped" role="grid" style="width:auto">
+    <tbody>
+        <tr role="row">
+            <th>Description</th>
+            <td>@Model.Description</td>
+        </tr>
+        <tr role="row">
+            <th>Time</th>
+            <td>@Model.Time</td>
+        </tr>
+        <tr role="row">
+            <th>Status</th>
+            <td>@Model.Status</td>
+        </tr>
+        <tr role="row">
+            <th>Affect</th>
+            <td>Disabled @Model.Disabled</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 class="text-left mt-4">Judgehost log snippet</h4>
+<snippet base64="@Model.JudgehostLog" />
+
+@if (Model.Status == InternalErrorStatus.Open)
+{
+<p class="mt-3">
+    <a asp-action="Mark" asp-route-todo="resolve" class="btn btn-success"><i class="fas fa-check"></i> Mark as resolved and re-enable</a>
+    <a asp-action="Mark" asp-route-todo="ignore" class="btn btn-danger"><i class="fas fa-times"></i> Mark as ignored</a>
+</p>
+}
