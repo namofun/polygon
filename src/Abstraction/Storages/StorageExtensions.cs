@@ -200,6 +200,7 @@ namespace Polygon.Storages
             entity.Md5sumOutput = output.ToMD5().ToHexDigest(true);
             entity.InputLength = (int)input.Length;
             entity.OutputLength = (int)output.Length;
+            entity.Rank = 1 + await store.CountAsync(entity.ProblemId);
 
             await store.CreateAsync(entity);
 
