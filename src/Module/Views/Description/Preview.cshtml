@@ -1,0 +1,33 @@
+﻿
+<link rel="stylesheet" href="~/lib/katex/katex.min.css" />
+<script defer src="~/lib/katex/katex.min.js"></script>
+<script defer src="~/lib/clipboard-js/clipboard.min.js"></script>
+
+<div class="row ml-lg-0 mr-lg-0">
+    <div class="col-lg-7 order-lg-0 order-1" style="max-width:50em">
+        <div class="mt-3">
+            @Html.Raw((string)ViewBag.Content)
+        </div>
+    </div>
+    <div class="col-lg-3 order-lg-1 order-0">
+        <div class="card mt-lg-4 mt-2" style="min-width:15em">
+            <div class="card-header">
+                Operations
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Current: <b>@ViewBag.Current</b></li>
+                    <li><a asp-route-new="false">Public version</a></li>
+                    <li><a asp-route-new="true">Preview version</a></li>
+                    <li class="mt-3"><a asp-action="Markdown" asp-route-target="description" target="_blank">Description</a></li>
+                    <li><a asp-action="Markdown" asp-route-target="inputdesc" target="_blank">Input Specification</a></li>
+                    <li><a asp-action="Markdown" asp-route-target="outputdesc" target="_blank">Output Specification</a></li>
+                    <li><a asp-action="Markdown" asp-route-target="interact" target="_blank">Interaction Protocol</a></li>
+                    <li><a asp-action="Markdown" asp-route-target="hint" target="_blank">Hint</a></li>
+                    <li class="mt-3"><a asp-action="Generate">Generate HTML</a></li>
+                    <li><a asp-action="GenerateLatex">Generate LaTeX</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

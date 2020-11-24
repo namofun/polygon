@@ -1,0 +1,28 @@
+﻿@model ChangeExpectedModel
+@{
+    ViewData["Title"] = "Changed expected verdict";
+    Layout = "_WindowLayout";
+    List<Language> langs = ViewBag.Languages;
+    var sels = langs.Select(a => new SelectListItem(a.Name, a.Id));
+}
+
+<div class="form-group">
+    <label class="required" asp-for="Verdict">Expected verdict</label>
+    <select asp-for="Verdict" required class="form-control custom-select form-control">
+        <option value="-1">-- no expected --</option>
+        <option value="0">Unknown</option>
+        <option value="1">Time Limit Exceeded</option>
+        <option value="2">Memory Limit Exceeded</option>
+        <option value="3">Runtime Error</option>
+        <option value="5">Wrong Answer</option>
+        <option value="11">Accepted</option>
+    </select>
+</div>
+<div class="form-group">
+    <label class="required" asp-for="Language"></label>
+    <select asp-for="Language" required class="form-control custom-select form-control" asp-items="sels"></select>
+</div>
+
+@section Footer {
+    <button asp-action="ChangeExpected" type="submit" class="btn-primary btn">Save</button>
+}

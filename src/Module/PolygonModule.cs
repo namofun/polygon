@@ -139,6 +139,29 @@ namespace SatelliteSite.PolygonModule
                     .ActiveWhenController("Problems")
                     .RequireRoles("Administrator,Problem");
             });
+
+            menus.Menu("Menu_PolygonNavBar", menu =>
+            {
+                menu.HasEntry(1)
+                    .HasTitle("fas fa-lightbulb", "Description")
+                    .HasLink("Polygon", "Description", "Preview")
+                    .ActiveWhenController("Description");
+
+                menu.HasEntry(2)
+                    .HasTitle("fas fa-compass", "Testcases")
+                    .HasLink("Polygon", "Testcases", "Testcases")
+                    .ActiveWhenController("Testcases");
+
+                menu.HasEntry(3)
+                    .HasTitle("fas fa-file-code", "Submissions")
+                    .HasLink("Polygon", "Submissions", "List")
+                    .ActiveWhenController("Submissions");
+
+                menu.HasEntry(4)
+                    .HasTitle("fas fa-arrow-right", "Catalog")
+                    .HasLink("Dashboard", "Problems", "List")
+                    .RequireRoles("Administrator,Problem");
+            });
         }
     }
 }

@@ -47,6 +47,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 return Forbid();
 
             Problem = await Facade.Problems.FindAsync(pid);
+            ViewData["ProblemItself"] = Problem;
             return Problem == null ? base.NotFound() : null;
         }
 

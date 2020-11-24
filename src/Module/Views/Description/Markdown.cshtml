@@ -1,0 +1,38 @@
+﻿@model MarkdownModel
+@{
+    ViewData["Title"] = $"Markdown {Model.Target}@{Model.BackingStore}";
+}
+
+<h2 class="mt-2 mb-3">@ViewData["Title"]</h2>
+<link rel="stylesheet" href="~/lib/editor-md/css/editormd.css" />
+<script src="~/lib/editor-md/editormd.js"></script>
+
+<form method="post" class="setting-form-group">
+    <input type="hidden" asp-for="BackingStore" />
+    <input type="hidden" asp-for="Target" />
+
+    <div style="height:600px">
+        <div id="editormd"><textarea style="display:none;" asp-for="Markdown"></textarea></div>
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+            var editor = editormd({
+                id: "editormd",
+                path: "/lib/editor-md/lib/",
+                tex: true,
+                imageUpload: true,
+                imageFormats: ["jpg", "jpeg", "gif", "png", "svg"],
+                imageUploadURL: "/api/static/images-upload?type=p&id=@(ViewBag.ProblemId)",
+            });
+            editormd.katexURL = {
+                js: "/lib/katex/katex.min",
+                css: "/lib/katex/katex.min"
+            };
+        });
+    </script>
+
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

@@ -1,0 +1,87 @@
+﻿@model IPagedList<Solution>
+@{
+    ViewData["Title"] = "Submissions";
+    List<Testcase> tc = ViewBag.Testcase;
+    bool showAll = ViewBag.All;
+}
+
+<h2 class="mt-2">Submissions</h2>
+
+<div class="d-none" id="paging">
+    <pagination bs-current-page="Model.CurrentPage" bs-total-page="Model.TotalPage" />
+</div>
+
+<div class="table-wrapper">
+    <table class="data-table table table-sm table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col" class="sortable searchable">ID</th>
+                <th scope="col" class="sortable searchable">time</th>
+                <th scope="col" class="sortable searchable">expected</th>
+                <th scope="col" class="sortable searchable">user</th>
+                <th scope="col" class="sortable searchable">lang</th>
+                <th scope="col" class="sortable searchable">run</th>
+                <th scope="col" class="sortable searchable">result</th>
+                <th scope="col">test results</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sub in Model)
+            {
+                <tr asp-action="Detail" asp-route-sid="@sub.SubmissionId" data-toggle="gotoUrl">
+                    <td data-sort="@(sub.SubmissionId)" use-a>s@(sub.SubmissionId)</td>
+                    <td use-a>@Html.CstTime(sub.Time)</td>
+                    <td use-a><verdict3 value="@(sub.ExpectedVerdict ?? Verdict.Unknown)" too-late="@(!sub.ExpectedVerdict.HasValue)" /></td>
+                    <td use-a>@sub.AuthorName</td>
+                    <td use-a class="langid">@sub.Language</td>
+                    <td use-a>@(sub.ExecutionTime.HasValue ? $"{sub.ExecutionTime}ms" : "N/A")</td>
+                    <td use-a><verdict3 value="@sub.Verdict" /></td>
+                    <td class="testcase-results">
+                        @{
+                            int t = 0;
+                            bool jp = sub.Verdict == Verdict.Pending || sub.Verdict == Verdict.Running;
+                            foreach (var item in tc)
+                            {
+                                t++;
+                                var de = sub.Details.SingleOrDefault(d => d.TestcaseId == item.Id);
+                                if (de != null) {<verdict6 value="@de.Status" tooltip="#@item.Rank, desc: @item.Description, runtime: @(de.ExecuteTime)ms." />}
+                                else {<verdict6 value="Pending" judging-pending="jp" tooltip="#@item.Rank, desc: @item.Description, not used." />}
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <a asp-action="Submit" data-toggle="ajaxWindow" data-target="submitCode" class="btn btn-success"><i class="fas fa-cloud-upload-alt"></i>&nbsp;Submit</a>
+    <a asp-action="Rejudge" class="btn btn-secondary" data-toggle="ajaxWindow" data-target="rejudgeProb"><i class="fas fa-sync"></i>&nbsp;Rejudge</a>
+</p>
+
+<script>
+    $().ready(function () {
+        $('.data-table').DataTable({
+            "paging": false,
+            "searching": true,
+            "ordering": true,
+            "order": [[0, 'asc']],
+            "info": false,
+            "autoWidth": false,
+            "language": {
+                "searchPlaceholder": "filter table",
+                "search": "_INPUT_",
+            },
+            'aoColumnDefs': [
+                { aTargets: ['sortable'], bSortable: true },
+                { aTargets: ['searchable'], bSearchable: true },
+                { aTargets: ['_all'], bSortable: false, bSearchable: false }
+            ],
+        });
+
+        $('[data-toggle="tooltip"]').tooltip();
+        $('.dataTables_wrapper .row:first-child .col-md-6:first-child').html($('#paging').html());
+        $('.dataTables_wrapper .pagination-sm').addClass('mb-0');
+    });
+</script>

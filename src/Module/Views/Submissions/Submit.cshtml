@@ -1,0 +1,61 @@
+﻿@model CodeSubmitModel
+@{
+    ViewData["Title"] = "Submit";
+    Layout = "_WindowLayout";
+    List<Language> lang = ViewBag.Language;
+    var lang2 = lang.Select(k => new SelectListItem(k.Name, k.Id));
+    ViewData["MaxWidth"] = "800px";
+}
+
+<div class="form-group">
+    <label class="required" asp-for="Language">Language</label>
+    <select asp-for="Language" asp-items="lang2" id="submit-lang" required class="form-control custom-select form-control">
+        <option value="" selected>Select a language</option>
+    </select>
+</div>
+<div class="form-group">
+    <script src="~/lib/ace/ace.js"></script>
+    <label class="required" asp-for="Code"></label>
+    <textarea id="codearea" asp-for="Code" hidden="hidden" required></textarea>
+    <div id="editor0" class="form-control"></div>
+</div>
+
+@section Footer {
+    <button asp-action="Submit" type="submit" class="btn-success btn">
+        <i class="fas fa-cloud-upload-alt"></i> Submit
+    </button>
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('form[name="form-@ViewData["HandleKey"]"]').on('submit', function () {
+                var question =
+                    'Language: ' + $('#submit-lang').find('option:selected').text() + '\n' +
+                    '\nMake submission?';
+                return confirm(question);
+            });
+        });
+
+        var editor0 = ace.edit("editor0");
+        editor0.setOptions({ maxLines: @(ViewData.ContainsKey("InAjax") ? 13 : 50), minLines: 13 });
+        editor0.setTheme("ace/theme/eclipse");
+        editor0.session.on('change', function () {
+            $('#codearea').val(editor0.session.getValue());
+        });
+
+        function setEditorMode(lang) {
+            editor0.session.setMode({ path: lang, v: Date.now() });
+        }
+
+        var langlist = {
+            '': '', 'c': 'c_cpp', 'cpp': 'c_cpp', 'java': 'java',
+            'py2': 'python', 'py3': 'python', 'pas': 'pascal', 'csharp': 'csharp',
+            'kt': 'kotlin', 'pl': 'perl', 'f95': 'fortran'
+        };
+
+        $('#submit-lang').on('change', function () {
+            setEditorMode("ace/mode/" + langlist[$(this).val()]);
+        });
+    </script>
+}
