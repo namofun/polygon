@@ -11,6 +11,9 @@
     <Version>1.0.0</Version>
     <PackageVersion>1.0.$(PreviewBuild)</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
 </Project>
