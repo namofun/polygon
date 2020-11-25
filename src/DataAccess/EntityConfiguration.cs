@@ -24,7 +24,7 @@ namespace Polygon.Storages
         IEntityTypeConfiguration<Submission>,
         IEntityTypeConfiguration<SubmissionStatistics>,
         IEntityTypeConfiguration<Testcase>
-        where TContext : DbContext
+        where TContext : DbContext, ISolutionAuthorQueryable
         where TUser : SatelliteSite.IdentityModule.Entities.User
         where TRole : SatelliteSite.IdentityModule.Entities.Role, IRoleWithProblem
     {

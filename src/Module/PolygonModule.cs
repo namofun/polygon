@@ -29,7 +29,7 @@ namespace SatelliteSite.PolygonModule
     public class PolygonModule<TUser, TRole, TContext> : AbstractModule
         where TUser : User, new()
         where TRole : Role, IRoleWithProblem, new()
-        where TContext : IdentityDbContext<TUser, TRole, int>
+        where TContext : IdentityDbContext<TUser, TRole, int>, ISolutionAuthorQueryable
     {
         public override string Area => "Polygon";
 

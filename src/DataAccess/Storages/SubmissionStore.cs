@@ -65,25 +65,10 @@ namespace Polygon.Storages
                 .SingleOrDefaultAsync();
         }
 
-        Task<Dictionary<int, string>> ISubmissionStore.GetAuthorNamesAsync(Expression<Func<Submission, bool>> sids)
+        async Task<Dictionary<int, string>> ISubmissionStore.GetAuthorNamesAsync(Expression<Func<Submission, bool>> sids)
         {
-            throw new NotImplementedException();
-
-            /*var query =
-                from s in sids
-                join u in Context.Set<User>() on new { s.ContestId, s.Author } equals new { ContestId = 0, Author = u.Id }
-                into uu
-                from u in uu.DefaultIfEmpty()
-                join t in Context.Set<Team>() on new { s.ContestId, s.Author } equals new { t.ContestId, Author = t.TeamId }
-                into tt
-                from t in tt.DefaultIfEmpty()
-                select new { s.SubmissionId, s.ContestId, s.Author, u.UserName, t.TeamName };
-
-            return query.ToDictionaryAsync(
-                keySelector: r => r.SubmissionId,
-                elementSelector: r => r.ContestId == 0
-                    ? $"{r.UserName ?? "SYSTEM"} (u{r.Author})"
-                    : $"{r.TeamName ?? "CONTEST"} (c{r.ContestId}t{r.Author})");*/
+            var query = await Context.Author(sids).ToListAsync();
+            return query.ToDictionary(s => s.SubmissionId, s => s.ToString());
         }
 
         Task<SubmissionFile> ISubmissionStore.GetFileAsync(int submissionId)
