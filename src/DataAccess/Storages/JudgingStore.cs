@@ -40,10 +40,10 @@ namespace Polygon.Storages
                 .Where(t => t.ProblemId == problemId)
                 .OrderBy(t => t.Rank)
                 .GroupJoin(
-                    inner: Context.Set<JudgingRun>(),
+                    inner: Context.Set<JudgingRun?>(),
                     outerKeySelector: t => new { TestcaseId = t.Id, JudgingId = judgingId },
-                    innerKeySelector: d => new { d.TestcaseId, d.JudgingId },
-                    resultSelector: (t, dd) => new { t, dd = (IEnumerable<JudgingRun?>)dd })
+                    innerKeySelector: d => new { d!.TestcaseId, d!.JudgingId },
+                    resultSelector: (t, dd) => new { t, dd })
                 .SelectMany(
                     collectionSelector: a => a.dd.DefaultIfEmpty(),
                     resultSelector: _selector);
