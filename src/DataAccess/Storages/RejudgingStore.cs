@@ -11,6 +11,8 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TUser, TRole, TContext> : IRejudgingStore
     {
+        private static readonly ConcurrentAsyncLock _beingRejudged = new ConcurrentAsyncLock();
+
         DbSet<Rejudging> Rejudgings => Context.Set<Rejudging>();
 
         async Task IRejudgingStore.ApplyAsync(Rejudging rejudge, int uid)
@@ -151,11 +153,9 @@ namespace Polygon.Storages
                 from r in Rejudgings
                 where r.ContestId == cid && r.Id == rjid
                 join u in Context.Set<TUser>() on r.IssuedBy equals u.Id
-                into uu1
-                from u1 in uu1.DefaultIfEmpty()
+                into uu1 from u1 in uu1.DefaultIfEmpty()
                 join u in Context.Set<TUser>() on r.OperatedBy equals u.Id
-                into uu2
-                from u2 in uu2.DefaultIfEmpty()
+                into uu2 from u2 in uu2.DefaultIfEmpty()
                 select new Rejudging(r, u1.UserName, u2.UserName);
             return query.SingleOrDefaultAsync();
         }
@@ -166,11 +166,9 @@ namespace Polygon.Storages
                 from r in Rejudgings
                 where r.ContestId == contestId
                 join u in Context.Set<TUser>() on r.IssuedBy equals u.Id
-                into uu1
-                from u1 in uu1.DefaultIfEmpty()
+                into uu1 from u1 in uu1.DefaultIfEmpty()
                 join u in Context.Set<TUser>() on r.OperatedBy equals u.Id
-                into uu2
-                from u2 in uu2.DefaultIfEmpty()
+                into uu2 from u2 in uu2.DefaultIfEmpty()
                 select new Rejudging(r, u1.UserName, u2.UserName);
             var model = await query.ToListAsync();
 
@@ -199,24 +197,29 @@ namespace Polygon.Storages
         async Task IRejudgingStore.RejudgeAsync(Submission sub, bool fullTest)
         {
             if (sub.ExpectedResult != null) fullTest = true;
+            Judging currentJudging;
 
-            var currentJudging = await Judgings
-                .Where(j => j.SubmissionId == sub.Id && j.Active)
-                .SingleAsync();
-
-            currentJudging.Active = false;
-            fullTest = fullTest || currentJudging.FullTest;
-            Judgings.Update(currentJudging);
-
-            Judgings.Add(new Judging
+            using (await _beingRejudged.LockAsync(sub.Id))
             {
-                SubmissionId = sub.Id,
-                FullTest = fullTest,
-                Active = true,
-                Status = Verdict.Pending,
-            });
+                currentJudging = await Judgings
+                    .Where(j => j.SubmissionId == sub.Id && j.Active)
+                    .SingleAsync();
 
-            await Context.SaveChangesAsync();
+                currentJudging.Active = false;
+                fullTest = fullTest || currentJudging.FullTest;
+                Judgings.Update(currentJudging);
+
+                Judgings.Add(new Judging
+                {
+                    SubmissionId = sub.Id,
+                    FullTest = fullTest,
+                    Active = true,
+                    Status = Verdict.Pending,
+                    PreviousJudgingId = currentJudging.Id,
+                });
+
+                await Context.SaveChangesAsync();
+            }
 
             var (cid, tid, pid, acc) = (
                 sub.ContestId, sub.TeamId, sub.ProblemId,

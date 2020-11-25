@@ -84,7 +84,7 @@ namespace SatelliteSite.PolygonModule.Apis
         [HttpPut("{hostname}")]
         [Authorize(Roles = "Administrator")]
         [AuditPoint(AuditlogType.Judgehost)]
-        public async Task<ActionResult<IEnumerable<JudgehostInfo>>> OnPut(
+        public async Task<ActionResult<JudgehostInfo[]>> OnPut(
             [FromRoute] string hostname, bool active,
             [FromServices] IJudgehostStore store)
         {
