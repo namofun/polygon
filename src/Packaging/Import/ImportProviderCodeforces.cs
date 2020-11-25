@@ -198,9 +198,10 @@ namespace Polygon.Packaging
                 if (test.Attribute("method").Value == "generated")
                     str += "; " + test.Attribute("cmd").Value;
 
-                using var ins = inp.Open();
-                using var outs = outp.Open();
-                await ctx.AddAsync(ins, outs, str, 0, attr2?.Value != "true", $"{fileName}.{{,a}}");
+                await ctx.AddAsync(
+                    input: (() => inp.Open(), inp.Length),
+                    output: (() => outp.Open(), outp.Length),
+                    str, 0, attr2?.Value != "true", $"{fileName}.{{,a}}");
             }
         }
 

@@ -184,30 +184,31 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="store">The store.</param>
         /// <param name="entity">The entity.</param>
-        /// <param name="input">The input file.</param>
-        /// <param name="output">The output file.</param>
+        /// <param name="inputFactory">The stream factory for input file.</param>
+        /// <param name="inputLength">The input file length.</param>
+        /// <param name="outputFactory">The stream factory for output file.</param>
+        /// <param name="outputLength">The output file length.</param>
         /// <returns>The created entity.</returns>
-        public static async Task<Testcase> CreateAsync(this ITestcaseStore store, Testcase entity, Stream input, Stream output)
+        public static async Task<Testcase> CreateAsync(
+            this ITestcaseStore store,
+            Testcase entity,
+            Func<Stream> inputFactory, long inputLength,
+            Func<Stream> outputFactory, long outputLength)
         {
-            if (!input.CanSeek || !output.CanSeek)
-            {
-                throw new InvalidOperationException("The type of input and output is not correct.");
-            }
-
-            input.Seek(0, SeekOrigin.Begin);
-            output.Seek(0, SeekOrigin.End);
-            entity.Md5sumInput = input.ToMD5().ToHexDigest(true);
-            entity.Md5sumOutput = output.ToMD5().ToHexDigest(true);
-            entity.InputLength = (int)input.Length;
-            entity.OutputLength = (int)output.Length;
+            using (var input = inputFactory())
+                entity.Md5sumInput = input.ToMD5().ToHexDigest(true);
+            using (var output = outputFactory())
+                entity.Md5sumOutput = output.ToMD5().ToHexDigest(true);
+            entity.InputLength = (int)inputLength;
+            entity.OutputLength = (int)outputLength;
             entity.Rank = 1 + await store.CountAsync(entity.ProblemId);
 
             await store.CreateAsync(entity);
 
-            input.Seek(0, SeekOrigin.Begin);
-            output.Seek(0, SeekOrigin.End);
-            await store.SetFileAsync(entity, "in", input);
-            await store.SetFileAsync(entity, "out", output);
+            using (var input = inputFactory())
+                await store.SetFileAsync(entity, "in", input);
+            using (var output = outputFactory())
+                await store.SetFileAsync(entity, "out", output);
 
             return entity;
         }

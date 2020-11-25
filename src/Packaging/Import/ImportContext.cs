@@ -94,24 +94,29 @@ namespace Polygon.Packaging
                     usedParts += ",point";
                 }
 
-                using var ins = inp.Open();
-                using var outs = outp.Open();
-                await AddAsync(ins, outs, descp, pnt, isSecret, $"{prefix}{file}.{{{usedParts}}}");
+                await AddAsync(
+                    input: (() => inp.Open(), inp.Length),
+                    output: (() => outp.Open(), outp.Length),
+                    descp, pnt, isSecret, $"{prefix}{file}.{{{usedParts}}}");
             }
         }
 
         public static async Task<ImportContext> CreateAsync(IPolygonFacade facade, Action<string> log, Problem problem)
         {
+            problem.TagName ??= string.Empty;
+            problem.Source ??= string.Empty;
             problem = await facade.Problems.CreateAsync(problem);
             log($"Problem p{problem.Id} created.");
             return new ImportContext(facade, log, problem);
         }
 
-        public async Task<Testcase> AddAsync(Stream input, Stream output, string desc, int point, bool isSecret, string from)
+        public async Task<Testcase> AddAsync((Func<Stream>, long) input, (Func<Stream>, long) output, string desc, int point, bool isSecret, string from)
         {
             var tc = await Facade.Testcases.CreateAsync(
-                input: input,
-                output: output,
+                inputFactory: input.Item1,
+                inputLength: input.Item2,
+                outputFactory: output.Item1,
+                outputLength: output.Item2,
                 entity: new Testcase
                 {
                     IsSecret = isSecret,
@@ -127,9 +132,12 @@ namespace Polygon.Packaging
 
         public async Task<Testcase> AddAsync(MemoryTestcase test, bool isSecret)
         {
-            using var input = new MemoryStream(Encoding.UTF8.GetBytes(test.Input));
-            using var output = new MemoryStream(Encoding.UTF8.GetBytes(test.Output));
-            return await AddAsync(input, output, test.Description, test.Point, isSecret, "memory");
+            var input = Encoding.UTF8.GetBytes(test.Input);
+            var output = Encoding.UTF8.GetBytes(test.Output);
+            return await AddAsync(
+                input: (() => new MemoryStream(input), input.Length),
+                output: (() => new MemoryStream(output), output.Length),
+                test.Description, test.Point, isSecret, "memory");
         }
 
         public Task<Submission> SubmitAsync(string code, string language, Verdict? expected = null)
