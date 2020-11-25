@@ -4,6 +4,7 @@ using Polygon.Entities;
 using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Controllers
@@ -81,17 +82,16 @@ namespace SatelliteSite.PolygonModule.Controllers
                 var last = await Store.FindAsync(tid, Problem.Id);
                 if (last == null) return NotFound();
 
+                (Func<Stream>, long)? inputf = null, outputf = null;
                 if (model.InputContent != null)
-                    using (var inputFile = model.InputContent.OpenReadStream())
-                        await Store.SetInputAsync(last, inputFile);
+                    inputf = (() => model.InputContent.OpenReadStream(), model.InputContent.Length);
                 if (model.OutputContent != null)
-                    using (var outputFile = model.OutputContent.OpenReadStream())
-                        await Store.SetOutputAsync(last, outputFile);
+                    outputf = (() => model.OutputContent.OpenReadStream(), model.OutputContent.Length);
 
                 last.Description = model.Description ?? last.Description;
                 last.IsSecret = model.IsSecret;
                 last.Point = model.Point;
-                await Store.UpdateAsync(last);
+                await Store.UpdateAsync(last, inputf, outputf);
 
                 await HttpContext.AuditAsync("modified", $"p{last.ProblemId}t{last.Id}");
                 StatusMessage = $"Testcase t{tid} updated successfully.";
@@ -129,11 +129,11 @@ namespace SatelliteSite.PolygonModule.Controllers
 
             try
             {
-                using var inputFile = model.InputContent.OpenReadStream();
-                using var outputFile = model.OutputContent.OpenReadStream();
-
                 var e = await Store.CreateAsync(
-                    input: inputFile, output: outputFile,
+                    inputFactory: () => model.InputContent.OpenReadStream(),
+                    inputLength: model.InputContent.Length,
+                    outputFactory: () => model.OutputContent.OpenReadStream(),
+                    outputLength: model.OutputContent.Length,
                     entity: new Testcase
                     {
                         Description = model.Description ?? "1",

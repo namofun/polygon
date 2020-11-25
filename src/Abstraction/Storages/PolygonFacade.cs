@@ -36,23 +36,6 @@ namespace Polygon.Storages
         IRejudgingStore Rejudgings { get; }
     }
 
-    /// <summary>
-    /// The big facade interface with one implemention.
-    /// </summary>
-    public interface IPolygonFacade2 :
-        IPolygonFacade,
-        IProblemStore,
-        ITestcaseStore,
-        ISubmissionStore,
-        IExecutableStore,
-        IInternalErrorStore,
-        IJudgehostStore,
-        IJudgingStore,
-        ILanguageStore,
-        IRejudgingStore
-    {
-    }
-
     /// <inheritdoc cref="IPolygonFacade" />
     internal class CompositePolygonFacade : IPolygonFacade
     {

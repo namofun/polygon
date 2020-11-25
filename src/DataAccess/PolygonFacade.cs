@@ -4,8 +4,13 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    /// <inheritdoc cref="IPolygonFacade2" />
-    public partial class PolygonFacade<TUser, TRole, TContext> : IPolygonFacade2
+    /// <summary>
+    /// The big facade interface with one implemention.
+    /// </summary>
+    /// <typeparam name="TUser">The user type.</typeparam>
+    /// <typeparam name="TRole">The role type.</typeparam>
+    /// <typeparam name="TContext">The context type.</typeparam>
+    public partial class PolygonFacade<TUser, TRole, TContext> : IPolygonFacade
         where TContext : DbContext
         where TUser : SatelliteSite.IdentityModule.Entities.User
         where TRole : SatelliteSite.IdentityModule.Entities.Role, IRoleWithProblem

@@ -195,20 +195,21 @@ namespace Polygon.Storages
             Func<Stream> inputFactory, long inputLength,
             Func<Stream> outputFactory, long outputLength)
         {
-            using (var input = inputFactory())
-                entity.Md5sumInput = input.ToMD5().ToHexDigest(true);
-            using (var output = outputFactory())
-                entity.Md5sumOutput = output.ToMD5().ToHexDigest(true);
-            entity.InputLength = (int)inputLength;
-            entity.OutputLength = (int)outputLength;
+            using var input = await (inputFactory, inputLength).CreateAsync();
+            using var output = await (outputFactory, outputLength).CreateAsync();
+
+            entity.Md5sumInput = await input.Md5HashAsync();
+            entity.Md5sumOutput = await output.Md5HashAsync();
+            entity.InputLength = (int)input.Length;
+            entity.OutputLength = (int)output.Length;
             entity.Rank = 1 + await store.CountAsync(entity.ProblemId);
 
             await store.CreateAsync(entity);
 
-            using (var input = inputFactory())
-                await store.SetFileAsync(entity, "in", input);
-            using (var output = outputFactory())
-                await store.SetFileAsync(entity, "out", output);
+            using (var inputs = input.OpenRead())
+                await store.SetFileAsync(entity, "in", inputs);
+            using (var outputs = output.OpenRead())
+                await store.SetFileAsync(entity, "out", outputs);
 
             return entity;
         }
@@ -236,47 +237,50 @@ namespace Polygon.Storages
         }
 
         /// <summary>
-        /// Set the testcase input file.
-        /// </summary>
-        /// <param name="store">The store.</param>
-        /// <param name="testcase">The testcase.</param>
-        /// <param name="source">The source.</param>
-        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
-        public static async Task<IFileInfo> SetInputAsync(this ITestcaseStore store, Testcase testcase, Stream source)
-        {
-            if (!source.CanSeek)
-            {
-                throw new InvalidOperationException("The type of file is not correct.");
-            }
-
-            source.Seek(0, SeekOrigin.Begin);
-            testcase.InputLength = (int)source.Length;
-            testcase.Md5sumInput = source.ToMD5().ToHexDigest(true);
-            await store.UpdateAsync(testcase);
-            source.Seek(0, SeekOrigin.Begin);
-            return await store.SetFileAsync(testcase, "in", source);
-        }
-
-        /// <summary>
         /// Set the testcase output file.
         /// </summary>
         /// <param name="store">The store.</param>
         /// <param name="testcase">The testcase.</param>
-        /// <param name="source">The source.</param>
-        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
-        public static async Task<IFileInfo> SetOutputAsync(this ITestcaseStore store, Testcase testcase, Stream source)
+        /// <param name="inputf">The input file.</param>
+        /// <param name="outputf">The output file.</param>
+        /// <returns>The task for updating testcase.</returns>
+        public static async Task UpdateAsync(
+            this ITestcaseStore store,
+            Testcase testcase,
+            (Func<Stream>, long)? inputf,
+            (Func<Stream>, long)? outputf)
         {
-            if (!source.CanSeek)
+            IStream2? input = null, output = null;
+
+            if (inputf != null)
             {
-                throw new InvalidOperationException("The type of file is not correct.");
+                input = await inputf.Value.CreateAsync();
+                testcase.Md5sumInput = await input.Md5HashAsync();
+                testcase.InputLength = (int)input.Length;
             }
 
-            source.Seek(0, SeekOrigin.Begin);
-            testcase.OutputLength = (int)source.Length;
-            testcase.Md5sumOutput = source.ToMD5().ToHexDigest(true);
+            if (outputf != null)
+            {
+                output = await outputf.Value.CreateAsync();
+                testcase.Md5sumOutput = await output.Md5HashAsync();
+                testcase.OutputLength = (int)output.Length;
+            }
+
             await store.UpdateAsync(testcase);
-            source.Seek(0, SeekOrigin.Begin);
-            return await store.SetFileAsync(testcase, "out", source);
+
+            if (input != null)
+            {
+                using (var inputs = input.OpenRead())
+                    await store.SetFileAsync(testcase, "in", inputs);
+                input.Dispose();
+            }
+
+            if (output != null)
+            {
+                using (var outputs = output.OpenRead())
+                    await store.SetFileAsync(testcase, "out", outputs);
+                output.Dispose();
+            }
         }
 
         /// <summary>
@@ -285,22 +289,40 @@ namespace Polygon.Storages
         /// <typeparam name="TFacade">The facade implemention type.</typeparam>
         /// <param name="services">The service collection.</param>
         /// <returns>The service collection.</returns>
-        public static IServiceCollection AddPolygonStorage<TFacade>(this IServiceCollection services) where TFacade : class, IPolygonFacade2
+        public static IServiceCollection AddPolygonStorage<TFacade>(this IServiceCollection services)
+            where TFacade : class, IPolygonFacade,
+                            IProblemStore, ITestcaseStore, ISubmissionStore,
+                            IExecutableStore, IInternalErrorStore, IJudgehostStore,
+                            IJudgingStore, ILanguageStore, IRejudgingStore
         {
             return services
-                .AddScoped<IPolygonFacade2, TFacade>()
-                .AddScoped<IPolygonFacade>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<IExecutableStore>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<IInternalErrorStore>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<IJudgehostStore>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<IJudgingStore>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<ILanguageStore>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<IProblemStore>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<IRejudgingStore>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<ISubmissionStore>(s => s.GetRequiredService<IPolygonFacade2>())
-                .AddScoped<ITestcaseStore>(s => s.GetRequiredService<IPolygonFacade2>());
+                .AddScoped<TFacade>()
+                .AddScoped<IPolygonFacade>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<IExecutableStore>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<IInternalErrorStore>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<IJudgehostStore>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<IJudgingStore>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<ILanguageStore>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<IProblemStore>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<IRejudgingStore>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<ISubmissionStore>(s => s.GetRequiredService<TFacade>())
+                .AddScoped<ITestcaseStore>(s => s.GetRequiredService<TFacade>());
         }
 
+        /// <summary>
+        /// Add polygon facade implemention.
+        /// </summary>
+        /// <typeparam name="TExecutableStore">The executable store implemention type.</typeparam>
+        /// <typeparam name="TInternalErrorStore">The internal error store implemention type.</typeparam>
+        /// <typeparam name="TJudgehostStore">The judgehost store implemention type.</typeparam>
+        /// <typeparam name="TJudgingStore">The judging store implemention type.</typeparam>
+        /// <typeparam name="TLanguageStore">The language store implemention type.</typeparam>
+        /// <typeparam name="TProblemStore">The problem store implemention type.</typeparam>
+        /// <typeparam name="TRejudgingStore">The rejudging store implemention type.</typeparam>
+        /// <typeparam name="TSubmissionStore">The submission store implemention type.</typeparam>
+        /// <typeparam name="TTestcaseStore">The testcase store implemention type.</typeparam>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The service collection.</returns>
         public static IServiceCollection AddPolygonStorage<
             TExecutableStore, TInternalErrorStore, TJudgehostStore,
             TJudgingStore, TLanguageStore, TProblemStore,
