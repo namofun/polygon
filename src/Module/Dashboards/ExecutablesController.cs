@@ -152,7 +152,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
             {
                 await Store.DeleteAsync(exec);
                 StatusMessage = $"Executable {execid} deleted successfully.";
-                await HttpContext.AuditAsync(execid, "delete");
+                await HttpContext.AuditAsync("deleted", execid);
             }
             catch
             {

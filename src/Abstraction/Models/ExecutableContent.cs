@@ -20,6 +20,23 @@
         /// </summary>
         public int Flags { get; set; }
 
+        /// <summary>
+        /// Infer the file name for source file.
+        /// </summary>
+        /// <returns>The inferred file name.</returns>
+        public string GetDummyFileName()
+        {
+            string dummyFileName = FileName;
+
+            if (!System.IO.Path.HasExtension(dummyFileName) &&
+                (FileContent.StartsWith("#!/bin/sh") || FileContent.StartsWith("#!/bin/bash")))
+            {
+                dummyFileName += ".sh";
+            }
+
+            return dummyFileName;
+        }
+
 #pragma warning disable CS8618
         /// <summary>
         /// Construct an empty content.
