@@ -36,7 +36,7 @@
                 <td use-a style="padding-right:1em">j@(g.Id) s@(g.SubmissionId)</td>
                 <td use-a>@Html.CstTime(g.StartTime)</td>
                 <td use-a>@Html.MinSecTimespan(g.StopTime - g.StartTime)</td>
-                <td use-a><verdict3 value="@g.Status" /></td>
+                <td use-a><verdict value="@g.Status" /></td>
                 <td use-a>@(g.Active ? "Yes" : "No")</td>
             </tr>
         }

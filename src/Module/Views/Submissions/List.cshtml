@@ -31,11 +31,11 @@
                 <tr asp-action="Detail" asp-route-sid="@sub.SubmissionId" data-toggle="gotoUrl">
                     <td data-sort="@(sub.SubmissionId)" use-a>s@(sub.SubmissionId)</td>
                     <td use-a>@Html.CstTime(sub.Time)</td>
-                    <td use-a><verdict3 value="@(sub.ExpectedVerdict ?? Verdict.Unknown)" too-late="@(!sub.ExpectedVerdict.HasValue)" /></td>
+                    <td use-a><verdict value="@(sub.ExpectedVerdict ?? Verdict.Unknown)" too-late="@(!sub.ExpectedVerdict.HasValue)" /></td>
                     <td use-a>@sub.AuthorName</td>
                     <td use-a class="langid">@sub.Language</td>
                     <td use-a>@(sub.ExecutionTime.HasValue ? $"{sub.ExecutionTime}ms" : "N/A")</td>
-                    <td use-a><verdict3 value="@sub.Verdict" /></td>
+                    <td use-a><verdict value="@sub.Verdict" /></td>
                     <td class="testcase-results">
                         @{
                             int t = 0;
@@ -44,8 +44,8 @@
                             {
                                 t++;
                                 var de = sub.Details.SingleOrDefault(d => d.TestcaseId == item.Id);
-                                if (de != null) {<verdict6 value="@de.Status" tooltip="#@item.Rank, desc: @item.Description, runtime: @(de.ExecuteTime)ms." />}
-                                else {<verdict6 value="Pending" judging-pending="jp" tooltip="#@item.Rank, desc: @item.Description, not used." />}
+                                if (de != null) {<verdict-badge value="@de.Status" tooltip="#@item.Rank, desc: @item.Description, runtime: @(de.ExecuteTime)ms." />}
+                                else {<verdict-badge value="Pending" judging-pending="jp" tooltip="#@item.Rank, desc: @item.Description, not used." />}
                             }
                         }
                     </td>
