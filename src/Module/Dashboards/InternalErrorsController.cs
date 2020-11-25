@@ -12,8 +12,9 @@ namespace SatelliteSite.PolygonModule.Dashboards
     [AuditPoint(Entities.AuditlogType.InternalError)]
     public class InternalErrorsController : ViewControllerBase
     {
-        private IInternalErrorStore Store { get; }
-        public InternalErrorsController(IInternalErrorStore store) => Store = store;
+        private IPolygonFacade Facade { get; }
+        private IInternalErrorStore Store => Facade.InternalErrors;
+        public InternalErrorsController(IPolygonFacade facade) => Facade = facade;
 
 
         [HttpGet]
@@ -22,12 +23,9 @@ namespace SatelliteSite.PolygonModule.Dashboards
             return View(await Store.ListAsync());
         }
 
-        
+
         [HttpGet("{eid}/{todo}")]
-        public async Task<IActionResult> Mark(int eid, string todo,
-            [FromServices] IProblemStore problems,
-            [FromServices] IJudgehostStore judgehosts,
-            [FromServices] ILanguageStore languages)
+        public async Task<IActionResult> Mark(int eid, string todo)
         {
             var ie = await Store.FindAsync(eid);
             if (ie is null) return NotFound();
@@ -48,11 +46,11 @@ namespace SatelliteSite.PolygonModule.Dashboards
                 {
                     var kind = toDisable.Kind;
                     if (kind == "language")
-                        await languages.ToggleJudgeAsync(toDisable.Language, true);
+                        await Facade.Languages.ToggleJudgeAsync(toDisable.Language, true);
                     else if (kind == "judgehost")
-                        await judgehosts.ToggleAsync(toDisable.HostName, true);
+                        await Facade.Judgehosts.ToggleAsync(toDisable.HostName, true);
                     else if (kind == "problem")
-                        await problems.ToggleJudgeAsync(toDisable.ProblemId.Value, true);
+                        await Facade.Problems.ToggleJudgeAsync(toDisable.ProblemId.Value, true);
                 }
 
                 await HttpContext.AuditAsync($"mark as {todo}d", $"{eid}");

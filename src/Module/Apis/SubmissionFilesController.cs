@@ -16,7 +16,6 @@ namespace SatelliteSite.PolygonModule.Apis
     [Route("[area]/contests/{cid}/submissions")]
     [Authorize(AuthenticationSchemes = "Basic")]
     [Authorize(Roles = "Administrator,Judgehost,CDS")]
-    [Produces("application/json")]
     public class SubmissionFilesController : ApiControllerBase
     {
         /// <summary>
@@ -55,6 +54,7 @@ namespace SatelliteSite.PolygonModule.Apis
         /// <param name="store"></param>
         /// <response code="200">The files for the submission</response>
         [HttpGet("{sid}/[action]")]
+        [Produces("application/json")]
         public async Task<ActionResult<SubmissionFile[]>> SourceCode(
             [FromRoute] int cid,
             [FromRoute] int sid,

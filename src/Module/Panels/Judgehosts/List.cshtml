@@ -3,6 +3,7 @@
     ViewData["Title"] = "Judgehosts";
     ViewData["RefreshSpan"] = 5;
     if (ViewData.ContainsKey("InAjax")) { Layout = null; }
+    Dictionary<string, (double, double, double)> loads = ViewBag.Load;
 }
 
 @section Header {
@@ -17,7 +18,7 @@
                 <th scope="col">active</th>
                 <th style="min-width:5em" scope="col">last check in</th>
                 <th scope="col">restriction</th>
-                <!--<th title="Load in 5m, 2h, 2d" style="min-width:5em" scope="col">load</th>-->
+                <th title="Load in 5m, 2h, 2d" style="min-width:5em" scope="col">load</th>
                 <th></th>
             </tr>
         </thead>
@@ -32,15 +33,16 @@
                     : ("danger", "times", Html.AutoUnitTimespan(lastCheckAgo.Value) + " ago");
 
                 var (todoIcon, todoStr, curState) = host.Active ? ("pause", "deactivate", "yes") : ("play", "activate", "no");
-                //var load = loads.ContainsKey(host.ServerId) ? loads[host.ServerId] : default((int, int, int));
-                <tr asp-action="Detail" asp-route-hostname="@host.ServerName" role="row" data-target="gotoUrl" class="@(host.Active ? "" : "disabled")">
-                    <td use-a class="text-monospace">@host.ServerName</td>
-                    <td use-a>@curState</td>
-                    <td use-a title="@host.PollTime"><i class="text-@statStr fas fa-@statIcon-circle"></i> @lastUnit</td>
-                    <td use-a><i>none</i></td>
-                    <!--<td>@@load.Item3, @@load.Item2, @@load.Item1</td>-->
-                    <td><a asp-action="Toggle" asp-route-hostname="@host.ServerName" asp-route-tobe="@todoStr" title="@todoStr judgehost"><i class="fas fa-@todoIcon"></i></a></td>
-                </tr>
+                var load = loads.GetValueOrDefault(host.ServerName, (double.NaN, double.NaN, double.NaN));
+            <tr asp-action="Detail" asp-route-hostname="@host.ServerName" role="row" data-target="gotoUrl" class="@(host.Active ? "" : "disabled")">
+                <td use-a class="text-monospace">@host.ServerName</td>
+                <td use-a>@curState</td>
+                <td use-a title="@host.PollTime"><i class="text-@statStr fas fa-@statIcon-circle"></i> @lastUnit</td>
+                <td use-a><i>none</i></td>
+                <td use-a asp-show-if="double.IsNaN(load.Item1)" class="disabled">N/A</td>
+                <td use-a asp-show-if="!double.IsNaN(load.Item1)">@($"{load.Item1:F2} {load.Item2:F2} {load.Item3:F2}")</td>
+                <td><a asp-action="Toggle" asp-route-hostname="@host.ServerName" asp-route-tobe="@todoStr" title="@todoStr judgehost"><i class="fas fa-@todoIcon"></i></a></td>
+            </tr>
             }
         </tbody>
     </table>

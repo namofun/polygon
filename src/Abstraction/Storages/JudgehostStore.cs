@@ -33,6 +33,12 @@ namespace Polygon.Storages
         Task<List<Judgehost>> ListAsync();
 
         /// <summary>
+        /// Get the system load for judgehosts in 5m, 2h, 2d.
+        /// </summary>
+        /// <returns>The load task.</returns>
+        Task<Dictionary<string, (double, double, double)>> LoadAsync();
+
+        /// <summary>
         /// Find the entity.
         /// </summary>
         /// <param name="name">The entity id.</param>

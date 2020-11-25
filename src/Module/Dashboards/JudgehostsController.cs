@@ -18,6 +18,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
         [HttpGet]
         public async Task<IActionResult> List()
         {
+            ViewBag.Load = await Store.LoadAsync();
             return View(await Store.ListAsync());
         }
 
@@ -33,7 +34,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
             ViewBag.Judgings = await judgings.ListAsync(j => j.Server == hostname, j => j, 100);
             return View();
         }
-        
+
 
         [HttpGet("{hostname}/{tobe}")]
         public async Task<IActionResult> Toggle(string hostname, string tobe)

@@ -12,7 +12,7 @@
             <tr><th>Name</th><td><span class="hostname">@host.ServerName</span></td></tr>
             <tr><th>Active</th><td>@(host.Active ? "Yes" : "No")</td></tr>
             <tr><th>Restriction</th><td><i>None</i></td></tr>
-            <tr><th>Status</th><td>Last checked in @Html.CstTime(host.PollTime)</td></tr>
+            <tr><th>Status</th><td asp-show-if="!host.PollTime.HasValue">Never checked in</td><td asp-show-if="host.PollTime.HasValue">Last checked in @Html.CstTime(host.PollTime)</td></tr>
         </table>
     </div>
 </div>
@@ -38,6 +38,12 @@
                 <td use-a>@Html.MinSecTimespan(g.StopTime - g.StartTime)</td>
                 <td use-a><verdict value="@g.Status" /></td>
                 <td use-a>@(g.Active ? "Yes" : "No")</td>
+            </tr>
+        }
+        @if (!judgings.Any())
+        {
+            <tr>
+                <td colspan="5" class="text-center">No data available.</td>
             </tr>
         }
     </tbody>
