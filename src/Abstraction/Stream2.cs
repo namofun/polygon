@@ -100,9 +100,9 @@ namespace System.IO
             _length = len;
         }
 
-        public static async Task<IStream2> CreateAsync(Stream source)
+        public static async Task<IStream2> CreateAsync(Stream source, long length)
         {
-            int len = checked((int)source.Length);
+            int len = checked((int)length);
             var stream = new RentMemoryStream2(len);
             for (int i = 0; i < len;)
                 i += await source.ReadAsync(stream._rentMemory!, i, len - i);
@@ -162,7 +162,7 @@ namespace System.IO
             if (stream.Item2 > 10 * 1024 * 1024)
                 return await TemporaryFileStream2.CreateAsync(s);
             else
-                return await RentMemoryStream2.CreateAsync(s);
+                return await RentMemoryStream2.CreateAsync(s, stream.Item2);
         }
     }
 }
