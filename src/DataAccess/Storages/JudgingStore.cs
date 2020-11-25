@@ -26,7 +26,7 @@ namespace Polygon.Storages
 
         Task<T> IJudgingStore.FindAsync<T>(Expression<Func<Judging, bool>> predicate, Expression<Func<Judging, T>> selector)
         {
-            return Judgings.Where(predicate).Select(selector).SingleOrDefaultAsync();
+            return Judgings.Where(predicate).OrderBy(j => j.Id).Select(selector).FirstOrDefaultAsync();
         }
 
         async Task<IEnumerable<T>> IJudgingStore.GetDetailsAsync<T>(int problemId, int judgingId, Expression<Func<Testcase, JudgingRun?, T>> selector)

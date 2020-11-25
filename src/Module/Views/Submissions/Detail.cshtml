@@ -43,6 +43,12 @@
     <a asp-action="RejudgeOne" class="btn btn-outline-primary btn-sm"><i class="fas fa-sync"></i> Rejudge</a>
 </div>
 
+<script src="~/lib/ace/ace.js"></script>
+<script src="~/lib/ace/ext-modelist.js"></script>
+<link rel="stylesheet" href="~/lib/nvd3/nv.d3.min.css" />
+<script src="~/lib/d3/d3.min.js"></script>
+<script src="~/lib/nvd3/nv.d3.min.js"></script>
+
 <div class="submission-summary mb-2">
     <span>
         <i class="fas fa-user" title="Author:"></i>
@@ -89,15 +95,15 @@
                     <td use-a>
                         @if (judging.Id == Model.JudgingId)
                         {<i class="fas fa-long-arrow-alt-right"></i>}
-                </td>
-                <td use-a>j@(judging.Id)</td>
-                <td use-a>@subTime?.ToString("HH:mm")</td>
-                <td use-a>@(judging.ExecuteTime.HasValue ? $"{judging.ExecuteTime.Value}ms" : "N/A")</td>
-                <td use-a>@(judging.ExecuteMemory.HasValue ? $"{judging.ExecuteMemory.Value}K" : "N/A")</td>
-                <td use-a><span class="hostname">@(judging.Server ?? "-")</span></td>
-                <td use-a><verdict value="@judging.Status" class="@(judging.Active ? "" : "disabled")" /></td>
-            </tr>
-        }
+                    </td>
+                    <td use-a>j@(judging.Id)</td>
+                    <td use-a>@subTime?.ToString("HH:mm")</td>
+                    <td use-a>@(judging.ExecuteTime.HasValue ? $"{judging.ExecuteTime.Value}ms" : "N/A")</td>
+                    <td use-a>@(judging.ExecuteMemory.HasValue ? $"{judging.ExecuteMemory.Value}K" : "N/A")</td>
+                    <td use-a><span class="hostname">@(judging.Server ?? "-")</span></td>
+                    <td use-a><verdict value="@judging.Status" class="@(judging.Active ? "" : "disabled")" /></td>
+                </tr>
+            }
         </tbody>
     </table>
 
@@ -144,9 +150,12 @@
     <table asp-show-if="Model.Verdict != Verdict.CompileError">
         <tr>
             <td>testcase runs: </td>
-            <td>@foreach (var (d, t) in Model.DetailsV2) {<a title="#@t.Rank, @(d == null ? "unknown" : $"runtime: {d.ExecuteTime}ms, result: {d.Status}")" href="#run-@t.Rank" onclick="@if (d?.Status == Verdict.Accepted) {@("display_correctruns(true);")}"><verdict-badge value="@(d?.Status ?? Verdict.Pending)" /></a>}</td>
-        </tr>
-    </table>
+            <td>
+                @foreach (var (d, t) in Model.DetailsV2)
+                {<a title="#@t.Rank, @(d == null ? "unknown" : $"runtime: {d.ExecuteTime}ms, result: {d.Status}")" href="#run-@t.Rank" onclick="@if (d?.Status == Verdict.Accepted) {@("display_correctruns(true);")}"><verdict-badge value="@(d?.Status ?? Verdict.Pending)" /></a>}
+        </td>
+    </tr>
+</table>
 </div>
 
 <h3>
@@ -169,7 +178,7 @@
             : Model.CombinedRunCompare
             ? "_SubmissionDetailInteractive"
             : "_SubmissionDetailOutput";
-        <partial name="@type" model="dt" />
+        <wpartial name="@type" model="dt" />
     }
 }
 

@@ -17,8 +17,8 @@ using System.IO;
 
 [assembly: ConfigurationInteger(1, "Judging", "process_limit", 64, "Maximum number of processes that the submission is allowed to start (including shell and possibly interpreters).")]
 [assembly: ConfigurationInteger(2, "Judging", "script_timelimit", 30, "Maximum seconds available for compile/compare scripts. This is a safeguard against malicious code and buggy scripts, so a reasonable but large amount should do.")]
-[assembly: ConfigurationInteger(3, "Judging", "script_memory_limit", 30, "Maximum memory usage (in kB) by compile/compare scripts. This is a safeguard against malicious code and buggy script, so a reasonable but large amount should do.")]
-[assembly: ConfigurationInteger(4, "Judging", "script_filesize_limit", 30, "Maximum filesize (in kB) compile/compare scripts may write. Submission will fail with compiler-error when trying to write more, so this should be greater than any *intermediate or final* result written by compilers.")]
+[assembly: ConfigurationInteger(3, "Judging", "script_memory_limit", 2097152, "Maximum memory usage (in kB) by compile/compare scripts. This is a safeguard against malicious code and buggy script, so a reasonable but large amount should do.")]
+[assembly: ConfigurationInteger(4, "Judging", "script_filesize_limit", 540672, "Maximum filesize (in kB) compile/compare scripts may write. Submission will fail with compiler-error when trying to write more, so this should be greater than any *intermediate or final* result written by compilers.")]
 [assembly: ConfigurationString(5, "Judging", "timelimit_overshoot", "1s|10%", "Time that submissions are kept running beyond timelimit before being killed. Specify as \"Xs\" for X seconds, \"Y%\" as percentage, or a combination of both separated by one of \"+|&\" for the sum, maximum, or minimum of both.")]
 [assembly: ConfigurationInteger(6, "Judging", "output_storage_limit", 60000, "Maximum size of error/system output stored in the database (in bytes); use \"-1\" to disable any limits.")]
 [assembly: ConfigurationInteger(7, "Judging", "diskspace_error", 1048576, "Minimum free disk space (in kB) on judgehosts.")]
