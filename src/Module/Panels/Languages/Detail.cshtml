@@ -1,21 +1,23 @@
-﻿@{
-    Language lang = ViewBag.Language;
-    IEnumerable<Solution> subs = ViewBag.Submissions;
-    ViewData["Title"] = "Language " + lang.Name;
+﻿@model Language
+@{
+    IPagedList<Solution> subs = ViewBag.Submissions;
+    Dictionary<int, string> authors = ViewBag.Authors;
+    Dictionary<int, string> problems = ViewBag.Problems;
+    ViewData["Title"] = "Language " + Model.Name;
 }
 
-<h2 class="mt-2">Language @lang.Name</h2>
+<h2 class="mt-2">@ViewData["Title"]</h2>
 
 <div class="row">
     <div class="col-lg-4">
         <table class="table table-sm table-striped">
-            <tr><th>ID</th><td>@lang.Id</td></tr>
-            <tr><th>Name</th><td>@lang.Name</td></tr>
+            <tr><th>ID</th><td>@Model.Id</td></tr>
+            <tr><th>Name</th><td>@Model.Name</td></tr>
             <tr>
                 <th>Allow submit</th>
                 <td>
-                    @(lang.AllowSubmit ? "Yes" : "No")
-                    <form asp-action="ToggleSubmit" asp-route-langid="@lang.Id" method="post" class="d-inline">
+                    @(Model.AllowSubmit ? "Yes" : "No")
+                    <form asp-action="ToggleSubmit" asp-route-langid="@Model.Id" method="post" class="d-inline">
                         <input type="hidden" name="allow_submit" value="" />
                         <input type="submit" class="btn btn-sm btn-outline-secondary" value="toggle" />
                     </form>
@@ -24,25 +26,25 @@
             <tr>
                 <th>Allow judge</th>
                 <td>
-                    @(lang.AllowJudge ? "Yes" : "No")
-                    <form asp-action="ToggleJudge" asp-route-langid="@lang.Id" method="post" class="d-inline">
+                    @(Model.AllowJudge ? "Yes" : "No")
+                    <form asp-action="ToggleJudge" asp-route-langid="@Model.Id" method="post" class="d-inline">
                         <input type="hidden" name="allow_judge" value="" />
                         <input type="submit" class="btn btn-sm btn-outline-secondary" value="toggle" />
                     </form>
                 </td>
             </tr>
-            <tr><th>Time factor</th><td>@lang.TimeFactor &times;</td></tr>
-            <tr><th>Compile script</th><td><a asp-controller="Executables" asp-action="Detail" asp-route-execid="@lang.CompileScript">@lang.CompileScript</a></td></tr>
-            <tr><th>File Extension</th><td>Main.@lang.FileExtension</td></tr>
+            <tr><th>Time factor</th><td>@Model.TimeFactor &times;</td></tr>
+            <tr><th>Compile script</th><td><a asp-controller="Executables" asp-action="Detail" asp-route-execid="@Model.CompileScript">@Model.CompileScript</a></td></tr>
+            <tr><th>File Extension</th><td>Main.@Model.FileExtension</td></tr>
         </table>
     </div>
 </div>
 
 <p>
-    <a asp-action="Edit" asp-route-langid="@lang.Id" class="btn btn-primary" title="Edit"><i class="fas fa-edit"></i>&nbsp;Edit</a>
+    <a asp-action="Edit" asp-route-langid="@Model.Id" class="btn btn-primary" title="Edit"><i class="fas fa-edit"></i>&nbsp;Edit</a>
 </p>
 
-<h3>Submissions in @lang.Name</h3>
+<h3>Submissions in @Model.Name <span data-toggle="tooltip" title="@subs.TotalCount total, showing top 100">(partial)</span></h3>
 
 <table class="data-table table table-hover table-striped table-sm submissions-table table-responsive" role="grid">
     <thead class="thead-light">
@@ -60,8 +62,8 @@
         {
             <tr asp-area="Polygon" asp-controller="Submissions" asp-action="Detail" asp-route-pid="@md.ProblemId" asp-route-sid="@md.SubmissionId" role="row">
                 <td use-a>s@(md.SubmissionId)</td>
-                <td use-a>@(md.ContestId == 0 ? $"u{md.TeamId}" : $"c{md.ContestId}t{md.TeamId}")</td>
-                <td use-a>p@(md.ProblemId)</td>
+                <td use-a>@authors.GetValueOrDefault(md.SubmissionId)</td>
+                <td use-a>p@(md.ProblemId) - @problems.GetValueOrDefault(md.ProblemId)</td>
                 <td use-a>@Html.CstTime(md.Time)</td>
                 <td use-a>@(md.CodeLength)B</td>
                 <td use-a><verdict skipped="@md.Skipped" value="@md.Verdict" /></td>

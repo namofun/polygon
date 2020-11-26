@@ -75,6 +75,20 @@ namespace Polygon.Storages
         Task<IPagedList<Problem>> ListAsync(int page, int perCount, int? uid = null);
 
         /// <summary>
+        /// List problem names.
+        /// </summary>
+        /// <param name="condition">The conditions.</param>
+        /// <returns>The task for fetching names.</returns>
+        Task<Dictionary<int, string>> ListNameAsync(Expression<Func<Submission, bool>> condition);
+
+        /// <summary>
+        /// List problem names.
+        /// </summary>
+        /// <param name="condition">The conditions.</param>
+        /// <returns>The task for fetching names.</returns>
+        Task<Dictionary<int, string>> ListNameAsync(Expression<Func<Problem, bool>> condition);
+
+        /// <summary>
         /// List permitted users.
         /// </summary>
         /// <param name="pid">The problem ID.</param>

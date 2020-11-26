@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Polygon.Entities;
 using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Dashboards
@@ -13,8 +14,9 @@ namespace SatelliteSite.PolygonModule.Dashboards
     [AuditPoint(Entities.AuditlogType.Language)]
     public class LanguagesController : ViewControllerBase
     {
-        private ILanguageStore Store { get; }
-        public LanguagesController(ILanguageStore store) => Store = store;
+        private IPolygonFacade Facade { get; }
+        private ILanguageStore Store => Facade.Languages;
+        public LanguagesController(IPolygonFacade facade) => Facade = facade;
 
 
         [HttpGet]
@@ -25,16 +27,25 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet("{langid}")]
-        public async Task<IActionResult> Detail(string langid,
-            [FromServices] ISubmissionStore submissions)
+        public async Task<IActionResult> Detail(string langid)
         {
             var lang = await Store.FindAsync(langid);
             if (lang is null) return NotFound();
 
-            ViewBag.Language = lang;
-            ViewBag.Submissions = await submissions
-                .ListWithJudgingAsync(s => s.Language == langid, limits: 100);
-            return View();
+            var subs = await Facade.Submissions.ListWithJudgingAsync(
+                pagination: (1, 100),
+                predicate: s => s.Language == langid);
+
+            var maxSub = subs.Select(s => s.SubmissionId).Append(-1).Max();
+            var minSub = subs.Select(s => s.SubmissionId).Append(-1).Min();
+            ViewBag.Authors = await Facade.Submissions.GetAuthorNamesAsync(
+                sids: s => s.Language == langid && s.Id >= minSub && s.Id <= maxSub);
+
+            ViewBag.Problems = await Facade.Problems.ListNameAsync(
+                s => s.Language == langid && s.Id >= minSub && s.Id <= maxSub);
+
+            ViewBag.Submissions = subs;
+            return View(lang);
         }
 
 
@@ -65,12 +76,11 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet("{langid}/[action]")]
-        public async Task<IActionResult> Edit(string langid,
-            [FromServices] IExecutableStore executables)
+        public async Task<IActionResult> Edit(string langid)
         {
             var lang = await Store.FindAsync(langid);
             if (lang == null) return NotFound();
-            ViewBag.Executables = await executables.ListAsync("compile");
+            ViewBag.Executables = await Facade.Executables.ListAsync("compile");
 
             ViewBag.Operator = "Edit";
             return View(new LanguageEditModel
@@ -103,10 +113,9 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> Add(
-            [FromServices] IExecutableStore executables)
+        public async Task<IActionResult> Add()
         {
-            ViewBag.Executables = await executables.ListAsync("compile");
+            ViewBag.Executables = await Facade.Executables.ListAsync("compile");
             ViewBag.Operator = "Add";
             return View("Edit", new LanguageEditModel { TimeFactor = 1 });
         }

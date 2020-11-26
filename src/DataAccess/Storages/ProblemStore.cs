@@ -124,5 +124,23 @@ namespace Polygon.Storages
         {
             return ProblemFiles.WriteStreamAsync($"p{problem.Id}/{fileName}", content);
         }
+
+        Task<Dictionary<int, string>> IProblemStore.ListNameAsync(Expression<Func<Problem, bool>> condition)
+        {
+            return Problems
+                .Where(condition)
+                .Select(p => new { p.Id, p.Title })
+                .ToDictionaryAsync(p => p.Id, p => p.Title);
+        }
+
+        public Task<Dictionary<int, string>> ListNameAsync(Expression<Func<Submission, bool>> condition)
+        {
+            return Submissions
+                .Where(condition)
+                .Join(Problems, s => s.ProblemId, p => p.Id, (s, p) => p)
+                .Select(p => new { p.Id, p.Title })
+                .Distinct()
+                .ToDictionaryAsync(p => p.Id, p => p.Title);
+        }
     }
 }
