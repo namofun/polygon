@@ -79,9 +79,9 @@ namespace Polygon.Storages
                 .SingleOrDefaultAsync();
         }
 
-        async Task<IEnumerable<T>> ISubmissionStore.ListAsync<T>(Expression<Func<Submission, T>> projection, Expression<Func<Submission, bool>>? predicate)
+        Task<List<T>> ISubmissionStore.ListAsync<T>(Expression<Func<Submission, T>> projection, Expression<Func<Submission, bool>>? predicate)
         {
-            return await Submissions
+            return Submissions
                 .WhereIf(predicate != null, predicate)
                 .Select(projection)
                 .ToListAsync();
@@ -100,9 +100,9 @@ namespace Polygon.Storages
                 .ToPagedListAsync(pagination.Page, pagination.PageCount);
         }
 
-        async Task<IEnumerable<T>> ISubmissionStore.ListWithJudgingAsync<T>(Expression<Func<Submission, Judging, T>> selector, Expression<Func<Submission, bool>>? predicate, int? limits)
+        Task<List<T>> ISubmissionStore.ListWithJudgingAsync<T>(Expression<Func<Submission, Judging, T>> selector, Expression<Func<Submission, bool>>? predicate, int? limits)
         {
-            return await Submissions
+            return Submissions
                 .WhereIf(predicate != null, predicate!)
                 .OrderByDescending(s => s.Id)
                 .TakeIf(limits)
@@ -114,21 +114,12 @@ namespace Polygon.Storages
                 .ToListAsync();
         }
 
-        async Task<IEnumerable<SubmissionStatistics>> ISubmissionStore.StatisticsAsync(int contestId, int teamId)
+        Task<List<SubmissionStatistics>> ISubmissionStore.StatisticsAsync(int contestId, int teamId)
         {
-            var query =
-                from ss in SubmissionStatistics
-                where ss.TeamId == teamId && ss.ContestId == contestId
-                select new SubmissionStatistics
-                {
-                    AcceptedSubmission = ss.AcceptedSubmission,
-                    TeamId = ss.TeamId,
-                    ContestId = ss.ContestId,
-                    TotalSubmission = ss.TotalSubmission,
-                    ProblemId = ss.ProblemId
-                };
-
-            return await query.ToListAsync();
+            return SubmissionStatistics
+                .AsNoTracking()
+                .Where(s => s.TeamId == teamId && s.ContestId == contestId)
+                .ToListAsync();
         }
 
         Task ISubmissionStore.UpdateAsync(Submission entity) => UpdateEntityAsync(entity);

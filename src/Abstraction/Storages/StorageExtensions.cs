@@ -158,7 +158,7 @@ namespace Polygon.Storages
         /// <param name="includeDetails">Whether to include judging runs.</param>
         /// <param name="limits">The count to take.</param>
         /// <returns>The task for fetching solutions.</returns>
-        public static Task<IEnumerable<Models.Solution>> ListWithJudgingAsync(
+        public static Task<List<Models.Solution>> ListWithJudgingAsync(
             this ISubmissionStore that,
             Expression<Func<Submission, bool>>? predicate = null,
             bool includeDetails = false,

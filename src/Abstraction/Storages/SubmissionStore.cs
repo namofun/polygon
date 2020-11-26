@@ -85,7 +85,7 @@ namespace Polygon.Storages
         /// <param name="projection">The entity shaper.</param>
         /// <param name="predicate">The submission filter.</param>
         /// <returns>The submission list.</returns>
-        Task<IEnumerable<T>> ListAsync<T>(
+        Task<List<T>> ListAsync<T>(
             Expression<Func<Submission, T>> projection,
             Expression<Func<Submission, bool>>? predicate = null);
 
@@ -110,7 +110,7 @@ namespace Polygon.Storages
         /// <param name="predicate">The conditions.</param>
         /// <param name="limits">The count to take.</param>
         /// <returns>The task for fetching solutions.</returns>
-        Task<IEnumerable<T>> ListWithJudgingAsync<T>(
+        Task<List<T>> ListWithJudgingAsync<T>(
             Expression<Func<Submission, Judging, T>> selector,
             Expression<Func<Submission, bool>>? predicate = null,
             int? limits = null);
@@ -138,6 +138,6 @@ namespace Polygon.Storages
         /// <param name="contestId">The contest ID.</param>
         /// <param name="teamId">The team ID.</param>
         /// <returns>The task for fetching cached statistics results.</returns>
-        Task<IEnumerable<SubmissionStatistics>> StatisticsAsync(int contestId, int teamId);
+        Task<List<SubmissionStatistics>> StatisticsAsync(int contestId, int teamId);
     }
 }
