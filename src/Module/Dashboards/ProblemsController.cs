@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Polygon;
 using Polygon.Entities;
 using Polygon.Storages;
 using SatelliteSite.IdentityModule.Services;
@@ -22,15 +24,18 @@ namespace SatelliteSite.PolygonModule.Dashboards
         private IProblemStore Store => Facade.Problems;
         private IUserManager UserManager { get; }
         private ILogger<ProblemsController> Logger { get; }
+        private IOptions<PolygonOptions> Options { get; }
 
         public ProblemsController(
             IPolygonFacade facade,
             IUserManager userManager,
-            ILogger<ProblemsController> logger)
+            ILogger<ProblemsController> logger,
+            IOptions<PolygonOptions> options)
         {
             Facade = facade;
             UserManager = userManager;
             Logger = logger;
+            Options = options;
         }
 
         private async Task<bool> CreateProblemRole(int problemId)
@@ -127,7 +132,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
         [ValidateAjaxWindow]
         public IActionResult Import()
         {
-            return Window();
+            return Window(Options.Value.ImportProviders);
         }
 
 
@@ -140,9 +145,8 @@ namespace SatelliteSite.PolygonModule.Dashboards
         {
             try
             {
-                if (!Polygon.Packaging.ResourcesDictionary.ImportProviders.TryGetValue(type, out var importType))
-                    return BadRequest();
-                var importer = importType.Item2.Invoke(HttpContext.RequestServices);
+                var importer = Options.Value.CreateImportProviders(HttpContext.RequestServices, type);
+                if (importer == null) return BadRequest();
 
                 List<Problem> probs;
                 using (var stream = file.OpenReadStream())

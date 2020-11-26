@@ -59,6 +59,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 OutputLimit = Problem.OutputLimit,
                 Title = Problem.Title,
                 Shared = Problem.Shared,
+                Tags = Problem.TagName,
             });
         }
 
@@ -134,7 +135,8 @@ namespace SatelliteSite.PolygonModule.Controllers
             Problem.OutputLimit = model.OutputLimit;
             Problem.TimeLimit = model.TimeLimit;
             Problem.Title = model.Title;
-            Problem.Source = model.Source ?? "";
+            Problem.Source = model.Source ?? string.Empty;
+            Problem.TagName = model.Tags ?? string.Empty;
             Problem.CombinedRunCompare = model.RunAsCompare;
             Problem.Shared = model.Shared;
             await Store.UpdateAsync(Problem);

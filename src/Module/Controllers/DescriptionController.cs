@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Polygon;
 using Polygon.Packaging;
-using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
 using System.IO;
@@ -30,7 +30,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         [HttpGet("{target}")]
         public async Task<IActionResult> Markdown(string target)
         {
-            if (!StorageExtensions.MarkdownFiles.Contains(target))
+            if (!ResourceDictionary.MarkdownFiles.Contains(target))
                 return NotFound();
 
             var lastVersion = await ReadFileAsync($"{target}.md") ?? "";
@@ -49,7 +49,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Markdown(string target, MarkdownModel model)
         {
-            if (!StorageExtensions.MarkdownFiles.Contains(target))
+            if (!ResourceDictionary.MarkdownFiles.Contains(target))
                 return NotFound();
             if (target != model.Target || $"p{Problem.Id}" != model.BackingStore)
                 return BadRequest();

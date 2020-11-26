@@ -294,7 +294,7 @@ namespace Polygon.Packaging
             }
 
             // Load statements
-            foreach (var mdfile in StorageExtensions.MarkdownFiles)
+            foreach (var mdfile in ResourceDictionary.MarkdownFiles)
             {
                 var entry = zipArchive.GetEntry("problem_statement/" + mdfile + ".md");
                 if (entry == null) continue;

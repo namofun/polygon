@@ -1,12 +1,11 @@
-﻿using Markdig;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Polygon;
 using Polygon.Packaging;
 using Polygon.Storages;
 using SatelliteSite;
@@ -49,23 +48,43 @@ namespace SatelliteSite.PolygonModule
                 version: "v7.2.0");
         }
 
+        private static void EnsureDirectoryExists(string directory)
+        {
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+        }
+
         public override void RegisterServices(IServiceCollection services)
         {
             services.ConfigureSwaggerGen(options => options.OperationFilter<SwaggerFixFilter>());
             services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TRole, TContext>>();
             services.AddPolygonStorage<PolygonFacade<TUser, TRole, TContext>>();
-            services.AddPolygonPackaging();
-            services.AddMarkdown();
+
+            services.PostConfigure<PolygonOptions>(o =>
+            {
+                o.FinalizeSettings();
+                EnsureDirectoryExists(o.JudgingDirectory);
+                EnsureDirectoryExists(o.ProblemDirectory);
+            });
+
+            services.AddScoped<IExportProvider, KattisExportProvider>();
+            services.AddScoped<IStatementProvider, MarkdownStatementProvider>();
+            services.AddScoped<IStatementWriter, MarkdownStatementWriter>();
+
+            services.AddImportProvider<KattisImportProvider>("kattis", "Kattis Package");
+            services.AddImportProvider<XmlImportProvider>("xysxml", "XiaoYang's XML");
+            services.AddImportProvider<FpsImportProvider>("hustoj", "HUSTOJ FPS XML");
+            services.AddImportProvider<CodeforcesImportProvider>("cfplyg", "CodeForces Polygon (Linux)");
+            services.AddImportProvider<DataImportProvider>("data", "Data (.in and .out/.ans)");
 
             services.AddMediatR(
                 typeof(Polygon.Judgement.DOMjudgeLikeHandlers),
                 typeof(Polygon.Storages.Handlers.Auditlogging));
 
-            services.AddPolygonFileDirectory().Configure<IWebHostEnvironment>((options, environment) =>
-            {
-                options.JudgingDirectory = Path.Combine(environment.ContentRootPath, "Runs");
-                options.ProblemDirectory = Path.Combine(environment.ContentRootPath, "Problems");
-            });
+            services.AddSingleton<IJudgingFileProvider, ByOptionJudgingFileProvider>();
+            services.AddSingleton<IProblemFileProvider, ByOptionProblemFileProvider>();
         }
 
         public override void RegisterMenu(IMenuContributor menus)
@@ -141,7 +160,7 @@ namespace SatelliteSite.PolygonModule
                     .RequireRoles("Administrator,Problem");
             });
 
-            menus.Menu("Menu_PolygonNavBar", menu =>
+            menus.Menu(ResourceDictionary.MenuNavbar, menu =>
             {
                 menu.HasEntry(1)
                     .HasTitle("fas fa-lightbulb", "Description")
@@ -163,6 +182,8 @@ namespace SatelliteSite.PolygonModule
                     .HasLink("Dashboard", "Problems", "List")
                     .RequireRoles("Administrator,Problem");
             });
+
+            menus.Component(ResourceDictionary.ComponentProblemOverview);
         }
 
         public void RegisterPolicies(IAuthorizationPolicyContainer container)

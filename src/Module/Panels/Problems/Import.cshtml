@@ -1,4 +1,7 @@
-﻿@{ Layout = null; }
+﻿@model IReadOnlyCollection<(string Key, string Value)>
+@{
+    Layout = null;
+}
 
 <form asp-action="Import" enctype="multipart/form-data" method="post" onsubmit="ajaxpost(this,'@ViewData["HandleKey2"]','@ViewData["HandleKey"]');return false">
     <div class="modal fade" id="modal-@ViewData["HandleKey"]" tabindex="-1" role="dialog" aria-labelledby="modal-@ViewData["HandleKey"]-label" aria-hidden="true">
@@ -13,13 +16,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="mytype">Type</label>
-                        <select id="mytype" name="type" class="form-control">
-                            <option value="kattis">Kattis Package</option>
-                            <option value="xysxml">XiaoYang's XML</option>
-                            <option value="hustoj">HUSTOJ FPS XML</option>
-                            <option value="cfplyg">CodeForces Polygon (Linux)</option>
-                            <option value="data">Data</option>
-                        </select>
+                        <select id="mytype" name="type" class="form-control" asp-items="Model.Select(k => new SelectListItem(k.Value, k.Key))"></select>
                     </div>
                     <div class="form-group">
                         <label for="customFile">File</label>

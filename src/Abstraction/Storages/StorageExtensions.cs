@@ -16,18 +16,6 @@ namespace Polygon.Storages
     public static class StorageExtensions
     {
         /// <summary>
-        /// The available markdown files
-        /// </summary>
-        public static readonly string[] MarkdownFiles = new[]
-        {
-            "description",
-            "inputdesc",
-            "outputdesc",
-            "hint",
-            "interact"
-        };
-
-        /// <summary>
         /// Count the testcases.
         /// </summary>
         /// <param name="that">The store.</param>

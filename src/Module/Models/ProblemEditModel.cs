@@ -28,6 +28,9 @@ namespace SatelliteSite.PolygonModule.Models
         [DisplayName("Source")]
         public string Source { get; set; }
 
+        [DisplayName("Tags")]
+        public string Tags { get; set; }
+
         [DisplayName("Run script")]
         public string RunScript { get; set; }
 

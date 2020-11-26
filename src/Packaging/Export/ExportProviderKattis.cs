@@ -112,7 +112,7 @@ namespace Polygon.Packaging
             }
 
             // Export the statements.
-            foreach (var mdname in StorageExtensions.MarkdownFiles)
+            foreach (var mdname in ResourceDictionary.MarkdownFiles)
             {
                 var file = await Facade.Problems.GetFileAsync(problem, $"{mdname}.md");
                 if (!file.Exists) continue;

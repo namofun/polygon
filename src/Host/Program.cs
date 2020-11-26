@@ -1,9 +1,13 @@
+using Markdig;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Polygon;
 using Polygon.Entities;
 using SatelliteSite.IdentityModule.Entities;
+using System.IO;
 
 namespace SatelliteSite
 {
@@ -25,6 +29,17 @@ namespace SatelliteSite
                 .AddModule<PolygonModule.PolygonModule<User, AspNetRole, DefaultContext>>()
                 //.ConfigureServices(services => services.AddDbModelSupplier<DefaultContext, SeedConfiguration<DefaultContext>>())
                 .AddDatabaseMssql<DefaultContext>("UserDbConnection")
-                .ConfigureSubstrateDefaults<DefaultContext>();
+                .ConfigureSubstrateDefaults<DefaultContext>(builder =>
+                {
+                    builder.ConfigureServices((context, services) =>
+                    {
+                        services.AddMarkdown();
+                        services.Configure<PolygonOptions>(options =>
+                        {
+                            options.JudgingDirectory = Path.Combine(context.HostingEnvironment.ContentRootPath, "Runs");
+                            options.ProblemDirectory = Path.Combine(context.HostingEnvironment.ContentRootPath, "Problems");
+                        });
+                    });
+                });
     }
 }

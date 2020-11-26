@@ -6,6 +6,8 @@
 }
 
 <h2 class="mt-2">@ViewData["Title"]</h2>
+<script src="~/lib/ace/ace.js"></script>
+<script src="~/lib/ace/ext-modelist.js"></script>
 
 <ul class="nav nav-tabs source-tab-nav">
     @foreach (var item in Model)
@@ -23,6 +25,6 @@
     {
         int id = t2++;
         <ace class="tab-pane fade @(id == 0 ? "show active" : "")" id="source-@id" role="tabpanel"
-             file="@item.FileName" value="@item.FileContent" />
+             file="@item.GetDummyFileName()" value="@item.FileContent" />
     }
 </div>
