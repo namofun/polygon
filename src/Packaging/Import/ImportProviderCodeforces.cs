@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -69,7 +70,7 @@ namespace Polygon.Packaging
             {
                 var f = newzip.CreateEntryFromByteArray(contents, "main" + ext);
                 f.ExternalAttributes = LINUX644;
-                using var testlib = ResourcesDictionary.GetTestlib();
+                using var testlib = Assembly.GetExecutingAssembly().GetManifestResourceStream("Polygon.Packaging.Resources.testlib.h")!;
                 var f2 = await newzip.CreateEntryFromStream(testlib, "testlib.h");
                 f2.ExternalAttributes = LINUX644;
             }

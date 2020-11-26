@@ -1,5 +1,4 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace Polygon.Packaging.Tests
 {
@@ -7,19 +6,12 @@ namespace Polygon.Packaging.Tests
     public class ResourceDictionaryTests
     {
         [TestMethod]
-        [DataRow("testlib.h")]
-        [DataRow("olymp.sty")]
-        [DataRow("contest.tex")]
-        public void TestExistence(string fileName)
+        public void TestlibExistence()
         {
-            ResourcesDictionary.Read(fileName).Dispose();
-        }
-
-        [TestMethod]
-        [DataRow("what.the.fuck")]
-        public void TestNonExistence(string fileName)
-        {
-            Assert.ThrowsException<InvalidOperationException>(() => ResourcesDictionary.Read(fileName));
+            var stream = typeof(CodeforcesImportProvider).Assembly
+                .GetManifestResourceStream("Polygon.Packaging.Resources.testlib.h");
+            Assert.IsNotNull(stream);
+            stream.Dispose();
         }
     }
 }
