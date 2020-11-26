@@ -139,5 +139,44 @@ namespace SatelliteSite.PolygonModule.Dashboards
             await HttpContext.AuditAsync("added", entity.Id);
             return RedirectToAction(nameof(Detail), new { langid = entity.Id });
         }
+
+
+        [HttpGet("{langid}/[action]")]
+        public async Task<IActionResult> Delete(string langid)
+        {
+            var lang = await Store.FindAsync(langid);
+            if (lang == null) return NotFound();
+
+            return AskPost(
+                title: $"Delete language {lang.Id} - \"{lang.Name}\"",
+                message: $"You're about to delete language {lang.Id} - \"{lang.Name}\".\n" +
+                    "Warning, this will succeed only if no submissions are created in this language.\n" +
+                    "Are you sure?",
+                area: "Dashboard", controller: "Languages", action: "Delete",
+                routeValues: new { langid },
+                type: BootstrapColor.danger);
+        }
+
+
+        [HttpPost("{langid}/[action]")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(string langid, bool post = true)
+        {
+            var lang = await Store.FindAsync(langid);
+            if (lang == null) return NotFound();
+
+            try
+            {
+                await Store.DeleteAsync(lang);
+                StatusMessage = $"Language {langid} deleted successfully.";
+                await HttpContext.AuditAsync("deleted", langid);
+            }
+            catch
+            {
+                StatusMessage = $"Error deleting language {langid}, foreign key constraints failed.";
+            }
+
+            return RedirectToAction(nameof(List));
+        }
     }
 }

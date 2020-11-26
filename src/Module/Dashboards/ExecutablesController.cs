@@ -38,7 +38,6 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet("{execid}/[action]")]
-        [ValidateAjaxWindow]
         public async Task<IActionResult> Delete(string execid)
         {
             var exec = await Store.FindAsync(execid);

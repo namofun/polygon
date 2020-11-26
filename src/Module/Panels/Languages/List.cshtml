@@ -16,6 +16,7 @@
                 <th scope="col" class="sortable searchable">timefactor</th>
                 <th scope="col" class="sortable searchable">file ext</th>
                 <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -29,6 +30,7 @@
                 <td use-a>@(lang.TimeFactor)&times;</td>
                 <td use-a>@lang.FileExtension</td>
                 <td><a title="edit this language" asp-action="Edit" asp-route-langid="@lang.Id"><i class="fas fa-edit"></i></a></td>
+                <td><a title="delete this language" asp-action="Delete" asp-route-langid="@lang.Id" data-toggle="ajaxWindow"><i class="fas fa-trash-alt"></i></a></td>
             </tr>
             }
         </tbody>
