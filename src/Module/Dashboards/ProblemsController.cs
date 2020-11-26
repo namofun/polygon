@@ -7,6 +7,7 @@ using Polygon.Storages;
 using SatelliteSite.IdentityModule.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Dashboards
@@ -17,16 +18,17 @@ namespace SatelliteSite.PolygonModule.Dashboards
     [AuditPoint(Entities.AuditlogType.Problem)]
     public class ProblemsController : ViewControllerBase
     {
-        private IProblemStore Store { get; }
+        private IPolygonFacade Facade { get; }
+        private IProblemStore Store => Facade.Problems;
         private IUserManager UserManager { get; }
         private ILogger<ProblemsController> Logger { get; }
 
         public ProblemsController(
-            IProblemStore store,
+            IPolygonFacade facade,
             IUserManager userManager,
             ILogger<ProblemsController> logger)
         {
-            Store = store;
+            Facade = facade;
             UserManager = userManager;
             Logger = logger;
         }
@@ -74,8 +76,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> Create(
-            [FromServices] ISignInManager signInManager)
+        public async Task<IActionResult> Create()
         {
             var p = await Store.CreateAsync(new Problem
             {
@@ -86,8 +87,9 @@ namespace SatelliteSite.PolygonModule.Dashboards
                 Title = "UNTITLED",
                 MemoryLimit = 524288,
                 OutputLimit = 4096,
-                Source = "",
+                Source = string.Empty,
                 TimeLimit = 10000,
+                TagName = string.Empty,
             });
 
             await HttpContext.AuditAsync("created", $"{p.Id}");
@@ -103,11 +105,9 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet("/[area]/submissions/[action]/{jid}")]
-        public async Task<IActionResult> ByJudgingId(
-            [FromRoute] int jid,
-            [FromServices] ISubmissionStore submission)
+        public async Task<IActionResult> ByJudgingId(int jid)
         {
-            var item = await submission.FindByJudgingAsync(jid);
+            var item = await Facade.Submissions.FindByJudgingAsync(jid);
             if (item == null) return NotFound();
 
             if (item.ContestId == 0)
@@ -176,17 +176,19 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet("/[area]/submissions")]
-        public async Task<IActionResult> Status(
-            [FromServices] ISubmissionStore submissions,
-            [FromQuery] int page = 1)
+        public async Task<IActionResult> Status(int page = 1)
         {
             if (page <= 0) return BadRequest();
 
-            var model = await submissions.ListWithJudgingAsync(pagination: (page, 50));
-            foreach (var item in model)
-                item.AuthorName = item.ContestId == 0
-                    ? $"u{item.TeamId}"
-                    : $"c{item.ContestId}t{item.TeamId}";
+            var model = await Facade.Submissions.ListWithJudgingAsync(pagination: (page, 50));
+
+            var maxSub = model.Select(s => s.SubmissionId).Append(-1).Max();
+            var minSub = model.Select(s => s.SubmissionId).Append(-1).Min();
+            ViewBag.Authors = await Facade.Submissions.GetAuthorNamesAsync(
+                sids: s => s.Id >= minSub && s.Id <= maxSub);
+
+            ViewBag.Problems = await Store.ListNameAsync(
+                (Submission s) => s.Id >= minSub && s.Id <= maxSub);
 
             return View(model);
         }

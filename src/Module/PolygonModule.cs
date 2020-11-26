@@ -1,5 +1,6 @@
 ﻿using Markdig;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -26,7 +27,7 @@ using System.IO;
 
 namespace SatelliteSite.PolygonModule
 {
-    public class PolygonModule<TUser, TRole, TContext> : AbstractModule
+    public class PolygonModule<TUser, TRole, TContext> : AbstractModule, IAuthorizationPolicyRegistry
         where TUser : User, new()
         where TRole : Role, IRoleWithProblem, new()
         where TContext : IdentityDbContext<TUser, TRole, int>, ISolutionAuthorQueryable
@@ -162,6 +163,11 @@ namespace SatelliteSite.PolygonModule
                     .HasLink("Dashboard", "Problems", "List")
                     .RequireRoles("Administrator,Problem");
             });
+        }
+
+        public void RegisterPolicies(IAuthorizationPolicyContainer container)
+        {
+            container.AddPolicy2("HasDashboard", b => b.AcceptRole("Problem"));
         }
     }
 }

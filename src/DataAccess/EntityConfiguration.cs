@@ -232,6 +232,11 @@ namespace Polygon.Storages
             entity.Property(e => e.ComapreArguments)
                 .IsUnicode(false)
                 .HasMaxLength(128);
+
+            entity.HasMany<TRole>()
+                .WithOne()
+                .HasForeignKey(r => r.ProblemId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public void Configure(EntityTypeBuilder<Rejudging> entity)

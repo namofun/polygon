@@ -1,12 +1,14 @@
 ﻿@model IPagedList<Solution>
 @{
-    ViewData["Title"] = "Status";
+    ViewData["Title"] = "Submissions";
+    Dictionary<int, string> authors = ViewBag.Authors;
+    Dictionary<int, string> problems = ViewBag.Problems;
 }
 
 <h2 class="mt-2 mb-3">@ViewData["Title"]</h2>
 
 <div class="d-none" id="paging">
-    <pagination bs-current-page="Model.CurrentPage" bs-total-page="Model.TotalPage" />
+    <pagination bs-current-page="Model.CurrentPage" />
 </div>
 
 <div class="table-wrapper">
@@ -28,15 +30,15 @@
             @foreach (var stat in Model)
             {
                 <tr asp-action="ByJudgingId" asp-route-jid="@stat.JudgingId" role="row" data-toggle="gotoUrl">
-                    <td use-a>@stat.SubmissionId</td>
+                    <td use-a>s@(stat.SubmissionId)</td>
                     <td use-a>@Html.CstTime(stat.Time)</td>
                     <td use-a><verdict skipped="@stat.Skipped" value="@stat.Verdict" /></td>
-                    <td use-a>p@(stat.ProblemId)</td>
+                    <td use-a>p@(stat.ProblemId) - @problems.GetValueOrDefault(stat.ProblemId, "UNKNOWN")</td>
                     <td use-a>@(stat.ExecutionTime.HasValue ? $"{stat.ExecutionTime.Value}ms" : "N/A")</td>
                     <td use-a>@(stat.ExecutionMemory.HasValue ? $"{stat.ExecutionMemory.Value}kb" : "N/A")</td>
                     <td use-a>@(stat.CodeLength)B</td>
                     <td class="text-variant" use-a>@stat.Language</td>
-                    <td use-a>@(stat.AuthorName)</td>
+                    <td use-a>@authors.GetValueOrDefault(stat.SubmissionId)</td>
                 </tr>
             }
         </tbody>
