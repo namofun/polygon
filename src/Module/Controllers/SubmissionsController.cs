@@ -140,7 +140,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             return File(
                 fileStream: fileInfo.CreateReadStream(),
                 contentType: "application/octet-stream",
-                fileDownloadName: $"j{jid}_r{rid}.{type}");
+                fileDownloadName: $"j{jid}.r{rid}.{type}");
         }
 
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace SatelliteSite.PolygonModule.Models
 {
     /// <inheritdoc />
-    public class SolutionV2 : Solution
+    public class SolutionV2 : Solution, ISubmissionDetail
     {
         public bool CombinedRunCompare { get; set; }
         public string CompileError { get; set; }
@@ -19,8 +19,10 @@ namespace SatelliteSite.PolygonModule.Models
         public int TimeLimit { get; set; }
         public double TimeFactor { get; set; }
 
-        public IEnumerable<Judging> AllJudgings { get; set; }
+        public ICollection<Judging> AllJudgings { get; set; }
         public string SourceCode { get; set; }
         public IEnumerable<(JudgingRun, Testcase)> DetailsV2 { get; set; }
+
+        public double RealTimeLimit => TimeLimit * TimeFactor / 1000;
     }
 }

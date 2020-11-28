@@ -1,0 +1,211 @@
+﻿@model ISubmissionDetail
+@functions {
+#pragma warning disable CS0612
+    static string ColorNvd3(Verdict result)
+    {
+        return result switch
+        {
+            Verdict.Unknown => "grey", // 0
+            Verdict.TimeLimitExceeded => "orange",
+            Verdict.MemoryLimitExceeded => "purple",
+            Verdict.RuntimeError => "#ff3399",
+            Verdict.OutputLimitExceeded => "black",
+            Verdict.WrongAnswer => "#dc3545", // 5
+            Verdict.CompileError => "grey",
+            Verdict.PresentationError => "#dc3545",
+            Verdict.Pending => "grey",
+            Verdict.Running => "grey",
+            Verdict.UndefinedError => "grey", // 10
+            Verdict.Accepted => "#28a745",
+            _ => throw new ArgumentOutOfRangeException($"Unknown verdict {result}")
+        };
+    }
+#pragma warning restore CS0612
+}
+
+<style>
+    .judging-table td a, .judging-table td a:hover {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .judging-table tr.disabled td a {
+        color: silver
+    }
+</style>
+
+<table asp-show-if="Model.AllJudgings.Count > 1" class="judging-table table table-striped table-hover table-sm" style="width: auto;">
+    <caption>Judgings</caption>
+    <thead>
+        <tr>
+            <td></td>
+            <th scope="col">ID</th>
+            <th scope="col">start</th>
+            <th scope="col">time</th>
+            <th scope="col">memory</th>
+            <th scope="col">judgehost</th>
+            <th scope="col">result</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var judging in Model.AllJudgings)
+        {
+            var subTime = judging.StartTime;
+            <tr asp-route-jid="@judging.Id" data-toggle="gotoUrl" class="@(judging.Active ? "" : "disabled")">
+                <td use-a><i asp-show-if="judging.Id == Model.JudgingId" class="fas fa-long-arrow-alt-right"></i></td>
+                <td use-a>j@(judging.Id)</td>
+                <td use-a>@subTime?.ToString("HH:mm")</td>
+                <td use-a>@(judging.ExecuteTime.HasValue ? $"{judging.ExecuteTime.Value}ms" : "N/A")</td>
+                <td use-a>@(judging.ExecuteMemory.HasValue ? $"{judging.ExecuteMemory.Value}K" : "N/A")</td>
+                <td use-a><span class="hostname">@(judging.Server ?? "-")</span></td>
+                <td use-a><verdict value="@judging.Status" class="@(judging.Active ? "" : "disabled")" /><span asp-show-if="judging.TotalScore.HasValue">&nbsp;(@judging.TotalScore)</span></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <nvd3 id="maxruntime" title="Max Runtimes" key="Max Runtime"
+          asp-show-if="Model.AllJudgings.Count > 1"
+          baseline="Model.RealTimeLimit"
+          max-value="Model.AllJudgings.Max(j => j.ExecuteTime ?? 0) / 1000.0"
+          data="@Model.AllJudgings.Select(j => new { label = $"j{j.Id}", value = j.ExecuteTime / 1000.0, color = ColorNvd3(j.Status) })"
+          x-axis="Judging" y-axis="Runtime (in s)" />
+    <nvd3 id="testcaseruntime" title="Testcase Runtimes" key="Runtime"
+          baseline="Model.RealTimeLimit"
+          max-value="Model.DetailsV2.Max(d => d.Item1?.ExecuteTime).GetValueOrDefault() / 1000.0"
+          data="@Model.DetailsV2.Select(r => new { label = $"r{r.Item2.Rank}", value = (r.Item1?.ExecuteTime ?? 0) / 1000.0, color = ColorNvd3(r.Item1?.Status ?? Verdict.Pending) })"
+          x-axis="Testcase Rank" y-axis="Runtime (in s)" />
+</div>
+
+<h2 class="mb-2">Judging j@(Model.JudgingId)</h2>
+
+<div class="mb-2">
+    <div>
+        Result: <verdict value="@Model.Judging.Status" class="@(Model.Judging.Active ? "" : "disabled")" />,
+        Judgehost: <span class="hostname">@(Model.Judging.Server ?? "-")</span>,
+        <span class="judgetime">
+            <razor asp-show-if="Model.Judging.StartTime.HasValue">
+                Judging started: @Model.Judging.StartTime?.ToString("HH:mm:ss"),
+                <razor asp-show-if="@(Model.Judging.StopTime.HasValue && Model.Judging.Status != Verdict.UndefinedError)">
+                    finished in @((Model.Judging.StopTime - Model.Judging.StartTime)?.ToString("mm\\:ss"))s
+                </razor>
+                <razor asp-show-if="@(!Model.Judging.StopTime.HasValue && Model.Judging.Status != Verdict.UndefinedError)">
+                    [still judging - busy @((DateTimeOffset.Now - Model.Judging.StartTime.Value).ToString("mm\\:ss"))s]
+                </razor>
+                <razor asp-show-if="@(Model.Judging.Status == Verdict.UndefinedError)">
+                    [aborted]
+                </razor>
+            </razor>
+            <razor asp-show-if="!Model.Judging.StartTime.HasValue">
+                Judging not started yet
+            </razor>
+        </span>
+        <razor asp-show-if="@(Model.Judging.StartTime.HasValue && Model.Judging.StopTime.HasValue && Model.Judging.Status != Verdict.CompileError)">
+            , max / sum runtime: @(Model.Judging.ExecuteTime / 1000.0)s / @(Model.DetailsV2.Sum(s => s.Item1?.ExecuteTime ?? 0) / 1000.0)s
+        </razor>
+    </div>
+    <table asp-show-if="Model.Verdict != Verdict.CompileError">
+        <tr>
+            <td>testcase runs: </td>
+            <td>
+                @foreach (var (d, t) in Model.DetailsV2)
+                {<a title="#@t.Rank, @(d == null ? "unknown" : $"runtime: {d.ExecuteTime}ms, result: {d.Status}")" href="#run-@t.Rank" onclick="@if (d?.Status == Verdict.Accepted) {@("display_correctruns(true);")}"><verdict-badge value="@(d?.Status ?? Verdict.Pending)" /></a>}
+            </td>
+        </tr>
+    </table>
+</div>
+
+@{
+    var (compileColor, compileState, compileSnippet) = Model.Verdict switch
+    {
+        Verdict.CompileError => ("red", "unsuccessful", ""),
+        Verdict.Pending => ("gray", "waiting", "d-none"),
+        _ => ("#1daa1d", "successful", "d-none"),
+    };
+}
+
+<h3>
+    <a class="collapse-link" href="javascript:collapse('#detailcompile')">
+        Compilation
+        <span style="color: @compileColor;">@compileState</span>
+    </a>
+</h3>
+
+<snippet class="@compileSnippet" id="detailcompile" base64="@Model.CompileError" />
+
+@if (Model.Verdict != Verdict.CompileError)
+{
+    foreach (var (detail, testcase) in Model.DetailsV2)
+    {
+<div class="run" asp-show-if="detail == null">
+    <h4 id="run-@testcase.Rank">Run @testcase.Rank</h4>
+    <p class="nodata">Testcase not used.</p>
+</div>
+<div class="run @(detail?.Status == Verdict.Accepted ? "run_correct" : "")" asp-show-if="detail != null">
+    <h4 id="run-@testcase.Rank">Run @testcase.Rank</h4>
+    <table><tr><td><table class="table table-sm table-striped table-bordered table-hover">
+        <tr>
+            <th>Description</th>
+            <td>@testcase.Description</td>
+        </tr>
+        <tr>
+            <th>Download</th>
+            <td>
+                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Testcases" asp-action="Fetch" asp-route-tid="@detail.TestcaseId" asp-route-filetype="input">Input</a>
+                /
+                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Testcases" asp-action="Fetch" asp-route-tid="@detail.TestcaseId" asp-route-filetype="output">Reference Output</a>
+                /
+                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Submissions" asp-action="RunDetails" asp-route-jid="@detail.JudgingId" asp-route-rid="@detail.Id" asp-route-type="out">Team Output</a>
+            </td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>@(detail.ExecuteTime)ms, @(detail.ExecuteMemory)kb.</td>
+        </tr>
+        <tr>
+            <th>Result</th>
+            <td><verdict value="@detail.Status" /></td>
+        </tr>
+    </table></td><td></td></tr></table>
+
+    <h5 class="pt-0">Diff output</h5>
+    <snippet class="mb-3" base64="@detail.OutputDiff" nodata="There was no diff output." />
+
+    <h5 class="pt-0" asp-show-if="Model.CombinedRunCompare">Validator/Submission interaction</h5>
+    <interactive asp-show-if="Model.CombinedRunCompare" filename="Runs/j@(detail.JudgingId)/r@(detail.Id).out" />
+
+    <h5 class="pt-0" asp-show-if="!Model.CombinedRunCompare">Program output</h5>
+    <snippet class="mb-3" asp-show-if="!Model.CombinedRunCompare" filename="Runs/j@(detail.JudgingId)/r@(detail.Id).out" nodata="There was no stdout output." />
+
+    <h5 class="pt-0">Program error output</h5>
+    <snippet class="mb-3" filename="Runs/j@(detail.JudgingId)/r@(detail.Id).err" nodata="There was no stderr output." />
+
+    <h5 class="pt-0">Judging system output (info/debug/errors)</h5>
+    <snippet class="mb-4" base64="@detail.OutputSystem" />
+</div>
+
+    }
+}
+
+<style>
+    div.submission-summary > span {
+        margin-right: 10px;
+    }
+
+    .run > h4, .run > h5 {
+        text-align: left;
+    }
+</style>
+
+<script type="text/javascript">
+    function display_correctruns(show) {
+        elements = document.getElementsByClassName('run_correct');
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style.display = show ? 'block' : 'none';
+        }
+    }
+
+    display_correctruns(false);
+</script>
