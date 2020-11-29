@@ -58,12 +58,10 @@ namespace SatelliteSite.PolygonModule.Controllers
             var tc = await Store.FindAsync(tid, Problem.Id);
             if (tc == null) return NotFound();
 
-            ViewData["pid"] = Problem.Id;
-            ViewData["tid"] = tid;
             ViewData["Title"] = $"Edit testcase t{tid}";
-
             return Window(new TestcaseUploadModel
             {
+                ProblemId = Problem.Id,
                 Description = tc.Description,
                 IsSecret = tc.IsSecret,
                 Point = tc.Point,
@@ -110,9 +108,11 @@ namespace SatelliteSite.PolygonModule.Controllers
         [HttpGet("[action]")]
         public IActionResult Create()
         {
-            ViewData["pid"] = Problem.Id;
             ViewData["Title"] = "Add new testcase";
-            return Window("Edit", new TestcaseUploadModel());
+            return Window("Edit", new TestcaseUploadModel
+            {
+                ProblemId = Problem.Id,
+            });
         }
 
 

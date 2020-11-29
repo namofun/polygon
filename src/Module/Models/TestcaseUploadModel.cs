@@ -5,6 +5,9 @@ namespace SatelliteSite.PolygonModule.Models
 {
     public class TestcaseUploadModel
     {
+        [DisplayName("Problem ID")]
+        public int ProblemId { get; set; }
+
         [DisplayName("Secret data, not shown to public")]
         public bool IsSecret { get; set; }
 
@@ -19,5 +22,11 @@ namespace SatelliteSite.PolygonModule.Models
 
         [DisplayName("Output Content")]
         public IFormFile OutputContent { get; set; }
+
+        [DisplayName("Custom Input (only on statements)")]
+        public string CustomInput { get; set; }
+
+        [DisplayName("Custom Output (only on statements)")]
+        public string CustomOutput { get; set; }
     }
 }
