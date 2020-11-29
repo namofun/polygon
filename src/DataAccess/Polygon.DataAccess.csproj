@@ -4,7 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>Polygon.Storages</RootNamespace>
+    <DescriptionAttach>The storage implementations in EFCore</DescriptionAttach>
   </PropertyGroup>
+
+  <Import Project="..\..\build\NugetPackage.Backend.props" />
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

@@ -3,7 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <DescriptionAttach>The problem judging module</DescriptionAttach>
   </PropertyGroup>
+
+  <Import Project="..\..\build\NugetPackage.props" />
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

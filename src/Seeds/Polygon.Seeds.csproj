@@ -2,7 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <DescriptionAttach>The database seeds</DescriptionAttach>
   </PropertyGroup>
+
+  <Import Project="..\..\build\NugetPackage.Backend.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />
