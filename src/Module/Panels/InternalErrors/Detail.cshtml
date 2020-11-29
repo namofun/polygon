@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Internal error e" + Model.Id;
     ViewData["RefreshSpan"] = 15;
+    var disabled = Model.Disabled.AsJson<InternalErrorDisable>();
 }
 
 @section Header {
@@ -24,7 +25,28 @@
         </tr>
         <tr role="row">
             <th>Affect</th>
-            <td>Disabled @Model.Disabled</td>
+            <td>
+                @if (disabled == null)
+                {
+                    @:Unknown Disabled
+                }
+                else if (disabled.ProblemId != null)
+                {
+                    <a asp-area="Polygon" asp-controller="Editor" asp-action="Overview" asp-route-pid="@disabled.ProblemId">Problem p@(disabled.ProblemId)</a>
+                }
+                else if (disabled.Language != null)
+                {
+                    <a asp-area="Dashboard" asp-controller="Languages" asp-action="Detail" asp-route-langid="@disabled.Language">Language @disabled.Language</a>
+                }
+                else if (disabled.HostName != null)
+                {
+                    <a asp-area="Dashboard" asp-controller="Judgehosts" asp-action="Detail" asp-route-hostname="@disabled.HostName">Judgehost @disabled.HostName</a>
+                }
+                else
+                {
+                    @Model.Disabled
+                }
+            </td>
         </tr>
     </tbody>
 </table>
