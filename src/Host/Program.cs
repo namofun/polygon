@@ -27,6 +27,7 @@ namespace SatelliteSite
                 .MarkDomain<Program>()
                 .AddModule<IdentityModule.IdentityModule<User, AspNetRole, DefaultContext>>()
                 .AddModule<PolygonModule.PolygonModule<User, AspNetRole, DefaultContext>>()
+                .AddModule<HostModule>()
                 //.ConfigureServices(services => services.AddDbModelSupplier<DefaultContext, SeedConfiguration<DefaultContext>>())
                 .AddDatabaseMssql<DefaultContext>("UserDbConnection")
                 .ConfigureSubstrateDefaults<DefaultContext>(builder =>
