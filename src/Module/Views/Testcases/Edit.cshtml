@@ -31,8 +31,18 @@
 </div>
 <div class="form-group">
     <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" asp-for="IsSecret">
+        <input type="checkbox" class="custom-control-input" asp-for="IsSecret" />
         <label class="custom-control-label" asp-for="IsSecret"></label>
+    </div>
+</div>
+<div class="testcase-custom-sample @(Model.IsSecret ? "d-none" : "")">
+    <div class="form-group">
+        <label asp-for="CustomInput"></label>
+        <textarea asp-for="CustomInput" class="form-control" placeholder="Leave empty if use input content"></textarea>
+    </div>
+    <div class="form-group">
+        <label asp-for="CustomOutput"></label>
+        <textarea asp-for="CustomOutput" class="form-control" placeholder="Leave empty if use output content"></textarea>
     </div>
 </div>
 <div class="upload-progress" asp-viewdata-key="InAjax"><div></div></div>
@@ -54,6 +64,14 @@
 @:                return false;
 @:            });
 }
+
+            $('#IsSecret').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $('.testcase-custom-sample').addClass('d-none');
+                } else {
+                    $('.testcase-custom-sample').removeClass('d-none');
+                }
+            });
         });
     </script>
 }

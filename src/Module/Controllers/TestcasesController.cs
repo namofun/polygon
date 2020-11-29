@@ -65,6 +65,8 @@ namespace SatelliteSite.PolygonModule.Controllers
                 Description = tc.Description,
                 IsSecret = tc.IsSecret,
                 Point = tc.Point,
+                CustomInput = tc.CustomInput,
+                CustomOutput = tc.CustomOutput,
             });
         }
 
@@ -89,6 +91,8 @@ namespace SatelliteSite.PolygonModule.Controllers
                 last.Description = model.Description ?? last.Description;
                 last.IsSecret = model.IsSecret;
                 last.Point = model.Point;
+                last.CustomInput = string.IsNullOrWhiteSpace(model.CustomInput) ? null : model.CustomInput;
+                last.CustomOutput = string.IsNullOrWhiteSpace(model.CustomOutput) ? null : model.CustomOutput;
                 await Store.UpdateAsync(last, inputf, outputf);
 
                 await HttpContext.AuditAsync("modified", $"p{last.ProblemId}t{last.Id}");
@@ -112,6 +116,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             return Window("Edit", new TestcaseUploadModel
             {
                 ProblemId = Problem.Id,
+                IsSecret = true,
             });
         }
 
@@ -140,6 +145,8 @@ namespace SatelliteSite.PolygonModule.Controllers
                         IsSecret = model.IsSecret,
                         Point = model.Point,
                         ProblemId = Problem.Id,
+                        CustomInput = model.CustomInput,
+                        CustomOutput = model.CustomOutput,
                     });
 
                 await HttpContext.AuditAsync("created", $"p{Problem.Id}t{e.Id}");
