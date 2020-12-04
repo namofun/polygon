@@ -5,6 +5,7 @@
     List<Language> lang = ViewBag.Language;
     var lang2 = lang.Select(k => new SelectListItem(k.Name, k.Id));
     ViewData["MaxWidth"] = "800px";
+    ViewData["StaticBackdrop"] = true;
 }
 
 <div class="form-group">

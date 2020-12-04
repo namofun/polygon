@@ -129,7 +129,6 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet("[action]")]
-        [ValidateAjaxWindow]
         public IActionResult Import()
         {
             return Window(Options.Value.ImportProviders);
@@ -137,7 +136,6 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpPost("[action]")]
-        [ValidateAjaxWindow]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(1 << 30)]
         [RequestFormLimits2(1 << 30)]

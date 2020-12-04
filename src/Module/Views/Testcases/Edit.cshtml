@@ -1,6 +1,8 @@
 ﻿@model TestcaseUploadModel
 @{
     Layout = "_WindowLayout";
+    ViewData["StaticBackdrop"] = true;
+    ViewData["FormAjaxUpload"] = Url.Action();
 }
 
 <div class="form-group">
@@ -54,17 +56,6 @@
 @section Scripts {
     <script>
         $(function () {
-            let $Form = $('#form-@ViewData["HandleKey"]');
-            $Form.prop("action", "@Url.Action()");
-            $Form.prop("enctype", "multipart/form-data");
-@if (ViewData.ContainsKey("InAjax"))
-{
-@:            $Form.on('submit', function () {
-@:                ajaxpost(this, '@ViewData["HandleKey2"]', '@ViewData["HandleKey"]');
-@:                return false;
-@:            });
-}
-
             $('#IsSecret').on('change', function () {
                 if ($(this).is(':checked')) {
                     $('.testcase-custom-sample').addClass('d-none');
