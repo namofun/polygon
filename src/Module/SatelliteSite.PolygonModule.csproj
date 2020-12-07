@@ -12,6 +12,7 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="SatelliteSite.Substrate" Version="$(SubstrateVersion)" />
     <PackageReference Include="SatelliteSite.IdentityModule" Version="$(SubstrateVersion)" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerEndpoint" Version="5.1.9" />
   </ItemGroup>
 
   <ItemGroup>

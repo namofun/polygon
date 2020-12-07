@@ -11,7 +11,7 @@ namespace Polygon.Storages
     /// <typeparam name="TRole">The role type.</typeparam>
     /// <typeparam name="TContext">The context type.</typeparam>
     public partial class PolygonFacade<TUser, TRole, TContext> : IPolygonFacade
-        where TContext : DbContext, ISolutionAuthorQueryable
+        where TContext : DbContext, IPolygonQueryable
         where TUser : SatelliteSite.IdentityModule.Entities.User
         where TRole : SatelliteSite.IdentityModule.Entities.Role, IRoleWithProblem
     {

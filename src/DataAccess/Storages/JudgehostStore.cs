@@ -4,7 +4,10 @@ using Polygon.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using LoadQuery = System.Linq.IQueryable<Polygon.Models.JudgehostLoad>;
+using Timer = System.Linq.Expressions.Expression<System.Func<System.DateTimeOffset>>;
 
 namespace Polygon.Storages
 {
@@ -54,32 +57,75 @@ namespace Polygon.Storages
                 .BatchUpdateAsync(h => new Judgehost { Active = active });
         }
 
+        /// <remarks>
+        /// <para>
+        /// Original Query:
+        /// </para>
+        /// <para>
+        /// <c>from j in Judgings</c><br />
+        /// <c>where j.Server != null &amp;&amp; (j.StopTime > DateTimeOffset.Now.AddDays(-2) || j.StopTime == null)</c><br />
+        /// <c>group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddDays(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g</c><br />
+        /// <c>select new { HostName = g.Key, Load = g.Sum(), Type = 3 };</c>
+        /// </para>
+        /// <para>
+        /// <c>from j in Judgings</c><br />
+        /// <c>where j.Server != null &amp;&amp; (j.StopTime > DateTimeOffset.Now.AddHours(-2) || j.StopTime == null)</c><br />
+        /// <c>group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddHours(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g</c><br />
+        /// <c>select new { HostName = g.Key, Load = g.Sum(), Type = 2 };</c>
+        /// </para>
+        /// <para>
+        /// <c>from j in Judgings</c><br />
+        /// <c>where j.Server != null &amp;&amp; (j.StopTime > DateTimeOffset.Now.AddMinutes(-5) || j.StopTime == null)</c><br />
+        /// <c>group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddMinutes(-5), j.StopTime ?? DateTimeOffset.Now) by j.Server into g</c><br />
+        /// <c>select new { HostName = g.Key, Load = g.Sum(), Type = 1 };</c>
+        /// </para>
+        /// <para>
+        /// <c>query1.Concat(query2).Concat(query3).ToList()</c>
+        /// </para>
+        /// </remarks>
         Task<Dictionary<string, (double, double, double)>> IJudgehostStore.LoadAsync()
         {
+            var compiledQuery = CachedQueryable.Cache.GetOrCreate("judgehost_loads_query", entry =>
+            {
+                var originalQuery = Context.JudgehostLoadQuery;
+                Expression<Func<TContext, DbSet<Judging>>> j = context => context.Set<Judging>();
+
+                var query1 = new ReplaceExpressionVisitor()
+                    .Attach(originalQuery.Parameters[0], j.Body)
+                    .Attach(originalQuery.Parameters[1], Expression.Constant(3, typeof(int)))
+                    .Attach(originalQuery.Parameters[2], ((Timer)(() => DateTimeOffset.Now.AddDays(-2))).Body)
+                    .Visit(originalQuery.Body);
+
+                var query2 = new ReplaceExpressionVisitor()
+                    .Attach(originalQuery.Parameters[0], j.Body)
+                    .Attach(originalQuery.Parameters[1], Expression.Constant(2, typeof(int)))
+                    .Attach(originalQuery.Parameters[2], ((Timer)(() => DateTimeOffset.Now.AddHours(-2))).Body)
+                    .Visit(originalQuery.Body);
+
+                var query3 = new ReplaceExpressionVisitor()
+                    .Attach(originalQuery.Parameters[0], j.Body)
+                    .Attach(originalQuery.Parameters[1], Expression.Constant(1, typeof(int)))
+                    .Attach(originalQuery.Parameters[2], ((Timer)(() => DateTimeOffset.Now.AddMinutes(-5))).Body)
+                    .Visit(originalQuery.Body);
+
+                Expression<Func<LoadQuery, LoadQuery, LoadQuery, LoadQuery>> concatToList =
+                    (query1, query2, query3) => query1.Concat(query2).Concat(query3);
+
+                var finalQuery = new ReplaceExpressionVisitor()
+                    .Attach(concatToList.Parameters[0], query1)
+                    .Attach(concatToList.Parameters[1], query2)
+                    .Attach(concatToList.Parameters[2], query3)
+                    .Visit(concatToList.Body);
+
+                var exp = Expression.Lambda<Func<TContext, LoadQuery>>(finalQuery, j.Parameters);
+                return EF.CompileAsyncQuery(exp);
+            });
+
             return CachedQueryable.Cache.GetOrCreateAsync("judgehost_loads", async entry =>
             {
-                var query1 =
-                    from j in Judgings
-                    where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddDays(-2) || j.StopTime == null)
-                    group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddDays(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
-                    select new { HostName = g.Key, Load = g.Sum(), Type = 3 };
-                
-                var query2 =
-                    from j in Judgings
-                    where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddHours(-2) || j.StopTime == null)
-                    group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddHours(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
-                    select new { HostName = g.Key, Load = g.Sum(), Type = 2 };
-
-                var query3 =
-                    from j in Judgings
-                    where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddMinutes(-5) || j.StopTime == null)
-                    group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddMinutes(-5), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
-                    select new { HostName = g.Key, Load = g.Sum(), Type = 1 };
-
-                var results = await query1.Concat(query2).Concat(query3).ToListAsync();
                 var returns = new Dictionary<string, (double, double, double)>();
-
-                foreach (var item in results)
+                
+                await foreach (var item in compiledQuery(Context))
                 {
                     if (!returns.ContainsKey(item.HostName)) returns.Add(item.HostName, default);
                     var current = returns[item.HostName];
@@ -92,6 +138,32 @@ namespace Polygon.Storages
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30);
                 return returns;
             });
+        }
+    }
+
+    /// <summary>
+    /// The expression replacing visitor.
+    /// </summary>
+    internal class ReplaceExpressionVisitor : ExpressionVisitor
+    {
+        private readonly Dictionary<Expression, Expression> _changes = new Dictionary<Expression, Expression>();
+
+        /// <summary>
+        /// Attach the expression to change from <paramref name="from"/> to <paramref name="to"/>.
+        /// </summary>
+        /// <param name="from">The source expression.</param>
+        /// <param name="to">The target expression.</param>
+        /// <returns>The resulting visitor.</returns>
+        public ReplaceExpressionVisitor Attach(Expression from, Expression to)
+        {
+            _changes.Add(from, to);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public override Expression Visit(Expression node)
+        {
+            return node == null ? null! : _changes.TryGetValue(node, out var exp) ? exp : base.Visit(node);
         }
     }
 }

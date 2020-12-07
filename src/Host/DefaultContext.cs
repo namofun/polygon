@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 
 namespace SatelliteSite
 {
-    public class DefaultContext : IdentityDbContext<User, AspNetRole, int>, ISolutionAuthorQueryable
+    public class DefaultContext : IdentityDbContext<User, AspNetRole, int>, IPolygonQueryable
     {
         public DefaultContext(DbContextOptions options)
             : base(options)
@@ -27,5 +27,12 @@ namespace SatelliteSite
                 // into tt from t in tt.DefaultIfEmpty()
                 select new SolutionAuthor(s.Id, s.ContestId, s.TeamId, u.UserName, null /*t.TeamName */);
         }
+
+        public Expression<Func<DbSet<Judging>, int, DateTimeOffset, IQueryable<JudgehostLoad>>> JudgehostLoadQuery { get; }
+            = (Judgings, type, time) =>
+                from j in Judgings
+                where j.Server != null && (j.StopTime > time || j.StopTime == null)
+                group EF.Functions.DateDiffSecond(j.StartTime ?? time, j.StopTime ?? DateTimeOffset.Now) by j.Server into g
+                select new JudgehostLoad { HostName = g.Key, Load = g.Sum(), Type = type };
     }
 }
