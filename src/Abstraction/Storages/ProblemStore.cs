@@ -135,5 +135,12 @@ namespace Polygon.Storages
         /// </summary>
         /// <returns>The task for rebuilding.</returns>
         Task RebuildStatisticsAsync();
+
+        /// <summary>
+        /// Read the compiled statement cache HTML for problem.
+        /// </summary>
+        /// <param name="problemId">The problem to read.</param>
+        /// <returns>A <see cref="Task"/> for reading the statement.</returns>
+        Task<string?> ReadCompiledHtmlAsync(int problemId);
     }
 }

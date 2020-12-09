@@ -20,23 +20,21 @@ namespace Polygon.Packaging
             Testcases = testcases;
         }
 
-        private async Task<string> TryReadFileAsync(Problem problem, string fileName)
+        private async Task<string> TryReadFileAsync(int problemId, string fileName)
         {
-            var fileInfo = await Store.GetFileAsync(problem.Id, fileName);
+            var fileInfo = await Store.GetFileAsync(problemId, fileName);
             return (await fileInfo.ReadAsync()) ?? string.Empty;
         }
 
         public async Task<Statement> ReadAsync(Problem problem)
         {
-            var pid = problem.Id;
+            var description = await TryReadFileAsync(problem.Id, "description.md");
+            var inputdesc = await TryReadFileAsync(problem.Id, "inputdesc.md");
+            var outputdesc = await TryReadFileAsync(problem.Id, "outputdesc.md");
+            var hint = await TryReadFileAsync(problem.Id, "hint.md");
+            var interact = await TryReadFileAsync(problem.Id, "interact.md");
 
-            var description = await TryReadFileAsync(problem, "description.md");
-            var inputdesc = await TryReadFileAsync(problem, "inputdesc.md");
-            var outputdesc = await TryReadFileAsync(problem, "outputdesc.md");
-            var hint = await TryReadFileAsync(problem, "hint.md");
-            var interact = await TryReadFileAsync(problem, "interact.md");
-
-            var testcases = await Testcases.ListAsync(pid, false);
+            var testcases = await Testcases.ListAsync(problem.Id, false);
             var samples = new List<MemoryTestcase>();
 
             foreach (var item in testcases)

@@ -133,7 +133,7 @@ namespace Polygon.Storages
                 .ToDictionaryAsync(p => p.Id, p => p.Title);
         }
 
-        public Task<Dictionary<int, string>> ListNameAsync(Expression<Func<Submission, bool>> condition)
+        Task<Dictionary<int, string>> IProblemStore.ListNameAsync(Expression<Func<Submission, bool>> condition)
         {
             return Submissions
                 .Where(condition)
@@ -141,6 +141,12 @@ namespace Polygon.Storages
                 .Select(p => new { p.Id, p.Title })
                 .Distinct()
                 .ToDictionaryAsync(p => p.Id, p => p.Title);
+        }
+
+        async Task<string?> IProblemStore.ReadCompiledHtmlAsync(int problemId)
+        {
+            var fileInfo = await ((IProblemStore)this).GetFileAsync(problemId, "view.html");
+            return await fileInfo.ReadAsync();
         }
     }
 }
