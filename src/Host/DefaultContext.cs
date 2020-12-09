@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 
 namespace SatelliteSite
 {
-    public class DefaultContext : IdentityDbContext<User, AspNetRole, int>, IPolygonQueryable
+    public class DefaultContext : IdentityDbContext<User, Role, int>, IPolygonQueryable
     {
         public DefaultContext(DbContextOptions options)
             : base(options)
@@ -32,7 +32,7 @@ namespace SatelliteSite
             = (Judgings, type, time) =>
                 from j in Judgings
                 where j.Server != null && (j.StopTime > time || j.StopTime == null)
-                group EF.Functions.DateDiffSecond(j.StartTime ?? time, j.StopTime ?? DateTimeOffset.Now) by j.Server into g
-                select new JudgehostLoad { HostName = g.Key, Load = g.Sum(), Type = type };
+                group EF.Functions.DateDiffMillisecond(j.StartTime ?? time, j.StopTime ?? DateTimeOffset.Now) by j.Server into g
+                select new JudgehostLoad { HostName = g.Key, Load = g.Sum() / 1000.0, Type = type };
     }
 }

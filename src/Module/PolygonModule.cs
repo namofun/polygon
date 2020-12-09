@@ -28,7 +28,7 @@ namespace SatelliteSite.PolygonModule
 {
     public class PolygonModule<TUser, TRole, TContext> : AbstractModule, IAuthorizationPolicyRegistry
         where TUser : User, new()
-        where TRole : Role, IRoleWithProblem, new()
+        where TRole : Role, new()
         where TContext : IdentityDbContext<TUser, TRole, int>, IPolygonQueryable
     {
         public override string Area => "Polygon";
@@ -59,8 +59,8 @@ namespace SatelliteSite.PolygonModule
         public override void RegisterServices(IServiceCollection services)
         {
             services.ConfigureSwaggerGen(options => options.OperationFilter<SwaggerFixFilter>());
-            services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TRole, TContext>>();
-            services.AddPolygonStorage<PolygonFacade<TUser, TRole, TContext>>();
+            services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TContext>>();
+            services.AddPolygonStorage<PolygonFacade<TUser, TContext>>();
 
             services.PostConfigure<PolygonOptions>(o =>
             {

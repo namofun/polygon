@@ -8,12 +8,10 @@ namespace Polygon.Storages
     /// The big facade interface with one implemention.
     /// </summary>
     /// <typeparam name="TUser">The user type.</typeparam>
-    /// <typeparam name="TRole">The role type.</typeparam>
     /// <typeparam name="TContext">The context type.</typeparam>
-    public partial class PolygonFacade<TUser, TRole, TContext> : IPolygonFacade
+    public partial class PolygonFacade<TUser, TContext> : IPolygonFacade
         where TContext : DbContext, IPolygonQueryable
         where TUser : SatelliteSite.IdentityModule.Entities.User
-        where TRole : SatelliteSite.IdentityModule.Entities.Role, IRoleWithProblem
     {
         /// <inheritdoc />
         IProblemStore IPolygonFacade.Problems => this;

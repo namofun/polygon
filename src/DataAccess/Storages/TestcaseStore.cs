@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TRole, TContext> : ITestcaseStore
+    public partial class PolygonFacade<TUser, TContext> : ITestcaseStore
     {
         DbSet<Testcase> Testcases => Context.Set<Testcase>();
 

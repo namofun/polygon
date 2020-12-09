@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TRole, TContext> : IJudgingStore
+    public partial class PolygonFacade<TUser, TContext> : IJudgingStore
     {
         DbSet<Judging> Judgings => Context.Set<Judging>();
 

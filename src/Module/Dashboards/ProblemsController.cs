@@ -38,34 +38,6 @@ namespace SatelliteSite.PolygonModule.Dashboards
             Options = options;
         }
 
-        private async Task<bool> CreateProblemRole(int problemId)
-        {
-            if (User.IsInRole("Administrator")) return true;
-
-            var role = UserManager.CreateEmptyRole("AuthorOfProblem" + problemId);
-            ((IRoleWithProblem)role).ProblemId = problemId;
-            var i1 = await UserManager.CreateAsync(role);
-
-            if (!i1.Succeeded)
-            {
-                StatusMessage = "Error creating roles. Please contact Administrator.";
-                Logger.LogError(i1);
-                return false;
-            }
-
-            var u = await UserManager.GetUserAsync(User);
-            var i2 = await UserManager.AddToRoleAsync(u, "AuthorOfProblem" + problemId);
-
-            if (!i2.Succeeded)
-            {
-                StatusMessage = "Error assigning roles. Please contact Administrator.";
-                Logger.LogError(i2);
-                return false;
-            }
-
-            return true;
-        }
-
 
         [HttpGet]
         public async Task<IActionResult> List(int page = 1)
@@ -99,8 +71,8 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
             await HttpContext.AuditAsync("created", $"{p.Id}");
 
-            if (!await CreateProblemRole(p.Id))
-                return RedirectToAction(nameof(List));
+            if (!User.IsInRole("Administrator"))
+                await Store.AuthorizeAsync(p.Id, int.Parse(User.GetUserId()), true);
 
             return RedirectToAction(
                 actionName: "Overview",
@@ -158,8 +130,10 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
                 StatusMessage = importer.LogBuffer.ToString();
 
-                foreach (var prob in probs)
-                    await CreateProblemRole(prob.Id);
+                int uid = int.Parse(User.GetUserId());
+                if (!User.IsInRole("Administrator"))
+                    foreach (var prob in probs)
+                        await Store.AuthorizeAsync(prob.Id, uid, true);
 
                 return RedirectToAction(
                     actionName: "Overview",

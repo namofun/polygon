@@ -66,6 +66,14 @@ namespace Polygon.Storages
         Task<Problem> FindAsync(int problemId);
 
         /// <summary>
+        /// Find the problem via ID.
+        /// </summary>
+        /// <param name="problemId">The problem ID.</param>
+        /// <param name="userId">The user ID.</param>
+        /// <returns>The task for problem.</returns>
+        Task<Problem> FindByPermissionAsync(int problemId, int userId);
+
+        /// <summary>
         /// List available problems.
         /// </summary>
         /// <param name="page">The page.</param>
@@ -87,6 +95,15 @@ namespace Polygon.Storages
         /// <param name="condition">The conditions.</param>
         /// <returns>The task for fetching names.</returns>
         Task<Dictionary<int, string>> ListNameAsync(Expression<Func<Problem, bool>> condition);
+
+        /// <summary>
+        /// Authorize the problem with such user ID.
+        /// </summary>
+        /// <param name="problemId">The problem to share.</param>
+        /// <param name="userId">The user to authorize.</param>
+        /// <param name="allow">Whether to authorize or unauthorize.</param>
+        /// <returns>The task for authorizing.</returns>
+        Task AuthorizeAsync(int problemId, int userId, bool allow);
 
         /// <summary>
         /// List permitted users.

@@ -11,7 +11,7 @@ using Timer = System.Linq.Expressions.Expression<System.Func<System.DateTimeOffs
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TRole, TContext> : IJudgehostStore
+    public partial class PolygonFacade<TUser, TContext> : IJudgehostStore
     {
         DbSet<Judgehost> Judgehosts => Context.Set<Judgehost>();
 

@@ -8,10 +8,9 @@ namespace Polygon.Storages
     /// Entity configuration for polygon backend.
     /// </summary>
     /// <typeparam name="TUser">The user type.</typeparam>
-    /// <typeparam name="TRole">The role type.</typeparam>
     /// <typeparam name="TContext">The DbContext type.</typeparam>
     /// <remarks>Should make entity inclusion on Contest to Rejudging.</remarks>
-    public class PolygonEntityConfiguration<TUser, TRole, TContext> :
+    public class PolygonEntityConfiguration<TUser, TContext> :
         EntityTypeConfigurationSupplier<TContext>,
         IEntityTypeConfiguration<Executable>,
         IEntityTypeConfiguration<InternalError>,
@@ -23,10 +22,10 @@ namespace Polygon.Storages
         IEntityTypeConfiguration<Rejudging>,
         IEntityTypeConfiguration<Submission>,
         IEntityTypeConfiguration<SubmissionStatistics>,
-        IEntityTypeConfiguration<Testcase>
+        IEntityTypeConfiguration<Testcase>,
+        IEntityTypeConfiguration<ProblemAuthor>
         where TContext : DbContext, IPolygonQueryable
         where TUser : SatelliteSite.IdentityModule.Entities.User
-        where TRole : SatelliteSite.IdentityModule.Entities.Role, IRoleWithProblem
     {
         public void Configure(EntityTypeBuilder<Executable> entity)
         {
@@ -232,11 +231,6 @@ namespace Polygon.Storages
             entity.Property(e => e.ComapreArguments)
                 .IsUnicode(false)
                 .HasMaxLength(128);
-
-            entity.HasMany<TRole>()
-                .WithOne()
-                .HasForeignKey(r => r.ProblemId)
-                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public void Configure(EntityTypeBuilder<Rejudging> entity)
@@ -368,6 +362,18 @@ namespace Polygon.Storages
             entity.Property(e => e.Description)
                 .HasMaxLength(1 << 9)
                 .IsRequired();
+        }
+
+        public void Configure(EntityTypeBuilder<ProblemAuthor> entity)
+        {
+            entity.ToTable("PolygonAuthors");
+
+            entity.HasKey(e => new { e.UserId, e.ProblemId });
+
+            entity.HasOne<Problem>()
+                .WithMany()
+                .HasForeignKey(e => e.ProblemId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

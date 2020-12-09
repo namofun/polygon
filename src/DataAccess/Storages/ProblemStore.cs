@@ -11,9 +11,11 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TRole, TContext> : IProblemStore
+    public partial class PolygonFacade<TUser, TContext> : IProblemStore
     {
         DbSet<Problem> Problems => Context.Set<Problem>();
+
+        DbSet<ProblemAuthor> Authors => Context.Set<ProblemAuthor>();
 
         Task<Problem> IProblemStore.CreateAsync(Problem entity) => CreateEntityAsync(entity);
 
@@ -37,23 +39,22 @@ namespace Polygon.Storages
 
         Task<IPagedList<Problem>> IProblemStore.ListAsync(int page, int perCount, int? uid)
         {
-            var uidLimit = Context.Set<IdentityUserRole<int>>()
-                .Where(ur => ur.UserId == uid)
-                .Join(Context.Set<TRole>(), ur => ur.RoleId, r => r.Id, (ur, r) => r)
-                .Where(r => r.ProblemId != null)
-                .Select(r => (int)r.ProblemId!);
-
-            return Problems
-                .WhereIf(uid.HasValue, p => uidLimit.Contains(p.Id))
-                .OrderBy(p => p.Id)
-                .ToPagedListAsync(page, perCount);
+            if (uid.HasValue)
+                return Authors
+                    .Where(pa => pa.UserId == uid)
+                    .OrderBy(pa => pa.ProblemId)
+                    .Join(Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
+                    .ToPagedListAsync(page, perCount);
+            else
+                return Problems
+                    .OrderBy(p => p.Id)
+                    .ToPagedListAsync(page, perCount);
         }
 
         async Task<IEnumerable<(int UserId, string UserName, string NickName)>> IProblemStore.ListPermittedUserAsync(int pid)
         {
-            var result = await Context.Set<TRole>()
+            var result = await Authors
                 .Where(r => r.ProblemId == pid)
-                .Join(Context.Set<IdentityUserRole<int>>(), r => r.Id, ur => ur.RoleId, (r, ur) => ur)
                 .Join(Context.Set<TUser>(), ur => ur.UserId, u => u.Id, (ur, u) => new { u.Id, u.UserName, u.NickName })
                 .ToListAsync();
             return result.Select(a => (a.Id, a.UserName, a.NickName));
@@ -147,6 +148,34 @@ namespace Polygon.Storages
         {
             var fileInfo = await ((IProblemStore)this).GetFileAsync(problemId, "view.html");
             return await fileInfo.ReadAsync();
+        }
+
+        async Task IProblemStore.AuthorizeAsync(int problemId, int userId, bool allow)
+        {
+            var auth = await Authors
+                .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
+                .FirstOrDefaultAsync();
+
+            if (allow && auth == null)
+            {
+                await CreateEntityAsync(new ProblemAuthor
+                {
+                    ProblemId = problemId,
+                    UserId = userId
+                });
+            }
+            else if (!allow && auth != null)
+            {
+                await DeleteEntityAsync(auth);
+            }
+        }
+
+        Task<Problem> IProblemStore.FindByPermissionAsync(int problemId, int userId)
+        {
+            return Authors
+                .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
+                .Join(Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
+                .SingleOrDefaultAsync();
         }
     }
 }

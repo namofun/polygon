@@ -197,12 +197,8 @@ namespace SatelliteSite.PolygonModule.Controllers
         {
             var user = await userManager.FindByIdAsync(uid);
             if (user == null) return NotFound();
-            var roleName = $"AuthorOfProblem{Problem.Id}";
-            var result = await userManager.RemoveFromRoleAsync(user, roleName);
-
-            StatusMessage = result.Succeeded
-                ? "Role unassigned."
-                : "Error " + result.ToString();
+            await Store.AuthorizeAsync(Problem.Id, user.Id, false);
+            StatusMessage = "Role unassigned.";
             return RedirectToAction(nameof(Overview));
         }
 
@@ -229,18 +225,8 @@ namespace SatelliteSite.PolygonModule.Controllers
                 return RedirectToAction(nameof(Overview));
             }
 
-            var roleName = $"AuthorOfProblem{Problem.Id}";
-            if (!await userManager.RoleExistsAsync(roleName))
-            {
-                var role = userManager.CreateEmptyRole(roleName);
-                ((IRoleWithProblem)role).ProblemId = Problem.Id;
-                await userManager.CreateAsync(role);
-            }
-
-            var result = await userManager.AddToRoleAsync(user, roleName);
-            StatusMessage = result.Succeeded
-                ? "Role assigned."
-                : "Error " + result.ToString();
+            await Store.AuthorizeAsync(Problem.Id, user.Id, true);
+            StatusMessage = "Role assigned.";
             return RedirectToAction(nameof(Overview));
         }
 
@@ -249,7 +235,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleSubmit()
         {
-            await Facade.Problems.ToggleSubmitAsync(Problem.Id, !Problem.AllowSubmit);
+            await Store.ToggleSubmitAsync(Problem.Id, !Problem.AllowSubmit);
             return RedirectToAction(nameof(Overview));
         }
 
@@ -258,7 +244,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleJudge()
         {
-            await Facade.Problems.ToggleJudgeAsync(Problem.Id, !Problem.AllowJudge);
+            await Store.ToggleJudgeAsync(Problem.Id, !Problem.AllowJudge);
             return RedirectToAction(nameof(Overview));
         }
 

@@ -40,15 +40,18 @@ namespace SatelliteSite.PolygonModule.Controllers
         private async Task<IActionResult> ValidateAsync()
         {
             if (!RouteData.Values.TryGetValue("pid", out var _pid) ||
-                !int.TryParse(_pid as string, out int pid))
+                !int.TryParse(_pid as string, out int pid) ||
+                !User.IsSignedIn())
                 return base.NotFound();
 
-            if (!User.IsInRoles($"Administrator,AuthorOfProblem{pid}"))
-                return Forbid();
+            if (!User.IsInRole("Administrator"))
+                Problem = await Facade.Problems.FindByPermissionAsync(pid, int.Parse(User.GetUserId() ?? "0"));
+            else
+                Problem = await Facade.Problems.FindAsync(pid);
 
-            Problem = await Facade.Problems.FindAsync(pid);
+            if (Problem == null) return base.NotFound();
             ViewData["ProblemItself"] = Problem;
-            return Problem == null ? base.NotFound() : null;
+            return null;
         }
 
         /// <summary>

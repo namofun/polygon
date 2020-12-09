@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TRole, TContext> : ISubmissionStore
+    public partial class PolygonFacade<TUser, TContext> : ISubmissionStore
     {
         DbSet<Submission> Submissions => Context.Set<Submission>();
 
