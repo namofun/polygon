@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Polygon.Entities;
+using Polygon.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using LoadQuery = System.Linq.IQueryable<Polygon.Models.JudgehostLoad>;
-using Timer = System.Linq.Expressions.Expression<System.Func<System.DateTimeOffset>>;
 
 namespace Polygon.Storages
 {
@@ -57,74 +56,91 @@ namespace Polygon.Storages
                 .BatchUpdateAsync(h => new Judgehost { Active = active });
         }
 
+        private class DiffRewriter : ExpressionVisitor
+        {
+            private readonly ParameterExpression _diff;
+            private readonly ParameterExpression _innerStart;
+            private readonly ParameterExpression _innerEnd;
+            private readonly Expression _innerBody;
+            private Expression? _lhs = null, _rhs = null;
+
+            public DiffRewriter(
+                ParameterExpression diff,
+                Expression<Func<DateTimeOffset, DateTimeOffset, double>> reload)
+            {
+                _diff = diff;
+                _innerStart = reload.Parameters[0];
+                _innerEnd = reload.Parameters[1];
+                _innerBody = reload.Body;
+            }
+
+            protected override Expression VisitParameter(ParameterExpression node)
+            {
+                if (node == _innerStart)
+                    return _lhs ?? throw new ArgumentNullException("Where is left hand side?");
+                if (node == _innerEnd)
+                    return _rhs ?? throw new ArgumentNullException("Where is right hand side?");
+                return base.VisitParameter(node);
+            }
+
+            protected override Expression VisitInvocation(InvocationExpression node)
+            {
+                if (node.Expression == _diff)
+                {
+                    _lhs = node.Arguments[0];
+                    _rhs = node.Arguments[1];
+                    var result = base.Visit(_innerBody);
+                    _rhs = null;
+                    _lhs = null;
+                    return result;
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+        }
+
+        private static Expression<Func<TContext, IQueryable<JudgehostLoad>>> CreateQuery(
+            Expression<Func<DateTimeOffset, DateTimeOffset, double>> source)
+        {
+            Expression<Func<TContext, Func<DateTimeOffset, DateTimeOffset, double>, IQueryable<JudgehostLoad>>>
+                superLoader = (context, diff) =>
+                (
+                    from j in context.Set<Judging>()
+                    where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddDays(-2) || j.StopTime == null)
+                    group diff(j.StartTime ?? DateTimeOffset.Now.AddDays(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
+                    select new JudgehostLoad { HostName = g.Key, Load = g.Sum(), Type = 3 }
+                ).Concat(
+                    from j in context.Set<Judging>()
+                    where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddHours(-2) || j.StopTime == null)
+                    group diff(j.StartTime ?? DateTimeOffset.Now.AddHours(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
+                    select new JudgehostLoad { HostName = g.Key, Load = g.Sum(), Type = 2 }
+                ).Concat(
+                    from j in context.Set<Judging>()
+                    where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddMinutes(-5) || j.StopTime == null)
+                    group diff(j.StartTime ?? DateTimeOffset.Now.AddMinutes(-5), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
+                    select new JudgehostLoad { HostName = g.Key, Load = g.Sum(), Type = 1 }
+                );
+
+            return Expression.Lambda<Func<TContext, IQueryable<JudgehostLoad>>>(
+                new DiffRewriter(superLoader.Parameters[1], source).Visit(superLoader.Body),
+                superLoader.Parameters[0]);
+        }
+
         /// <remarks>
-        /// <para>
-        /// Original Query:
-        /// </para>
-        /// <para>
-        /// <c>from j in Judgings</c><br />
-        /// <c>where j.Server != null &amp;&amp; (j.StopTime > DateTimeOffset.Now.AddDays(-2) || j.StopTime == null)</c><br />
-        /// <c>group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddDays(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g</c><br />
-        /// <c>select new { HostName = g.Key, Load = g.Sum(), Type = 3 };</c>
-        /// </para>
-        /// <para>
-        /// <c>from j in Judgings</c><br />
-        /// <c>where j.Server != null &amp;&amp; (j.StopTime > DateTimeOffset.Now.AddHours(-2) || j.StopTime == null)</c><br />
-        /// <c>group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddHours(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g</c><br />
-        /// <c>select new { HostName = g.Key, Load = g.Sum(), Type = 2 };</c>
-        /// </para>
-        /// <para>
-        /// <c>from j in Judgings</c><br />
-        /// <c>where j.Server != null &amp;&amp; (j.StopTime > DateTimeOffset.Now.AddMinutes(-5) || j.StopTime == null)</c><br />
-        /// <c>group EF.Functions.DateDiffSecond(j.StartTime ?? DateTimeOffset.Now.AddMinutes(-5), j.StopTime ?? DateTimeOffset.Now) by j.Server into g</c><br />
-        /// <c>select new { HostName = g.Key, Load = g.Sum(), Type = 1 };</c>
-        /// </para>
-        /// <para>
-        /// <c>query1.Concat(query2).Concat(query3).ToList()</c>
-        /// </para>
+        /// For original query, please refer to <see cref="CreateQuery(Expression{Func{DateTimeOffset, DateTimeOffset, double}})"/>.
         /// </remarks>
         Task<Dictionary<string, (double, double, double)>> IJudgehostStore.LoadAsync()
         {
-            var compiledQuery = CachedQueryable.Cache.GetOrCreate("judgehost_loads_query", entry =>
-            {
-                var originalQuery = Context.JudgehostLoadQuery;
-                Expression<Func<TContext, DbSet<Judging>>> j = context => context.Set<Judging>();
-
-                var query1 = new ReplaceExpressionVisitor()
-                    .Attach(originalQuery.Parameters[0], j.Body)
-                    .Attach(originalQuery.Parameters[1], Expression.Constant(3, typeof(int)))
-                    .Attach(originalQuery.Parameters[2], ((Timer)(() => DateTimeOffset.Now.AddDays(-2))).Body)
-                    .Visit(originalQuery.Body);
-
-                var query2 = new ReplaceExpressionVisitor()
-                    .Attach(originalQuery.Parameters[0], j.Body)
-                    .Attach(originalQuery.Parameters[1], Expression.Constant(2, typeof(int)))
-                    .Attach(originalQuery.Parameters[2], ((Timer)(() => DateTimeOffset.Now.AddHours(-2))).Body)
-                    .Visit(originalQuery.Body);
-
-                var query3 = new ReplaceExpressionVisitor()
-                    .Attach(originalQuery.Parameters[0], j.Body)
-                    .Attach(originalQuery.Parameters[1], Expression.Constant(1, typeof(int)))
-                    .Attach(originalQuery.Parameters[2], ((Timer)(() => DateTimeOffset.Now.AddMinutes(-5))).Body)
-                    .Visit(originalQuery.Body);
-
-                Expression<Func<LoadQuery, LoadQuery, LoadQuery, LoadQuery>> concatToList =
-                    (query1, query2, query3) => query1.Concat(query2).Concat(query3);
-
-                var finalQuery = new ReplaceExpressionVisitor()
-                    .Attach(concatToList.Parameters[0], query1)
-                    .Attach(concatToList.Parameters[1], query2)
-                    .Attach(concatToList.Parameters[2], query3)
-                    .Visit(concatToList.Body);
-
-                var exp = Expression.Lambda<Func<TContext, LoadQuery>>(finalQuery, j.Parameters);
-                return EF.CompileAsyncQuery(exp);
-            });
+            var compiledQuery = CachedQueryable.Cache.GetOrCreate(
+                key: "judgehost_loads_query",
+                factory: entry => EF.CompileAsyncQuery(CreateQuery(Context.CalculateDuration)));
 
             return CachedQueryable.Cache.GetOrCreateAsync("judgehost_loads", async entry =>
             {
                 var returns = new Dictionary<string, (double, double, double)>();
-                
+
                 await foreach (var item in compiledQuery(Context))
                 {
                     if (!returns.ContainsKey(item.HostName)) returns.Add(item.HostName, default);

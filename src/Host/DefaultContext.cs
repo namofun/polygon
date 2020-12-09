@@ -28,11 +28,7 @@ namespace SatelliteSite
                 select new SolutionAuthor(s.Id, s.ContestId, s.TeamId, u.UserName, null /*t.TeamName */);
         }
 
-        public Expression<Func<DbSet<Judging>, int, DateTimeOffset, IQueryable<JudgehostLoad>>> JudgehostLoadQuery { get; }
-            = (Judgings, type, time) =>
-                from j in Judgings
-                where j.Server != null && (j.StopTime > time || j.StopTime == null)
-                group EF.Functions.DateDiffMillisecond(j.StartTime ?? time, j.StopTime ?? DateTimeOffset.Now) by j.Server into g
-                select new JudgehostLoad { HostName = g.Key, Load = g.Sum() / 1000.0, Type = type };
+        public Expression<Func<DateTimeOffset, DateTimeOffset, double>> CalculateDuration { get; }
+            = (start, end) => EF.Functions.DateDiffMillisecond(start, end) / 1000.0;
     }
 }

@@ -31,20 +31,13 @@ namespace Polygon.Storages
         IQueryable<SolutionAuthor> Author(Expression<Func<Submission, bool>> predicate);
 
         /// <summary>
-        /// Create an <see cref="IQueryable{JudgehostLoad}"/> to query judgehost loads.
+        /// Create an expression to calculate the duration seconds between two <see cref="DateTimeOffset"/>.
         /// </summary>
         /// <remarks>
-        /// Returning a query like these:
-        /// <para>
-        /// <c>from j in INPUT(DbSet&lt;Judging&gt;)</c><br />
-        /// <c>where j.Server != null</c><br />
-        /// <c>where j.StopTime > INPUT(DateTimeOffset) || j.StopTime == null</c><br />
-        /// <c>let endTime = j.StopTime ?? DateTimeOffset.Now</c><br />
-        /// <c>let startTime = j.StartTime ?? INPUT(DateTimeOffset)</c><br />
-        /// <c>group (endTime - startTime).TotalSeconds by j.Server into g</c><br />
-        /// <c>select new { HostName = g.Key, Load = g.Sum(), Type = INPUT(int) };</c>
-        /// </para>
+        /// Usually, it can be expressed in several ways.
+        /// <list type="bullet">For SqlServer, it may be <c>(start, end) => EF.Functions.DateDiffMillisecond(start, end) / 1000.0</c>.</list>
+        /// <list type="bullet">For InMemory, it may be <c>(start, end) => (end - start).TotalSeconds</c>.</list>
         /// </remarks>
-        Expression<Func<DbSet<Judging>, int, DateTimeOffset, IQueryable<JudgehostLoad>>> JudgehostLoadQuery { get; }
+        Expression<Func<DateTimeOffset, DateTimeOffset, double>> CalculateDuration { get; }
     }
 }
