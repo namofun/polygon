@@ -85,6 +85,13 @@ namespace Polygon.Storages
         Task<int> CountAsync(int problemId);
 
         /// <summary>
+        /// Count and get the total score from the testcases.
+        /// </summary>
+        /// <param name="problemId">The problem ID.</param>
+        /// <returns>The count task.</returns>
+        Task<(int, int)> CountAndScoreAsync(int problemId);
+
+        /// <summary>
         /// Get the testcase file.
         /// </summary>
         /// <param name="testcase">The testcase.</param>

@@ -22,7 +22,9 @@ namespace SatelliteSite.PolygonModule.Controllers
         [HttpGet("/[area]/{pid}")]
         public async Task<IActionResult> Overview()
         {
-            ViewBag.TestcaseCount = await Facade.Testcases.CountAsync(Problem.Id);
+            var (count, score) = await Facade.Testcases.CountAndScoreAsync(Problem.Id);
+            ViewBag.TestcaseCount = count;
+            ViewBag.TestcaseScore = score;
             ViewBag.Users = await Facade.Problems.ListPermittedUserAsync(Problem.Id);
             return View(Problem);
         }

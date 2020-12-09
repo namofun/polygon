@@ -81,6 +81,16 @@ namespace Polygon.Storages
                 .CountAsync();
         }
 
+        async Task<(int, int)> ITestcaseStore.CountAndScoreAsync(int pid)
+        {
+            var q = await Testcases
+                .Where(t => t.ProblemId == pid)
+                .GroupBy(t => 1)
+                .Select(g => new { Count = g.Count(), Score = g.Sum(t => t.Point) })
+                .FirstOrDefaultAsync();
+            return (q.Count, q.Score);
+        }
+
         Task<Testcase> ITestcaseStore.CreateAsync(Testcase entity) => CreateEntityAsync(entity);
 
         Task<Testcase> ITestcaseStore.FindAsync(int tid, int? pid)
