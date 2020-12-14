@@ -13,14 +13,14 @@ namespace Polygon.Storages
 
     public class ByOptionJudgingFileProvider : PhysicalMutableFileProvider, IJudgingFileProvider
     {
-        public ByOptionJudgingFileProvider(IOptions<PolygonOptions> options) : base(options.Value.JudgingDirectory)
+        public ByOptionJudgingFileProvider(IOptions<PolygonPhysicalOptions> options) : base(options.Value.JudgingDirectory)
         {
         }
     }
 
     public class ByOptionProblemFileProvider : PhysicalMutableFileProvider, IProblemFileProvider
     {
-        public ByOptionProblemFileProvider(IOptions<PolygonOptions> options) : base(options.Value.ProblemDirectory)
+        public ByOptionProblemFileProvider(IOptions<PolygonPhysicalOptions> options) : base(options.Value.ProblemDirectory)
         {
         }
     }

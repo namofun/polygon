@@ -1,16 +1,11 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Polygon;
 using Polygon.Packaging;
 using Polygon.Storages;
 using SatelliteSite;
-using SatelliteSite.IdentityModule.Entities;
-using System.IO;
 
 [assembly: RoleDefinition(10, "Judgehost", "judgehost", "(Internal/System) Judgehost")]
 [assembly: RoleDefinition(11, "Problem", "prob", "Problem Provider")]
@@ -26,10 +21,8 @@ using System.IO;
 
 namespace SatelliteSite.PolygonModule
 {
-    public class PolygonModule<TUser, TRole, TContext> : AbstractModule, IAuthorizationPolicyRegistry
-        where TUser : User, new()
-        where TRole : Role, new()
-        where TContext : IdentityDbContext<TUser, TRole, int>, IPolygonQueryable
+    public class PolygonModule<TRole> : AbstractModule, IAuthorizationPolicyRegistry
+        where TRole : class, IServiceRole, new()
     {
         public override string Area => "Polygon";
 
@@ -48,31 +41,15 @@ namespace SatelliteSite.PolygonModule
                 version: "v7.2.0");
         }
 
-        private static void EnsureDirectoryExists(string directory)
-        {
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-        }
-
         public override void RegisterServices(IServiceCollection services)
         {
             services.ConfigureSwaggerGen(options => options.OperationFilter<SwaggerFixFilter>());
-            services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TContext>>();
-            services.AddPolygonStorage<PolygonFacade<TUser, TContext>>();
-            services.AddSingleton<QueryCache<TContext>>();
-
-            services.PostConfigure<PolygonOptions>(o =>
-            {
-                o.FinalizeSettings();
-                EnsureDirectoryExists(o.JudgingDirectory);
-                EnsureDirectoryExists(o.ProblemDirectory);
-            });
 
             services.AddScoped<IExportProvider, KattisExportProvider>();
             services.AddScoped<IStatementProvider, MarkdownStatementProvider>();
             services.AddScoped<IStatementWriter, MarkdownStatementWriter>();
+
+            services.AddMediatRAssembly(typeof(Polygon.Judgement.DOMjudgeLikeHandlers).Assembly);
 
             services.AddImportProvider<KattisImportProvider>("kattis", "Kattis Package");
             services.AddImportProvider<XmlImportProvider>("xysxml", "XiaoYang's XML");
@@ -80,12 +57,9 @@ namespace SatelliteSite.PolygonModule
             services.AddImportProvider<CodeforcesImportProvider>("cfplyg", "CodeForces Polygon (Linux)");
             services.AddImportProvider<DataImportProvider>("data", "Data (.in and .out/.ans)");
 
-            services.AddMediatR(
-                typeof(Polygon.Judgement.DOMjudgeLikeHandlers),
-                typeof(Polygon.Storages.Handlers.Auditlogging));
+            new TRole().Configure(services);
 
-            services.AddSingleton<IJudgingFileProvider, ByOptionJudgingFileProvider>();
-            services.AddSingleton<IProblemFileProvider, ByOptionProblemFileProvider>();
+            services.PostConfigure<PolygonOptions>(o => o.FinalizeSettings());
         }
 
         public override void RegisterMenu(IMenuContributor menus)
@@ -137,21 +111,21 @@ namespace SatelliteSite.PolygonModule
                     menu.HasLink("#")
                         .HasTitle("fas fa-gavel", "Judgings")
                         .RequireRoles("Administrator")
-                        .HasBadge("num-alerts-judgehosts", BootstrapColor.warning)
-                        .HasBadge("num-alerts-internalerrors", BootstrapColor.danger)
+                        .HasBadge("judgehosts", BootstrapColor.warning)
+                        .HasBadge("internalerrors", BootstrapColor.danger)
                         .ActiveWhenController("Judgehosts,InternalErrors");
 
                     menu.HasEntry(0)
                         .HasIdentifier("menu_judgehosts")
                         .HasLink("Dashboard", "Judgehosts", "List")
                         .HasTitle("fas fa-server fa-fw", "judgehosts")
-                        .HasBadge("num-alerts-judgehosts-sub", BootstrapColor.warning);
+                        .HasBadge("judgehosts", BootstrapColor.warning);
 
                     menu.HasEntry(1)
                         .HasIdentifier("menu_internal_error")
                         .HasLink("Dashboard", "InternalErrors", "List")
                         .HasTitle("fas fa-bolt fa-fw", "internal error")
-                        .HasBadge("num-alerts-internalerrors-sub", BootstrapColor.warning);
+                        .HasBadge("internalerrors", BootstrapColor.warning);
                 });
 
                 menu.HasEntry(300)

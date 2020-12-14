@@ -59,16 +59,6 @@ namespace Polygon
         public IReadOnlyCollection<(string, string)> ImportProviders => _importNames;
 
         /// <summary>
-        /// The content directory for judging related
-        /// </summary>
-        public string JudgingDirectory { get; set; } = string.Empty;
-
-        /// <summary>
-        /// The problem directory for judging related
-        /// </summary>
-        public string ProblemDirectory { get; set; } = string.Empty;
-
-        /// <summary>
         /// Create an instance of import providers.
         /// </summary>
         /// <param name="services">The service provider.</param>

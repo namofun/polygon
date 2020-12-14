@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Polygon.Storages
@@ -337,6 +338,19 @@ namespace Polygon.Storages
                 .AddScoped<IRejudgingStore, TRejudgingStore>()
                 .AddScoped<ISubmissionStore, TSubmissionStore>()
                 .AddScoped<ITestcaseStore, TTestcaseStore>();
+        }
+
+        /// <summary>
+        /// Add the assembly to MediatR.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="assembly">The handler assembly.</param>
+        /// <returns>The service collection.</returns>
+        public static IServiceCollection AddMediatRAssembly(
+            this IServiceCollection services, Assembly assembly)
+        {
+            MediatR.Registration.ServiceRegistrar.AddMediatRClasses(services, new[] { assembly });
+            return services;
         }
     }
 }

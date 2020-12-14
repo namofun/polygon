@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />
-    <ProjectReference Include="..\DataAccess\Polygon.DataAccess.csproj" />
     <ProjectReference Include="..\Packaging\Polygon.Packaging.csproj" />
     <ProjectReference Include="..\Judgement\Polygon.Judgement.csproj" />
     <ProjectReference Include="..\TagHelpers\Polygon.TagHelpers.csproj" />
