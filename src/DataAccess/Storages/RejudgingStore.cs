@@ -55,13 +55,11 @@ namespace Polygon.Storages
                 select new { g.Key.TeamId, g.Key.ContestId, g.Key.ProblemId, Delta = g.Sum() };
 
             await Context.Set<SubmissionStatistics>()
-                .MergeAsync(
-                    sourceTable: statisticsMerge,
-                    targetKey: s => new { s.TeamId, s.ContestId, s.ProblemId },
-                    sourceKey: s => new { s.TeamId, s.ContestId, s.ProblemId },
-                    insertExpression: null,
-                    delete: false,
-                    updateExpression: (o, s) => new SubmissionStatistics
+                .BatchUpdateJoinAsync(
+                    inner: statisticsMerge,
+                    outerKeySelector: s => new { s.TeamId, s.ContestId, s.ProblemId },
+                    innerKeySelector: s => new { s.TeamId, s.ContestId, s.ProblemId },
+                    updateSelector: (o, s) => new SubmissionStatistics
                     {
                         AcceptedSubmission = o.AcceptedSubmission + s.Delta
                     });
