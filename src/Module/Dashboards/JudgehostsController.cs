@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Polygon.Storages;
+using System;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Dashboards
@@ -16,9 +18,17 @@ namespace SatelliteSite.PolygonModule.Dashboards
 
 
         [HttpGet]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(
+            [FromServices] IMemoryCache memoryCache)
         {
-            ViewBag.Load = await Store.LoadAsync();
+            ViewBag.Load = await memoryCache
+                .GetOrCreateAsync("judgehost_loads", async entry =>
+                {
+                    var result = await Store.LoadAsync();
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30);
+                    return result;
+                });
+
             return View(await Store.ListAsync());
         }
 

@@ -48,12 +48,15 @@ namespace Polygon.Storages
 
         public IMediator Mediator { get; }
 
-        public PolygonFacade(TContext context, IJudgingFileProvider jf, IProblemFileProvider pf, IMediator mediator)
+        public QueryCache<TContext> QueryCache { get; }
+
+        public PolygonFacade(TContext context, IJudgingFileProvider jf, IProblemFileProvider pf, IMediator mediator, QueryCache<TContext> queryCache)
         {
             Context = context;
             JudgingFiles = jf;
             ProblemFiles = pf;
             Mediator = mediator;
+            QueryCache = queryCache;
         }
 
         private async Task<T> CreateEntityAsync<T>(T entity) where T : class

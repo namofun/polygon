@@ -61,6 +61,7 @@ namespace SatelliteSite.PolygonModule
             services.ConfigureSwaggerGen(options => options.OperationFilter<SwaggerFixFilter>());
             services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TContext>>();
             services.AddPolygonStorage<PolygonFacade<TUser, TContext>>();
+            services.AddSingleton<QueryCache<TContext>>();
 
             services.PostConfigure<PolygonOptions>(o =>
             {

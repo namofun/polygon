@@ -140,7 +140,7 @@ namespace Polygon.Storages
         {
             return Rejudgings
                 .Where(t => t.Applied == null && t.ContestId == cid)
-                .CachedCountAsync($"`c{cid}`rejs`pending_count", TimeSpan.FromSeconds(10));
+                .CountAsync();
         }
 
         Task<Rejudging> IRejudgingStore.CreateAsync(Rejudging entity) => CreateEntityAsync(entity);
