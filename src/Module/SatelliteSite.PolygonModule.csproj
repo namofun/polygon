@@ -9,6 +9,13 @@
   <Import Project="..\..\build\NugetPackage.props" />
 
   <ItemGroup>
+    <None Include="..\..\build\CopyDocumentXml.props" Pack="true" PackagePath="build\" Link="build\CopyDocumentXml.props" />
+    <None Include="..\..\build\SatelliteSite.PolygonModule.props" Pack="true" PackagePath="build\" Link="build\SatelliteSite.PolygonModule.props" />
+    <None Include="..\..\build\SatelliteSite.PolygonModule-buildMultiTargeting.props" Pack="true" PackagePath="buildMultiTargeting\SatelliteSite.PolygonModule.props" Link="build\SatelliteSite.PolygonModule-buildMultiTargeting.props" />
+    <None Include="..\..\build\SatelliteSite.PolygonModule-buildTransitive.props" Pack="true" PackagePath="buildTransitive\SatelliteSite.PolygonModule.props" Link="build\SatelliteSite.PolygonModule-buildTransitive.props" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="SatelliteSite.Substrate" Version="$(SubstrateVersion)" />
     <PackageReference Include="SatelliteSite.IdentityModule" Version="$(SubstrateVersion)" />
