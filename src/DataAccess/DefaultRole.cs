@@ -26,7 +26,7 @@ namespace Polygon
             services.AddPolygonStorage<PolygonFacade<TUser, TContext>>();
             services.AddSingleton<QueryCache<TContext>>();
 
-            services.AddMediatRAssembly(typeof(Auditlogging).Assembly);
+            MediatR.Registration.ServiceRegistrar.AddMediatRClasses(services, new[] { typeof(Auditlogging).Assembly });
 
             services.AddOptions<PolygonPhysicalOptions>()
                 .PostConfigure(options =>
