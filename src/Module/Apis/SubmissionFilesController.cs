@@ -64,5 +64,26 @@ namespace SatelliteSite.PolygonModule.Apis
             if (src == null) return NotFound();
             return new[] { src };
         }
+
+
+        /// <summary>
+        /// Get the plain source code of the only file for the given submission
+        /// </summary>
+        /// <param name="cid">The contest ID</param>
+        /// <param name="sid">The ID of the entity to get</param>
+        /// <param name="store"></param>
+        /// <response code="200">The files for the submission</response>
+        [HttpGet("{sid}/[action]")]
+        [Produces("application/octet-stream")]
+        public async Task<IActionResult> SourcePlain(
+            [FromRoute] int cid,
+            [FromRoute] int sid,
+            [FromServices] ISubmissionStore store)
+        {
+            var src = await store.GetFileAsync(sid);
+            if (src == null) return NotFound();
+            var decode = Convert.FromBase64String(src.SourceCode);
+            return File(decode, "application/octet-stream", src.FileName);
+        }
     }
 }

@@ -74,6 +74,12 @@ namespace Polygon.Judgement
         [JsonPropertyName("testcases")]
         public Dictionary<string, TestcaseToJudge> Testcases { get; set; }
 
+#pragma warning disable CS8618
+        public NextJudging()
+        {
+        }
+#pragma warning restore CS8618
+
         public NextJudging(JudgingBeginEvent r, Dictionary<string, string> md5s, List<Testcase> testcases)
         {
             SubmissionId = r.Judging.SubmissionId;
