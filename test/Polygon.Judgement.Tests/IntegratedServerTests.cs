@@ -37,10 +37,10 @@ namespace SatelliteSite.Tests
             await _factory.RunScoped(async sp =>
             {
                 var list = await sp.GetRequiredService<IJudgehostStore>().ListAsync();
-                Assert.Empty(list);
+                Assert.DoesNotContain(list, l => l.ServerName == "fake-judgehost-0");
 
-                var iec = await sp.GetRequiredService<IInternalErrorStore>().CountOpenAsync();
-                Assert.Equal(0, iec);
+                var iec = await sp.GetRequiredService<IInternalErrorStore>().ListAsync();
+                Assert.DoesNotContain(iec, ie => ie.Description == "low on disk space on fake-judgehost-0");
             });
 
             await judgehost.ManualStartAsync(default);
@@ -50,12 +50,12 @@ namespace SatelliteSite.Tests
             await _factory.RunScoped(async sp =>
             {
                 var list = await sp.GetRequiredService<IJudgehostStore>().ListAsync();
-                var item = Assert.Single(list);
+                var item = Assert.Single(list, l => l.ServerName == "fake-judgehost-0");
                 Assert.Equal(judgehost.HostName, item.ServerName);
                 Assert.False(item.Active);
 
-                var iec = await sp.GetRequiredService<IInternalErrorStore>().CountOpenAsync();
-                Assert.Equal(1, iec);
+                var iec = await sp.GetRequiredService<IInternalErrorStore>().ListAsync();
+                Assert.Contains(iec, ie => ie.Description == "low on disk space on fake-judgehost-0");
             });
         }
 
