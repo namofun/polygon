@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="SatelliteSite.DataAccess" Version="$(SubstrateVersion)" />
   </ItemGroup>
 
   <ItemGroup>

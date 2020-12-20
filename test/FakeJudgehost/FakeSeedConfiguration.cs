@@ -5,7 +5,7 @@ using System;
 
 namespace Polygon
 {
-    public class TestSeedConfiguration<TContext> :
+    public class FakeSeedConfiguration<TContext> :
         EntityTypeConfigurationSupplier<TContext>,
         IEntityTypeConfiguration<Executable>,
         IEntityTypeConfiguration<Language>

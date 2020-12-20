@@ -21,7 +21,7 @@ namespace Polygon
         {
             services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TContext>>();
             services.AddDbModelSupplier<TContext, Entities.SeedConfiguration<TContext>>();
-            services.AddDbModelSupplier<TContext, TestSeedConfiguration<TContext>>();
+            services.AddDbModelSupplier<TContext, FakeSeedConfiguration<TContext>>();
             services.AddPolygonStorage<PolygonFacade<TUser, TContext>>();
             services.AddSingleton<QueryCache<TContext>>();
 
