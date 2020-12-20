@@ -30,23 +30,24 @@ namespace Polygon.FakeJudgehost
             this JudgeDaemon judgeDaemon,
             string kind, string idColumn, object id,
             string description,
-            int judgingId, int cid,
+            int? judgingId = null, int? cid = null,
             string? extra_log = null)
         {
-            string judgehostLog = "";
-            if (!string.IsNullOrWhiteSpace(extra_log))
-                judgehostLog += "\n\n--------------------------------------------------------------------------------\n\n" + extra_log;
-
-            var body = new FormUrlEncodedContent(new Dictionary<string, string>
+            string judgehostLog = extra_log ?? "";
+            var body = new Dictionary<string, string>
             {
-                ["judgingid"] = judgingId.ToString(),
-                ["cid"] = cid.ToString(),
                 ["description"] = description,
                 ["judgehostlog"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(judgehostLog)),
                 ["disabled"] = $"{{\"kind\":\"{kind}\",\"{idColumn}\":{id.ToJson()}}}",
-            });
+            };
 
-            using var form = await judgeDaemon.HttpClient.PostAsync("judgehosts/internal-error", body);
+            if (judgingId.HasValue)
+            {
+                body["judgingid"] = judgingId.Value.ToString();
+                body["cid"] = (cid ?? 0).ToString();
+            }
+
+            using var form = await judgeDaemon.HttpClient.PostAsync("judgehosts/internal-error", new FormUrlEncodedContent(body));
             var content = await form.Content.ReadAsStringAsync();
             return int.Parse(content);
         }

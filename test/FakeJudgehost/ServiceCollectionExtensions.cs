@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Polygon.FakeJudgehost;
 using System;
+using System.Linq;
 
 namespace Polygon
 {
@@ -30,6 +32,7 @@ namespace Polygon
         /// <returns>The service collection.</returns>
         public static IServiceCollection AddJudgehost(this IServiceCollection services, string hostname, IDaemonStrategy strategy)
         {
+            services.AddOptions<DaemonOptions>();
             return services.AddHostedService(sp => new JudgeDaemon(sp, hostname, strategy));
         }
 
@@ -43,6 +46,21 @@ namespace Polygon
         public static IServiceCollection AddJudgehost<TStrategy>(this IServiceCollection services, string hostname) where TStrategy : class, IDaemonStrategy, new()
         {
             return AddJudgehost(services, hostname, new TStrategy());
+        }
+
+        /// <summary>
+        /// Find the correct judgehost, or throwing an exception when not found.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider.</param>
+        /// <param name="hostname">The judgehost hostname.</param>
+        /// <returns>The judgehost.</returns>
+        public static JudgeDaemon GetJudgehost(this IServiceProvider serviceProvider, string hostname)
+        {
+            return serviceProvider
+                .GetServices<IHostedService>()
+                .OfType<JudgeDaemon>()
+                .Where(j => j.HostName == hostname)
+                .Single();
         }
     }
 }

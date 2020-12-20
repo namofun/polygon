@@ -17,10 +17,8 @@ namespace Polygon.FakeJudgehost
     /// </summary>
     public class JudgeDaemon : BackgroundService
     {
-        /// <summary>
-        /// The used strategy
-        /// </summary>
-        private IDaemonStrategy Strategy { get; }
+        private readonly Lazy<HttpClient> _httpClient;
+        private readonly IDaemonStrategy _strategy;
 
         /// <summary>
         /// The daemon options
@@ -35,7 +33,7 @@ namespace Polygon.FakeJudgehost
         /// <summary>
         /// The servicing HTTP client
         /// </summary>
-        public HttpClient HttpClient { get; }
+        public HttpClient HttpClient => _httpClient.Value;
 
         /// <summary>
         /// The judgehost host name
@@ -58,9 +56,21 @@ namespace Polygon.FakeJudgehost
             Services = services;
             Options = services.GetRequiredService<IOptions<DaemonOptions>>();
             HostName = hostname;
-            HttpClient = Options.Value.CreateConfiguredClient(services);
-            Strategy = strategy;
+            _httpClient = new Lazy<HttpClient>(() => Options.Value.CreateConfiguredClient(Services));
+            _strategy = strategy;
             Logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("Polygon.FakeJudgehost." + hostname);
+        }
+
+        /// <inheritdoc cref="BackgroundService.StartAsync(CancellationToken)" />
+        public Task ManualStartAsync(CancellationToken cancellationToken)
+        {
+            return base.StartAsync(cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public override Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -91,7 +101,7 @@ namespace Polygon.FakeJudgehost
                 break;
             }
 
-            await Strategy.ExecuteAsync(this, stoppingToken);
+            await _strategy.ExecuteAsync(this, stoppingToken);
         }
 
         /// <inheritdoc />
