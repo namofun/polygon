@@ -31,7 +31,12 @@ namespace SatelliteSite.Tests
 
                         services.ConfigureJudgeDaemon(options =>
                         {
-                            options.HttpClientFactory = _ => CreateClient();
+                            options.HttpClientFactory = _ =>
+                            {
+                                var client = CreateClient();
+                                client.BaseAddress = new System.Uri("http://localhost/api/");
+                                return client;
+                            };
                         });
                     });
                 });

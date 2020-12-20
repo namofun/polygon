@@ -18,7 +18,11 @@ namespace Polygon.FakeJudgehost
     public class JudgeDaemon : BackgroundService
     {
         private readonly Lazy<HttpClient> _httpClient;
-        private readonly IDaemonStrategy _strategy;
+
+        /// <summary>
+        /// The judgehost execution logic
+        /// </summary>
+        public IDaemonStrategy Strategy { get; }
 
         /// <summary>
         /// The daemon options
@@ -57,7 +61,7 @@ namespace Polygon.FakeJudgehost
             Options = services.GetRequiredService<IOptions<DaemonOptions>>();
             HostName = hostname;
             _httpClient = new Lazy<HttpClient>(() => Options.Value.CreateConfiguredClient(Services));
-            _strategy = strategy;
+            Strategy = strategy;
             Logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("Polygon.FakeJudgehost." + hostname);
         }
 
@@ -78,8 +82,6 @@ namespace Polygon.FakeJudgehost
         {
             while (true)
             {
-                await Task.Delay(1000, stoppingToken);
-
                 try
                 {
                     Logger.LogInformation("Registering judgehost on endpoint...");
@@ -92,16 +94,17 @@ namespace Polygon.FakeJudgehost
                     {
                         Logger.LogWarning("Found unfinished judging j{judgingId} in my name; given back", item.JudgingId);
                     }
+
+                    break;
                 }
                 catch
                 {
                     Logger.LogError("Registering judgehost on endpoint failed.");
+                    await Task.Delay(1000, stoppingToken);
                 }
-
-                break;
             }
 
-            await _strategy.ExecuteAsync(this, stoppingToken);
+            await Strategy.ExecuteAsync(this, stoppingToken);
         }
 
         /// <inheritdoc />
