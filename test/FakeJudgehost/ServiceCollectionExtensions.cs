@@ -33,7 +33,7 @@ namespace Polygon
         public static IServiceCollection AddJudgehost(this IServiceCollection services, string hostname, IDaemonStrategy strategy)
         {
             services.AddOptions<DaemonOptions>();
-            return services.AddHostedService(sp => new JudgeDaemon(sp, hostname, strategy));
+            return services.AddSingleton<IHostedService, JudgeDaemon>(sp => new JudgeDaemon(sp, hostname, strategy));
         }
 
         /// <summary>

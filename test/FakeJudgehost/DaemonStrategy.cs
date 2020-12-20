@@ -15,5 +15,10 @@ namespace Polygon.FakeJudgehost
         /// <param name="stoppingToken">The token to stop action.</param>
         /// <returns>The task for executing core logics.</returns>
         Task ExecuteAsync(JudgeDaemon service, CancellationToken stoppingToken);
+
+        /// <summary>
+        /// The Semaphore to notify activity progress
+        /// </summary>
+        SemaphoreSlim Semaphore { get; }
     }
 }

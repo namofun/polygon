@@ -50,6 +50,11 @@ namespace Polygon.FakeJudgehost
         public ILogger Logger { get; }
 
         /// <summary>
+        /// Whether error happened
+        /// </summary>
+        public bool Error { get; internal set; }
+
+        /// <summary>
         /// Creates a <see cref="JudgeDaemon"/> using the hostname and execution strategy.
         /// </summary>
         /// <param name="services">The service provider.</param>

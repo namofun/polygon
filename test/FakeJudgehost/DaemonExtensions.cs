@@ -78,11 +78,18 @@ namespace Polygon.FakeJudgehost
         public static async Task<NextJudging?> NextJudging(
             this JudgeDaemon judgeDaemon)
         {
-            var url = $"judgehosts/next-judging/{UrlEncoder.Default.Encode(judgeDaemon.HostName)}";
-            using var request = await judgeDaemon.HttpClient.PostAsync(url, new StringContent(""));
-            if (request.Content.Headers.ContentLength == 2) return null;
-            using var stream = await request.Content.ReadAsStreamAsync();
-            return await JsonSerializer.DeserializeAsync<NextJudging>(stream);
+            try
+            {
+                var url = $"judgehosts/next-judging/{UrlEncoder.Default.Encode(judgeDaemon.HostName)}";
+                using var request = await judgeDaemon.HttpClient.PostAsync(url, new StringContent(""));
+                if (request.Content.Headers.ContentLength == 2) return null;
+                using var stream = await request.Content.ReadAsStreamAsync();
+                return await JsonSerializer.DeserializeAsync<NextJudging>(stream);
+            }
+            catch (NotSupportedException ex)
+            {
+                throw new ApplicationException("NextJudging error", ex);
+            }
         }
 
         /// <summary>
@@ -95,10 +102,17 @@ namespace Polygon.FakeJudgehost
         public static async Task<T> DbConfigGet<T>(
             this JudgeDaemon judgeDaemon, string name)
         {
-            var values = await judgeDaemon.HttpClient.GetStringAsync($"config?name={UrlEncoder.Default.Encode(name)}");
-            using var jsonDoc = JsonDocument.Parse(values);
-            var element = jsonDoc.RootElement.GetProperty(name);
-            return element.GetRawText().AsJson<T>();
+            try
+            {
+                var values = await judgeDaemon.HttpClient.GetStringAsync($"config?name={UrlEncoder.Default.Encode(name)}");
+                using var jsonDoc = JsonDocument.Parse(values);
+                var element = jsonDoc.RootElement.GetProperty(name);
+                return element.GetRawText().AsJson<T>();
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("DbConfigGet error", ex);
+            }
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,8 @@ namespace Polygon.FakeJudgehost
 {
     public class FakeJudgeActivity : IDaemonStrategy
     {
+        public SemaphoreSlim Semaphore { get; } = new SemaphoreSlim(0, 1);
+
         public Dictionary<string, (string, byte[])> Files { get; }
             = new Dictionary<string, (string, byte[])>();
 
@@ -63,7 +67,13 @@ namespace Polygon.FakeJudgehost
                 row.SubmissionId, row.TeamId, row.ProblemId, row.LanguageId, row.JudgingId);
 
             if (row.LanguageId != "fake")
-                await service.Disable("language", "langid", row.LanguageId, $"Language {row.LanguageId} is not supported by fake judgehost.", row.JudgingId, row.ContestId, "hmmmmmm...");
+            {
+                await service.Disable(
+                    "language", "langid", row.LanguageId,
+                    $"Language {row.LanguageId} is not supported by fake judgehost.",
+                    row.JudgingId, row.ContestId, "hmmmmmm...");
+                return;
+            }
 
             await service.DbConfigGet<int>("script_timelimit");
             await service.DbConfigGet<int>("script_memory_limit");
@@ -79,14 +89,15 @@ namespace Polygon.FakeJudgehost
             {
                 await service.Disable(
                     "language", "langid", row.LanguageId,
-                    row.Compile + ": fetch, compile, or deploy of compile script failed.");
+                    row.Compile + ": fetch, compile, or deploy of compile script failed.",
+                    row.JudgingId, row.ContestId);
             }
 
             var submission = await FetchSubmission(service, row.ContestId, row.SubmissionId);
-            await service.UpdateJudging(row.JudgingId, submission == "C", "ok");
+            await service.UpdateJudging(row.JudgingId, submission != "C", "ok");
             if (submission == "C") return;
 
-            await service.DbConfigGet<string>("dbconfig_get_rest");
+            await service.DbConfigGet<string>("timelimit_overshoot");
             var update_every_X_seconds = TimeSpan.FromSeconds(await service.DbConfigGet<int>("update_judging_seconds"));
 
             int totalcases = 0;
@@ -116,7 +127,8 @@ namespace Polygon.FakeJudgehost
                 {
                     await service.Disable(
                         "problem", "probid", row.ProblemId,
-                        $"{row.Compare} or {row.Run}: fetch, compile, or deploy of compile script failed.");
+                        $"{row.Compare} or {row.Run}: fetch, compile, or deploy of compile script failed.",
+                        row.JudgingId, row.ContestId);
                     return "compare-error";
                 }
 
@@ -155,7 +167,8 @@ namespace Polygon.FakeJudgehost
                     {
                         await service.Disable(
                             "problem", "probid", row.ProblemId,
-                            "uploading unsent judging runs failed");
+                            "uploading unsent judging runs failed",
+                            row.JudgingId, row.ContestId);
                         return;
                     }
 
@@ -188,7 +201,8 @@ namespace Polygon.FakeJudgehost
                 {
                     await service.Disable(
                         "problem", "probid", row.ProblemId,
-                        "uploading unsent judging runs failed");
+                        "uploading unsent judging runs failed",
+                        row.JudgingId, row.ContestId);
                     return;
                 }
             }
@@ -198,18 +212,33 @@ namespace Polygon.FakeJudgehost
 
         public async Task ExecuteAsync(JudgeDaemon service, CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                var row = await service.NextJudging();
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    var row = await service.NextJudging();
 
-                if (row == null)
-                {
-                    await Task.Delay(5000, stoppingToken);
+                    if (row == null)
+                    {
+                        if (service.Services.GetRequiredService<IHostEnvironment>().EnvironmentName == "Testing")
+                            break;
+                        await Task.Delay(5000, stoppingToken);
+                    }
+                    else
+                    {
+                        await Judge(service, row, stoppingToken);
+                    }
                 }
-                else
-                {
-                    await Judge(service, row, stoppingToken);
-                }
+            }
+            catch (ApplicationException ex)
+            {
+                service.Error = true;
+                service.Logger.LogError(ex, "Unexpected exception happened.");
+                throw;
+            }
+            finally
+            {
+                Semaphore.Release();
             }
         }
     }

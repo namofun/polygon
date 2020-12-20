@@ -23,6 +23,12 @@ namespace Polygon.Judgement
         [JsonPropertyName("description_as_string")]
         public string Description { get; set; }
 
+#pragma warning disable CS8618
+        public TestcaseToJudge()
+        {
+        }
+#pragma warning restore CS8618
+
         public TestcaseToJudge(Testcase t)
         {
             TestcaseId = t.Id;
