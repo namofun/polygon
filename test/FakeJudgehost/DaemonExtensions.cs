@@ -61,11 +61,12 @@ namespace Polygon.FakeJudgehost
         /// <returns>The </returns>
         public static Task<HttpResponseMessage> SendUnsentJudgingRuns(
             this JudgeDaemon judgeDaemon,
-            List<JudgingRun> unsent_judging_runs,
+            Queue<JudgingRun> unsent_judging_runs,
             int judgingid)
         {
             var url = $"judgehosts/add-judging-run/{UrlEncoder.Default.Encode(judgeDaemon.HostName)}/{judgingid}";
-            var batch = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("batch", unsent_judging_runs.ToJson()) });
+            var batch = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("batch", unsent_judging_runs.ToArray().ToJson()) });
+            unsent_judging_runs.Clear();
             return judgeDaemon.HttpClient.PostAsync(url, batch);
         }
 
@@ -82,6 +83,43 @@ namespace Polygon.FakeJudgehost
             if (request.Content.Headers.ContentLength == 2) return null;
             using var stream = await request.Content.ReadAsStreamAsync();
             return await JsonSerializer.DeserializeAsync<NextJudging>(stream);
+        }
+
+        /// <summary>
+        /// Get the configure value.
+        /// </summary>
+        /// <typeparam name="T">The configure value type.</typeparam>
+        /// <param name="judgeDaemon">The judge daemon.</param>
+        /// <param name="name">The config name.</param>
+        /// <returns>The task for fetching configuration value.</returns>
+        public static async Task<T> DbConfigGet<T>(
+            this JudgeDaemon judgeDaemon, string name)
+        {
+            var values = await judgeDaemon.HttpClient.GetStringAsync($"config?name={UrlEncoder.Default.Encode(name)}");
+            using var jsonDoc = JsonDocument.Parse(values);
+            var element = jsonDoc.RootElement.GetProperty(name);
+            return element.GetRawText().AsJson<T>();
+        }
+
+        /// <summary>
+        /// Update the judging information.
+        /// </summary>
+        /// <param name="judgeDaemon">The judge daemon.</param>
+        /// <param name="judgingid">The judging id.</param>
+        /// <param name="compile_success">Whether compile succeeded.</param>
+        /// <param name="output_compile">The compiler output.</param>
+        /// <returns>The task for updating compiling information.</returns>
+        public static async Task UpdateJudging(
+            this JudgeDaemon judgeDaemon, int judgingid, bool compile_success, string output_compile)
+        {
+            var url = $"judgehosts/update-judging/{UrlEncoder.Default.Encode(judgeDaemon.HostName)}/{judgingid}";
+            var args = new Dictionary<string, string>
+            {
+                ["compile_success"] = compile_success ? "1" : "0",
+                ["output_compile"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(output_compile ?? ""))
+            };
+
+            using var msg = await judgeDaemon.HttpClient.PutAsync(url, new FormUrlEncodedContent(args));
         }
     }
 }
