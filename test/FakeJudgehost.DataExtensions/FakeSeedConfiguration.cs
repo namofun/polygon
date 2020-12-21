@@ -40,7 +40,7 @@ namespace Polygon
 
             var more = SeedConfiguration<TContext>
                 .GetSeedExecutables()
-                .Where(e => e.Type != "compile" && e.Id != "cpp")
+                .Where(e => e.Type != "compile" || e.Id == "cpp")
                 .ToList();
 
             more.Add(new Executable
