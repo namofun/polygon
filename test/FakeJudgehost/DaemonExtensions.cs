@@ -43,6 +43,20 @@ namespace Polygon.FakeJudgehost
         }
 
         /// <summary>
+        /// Register on remote endpoint and return all unfinished judgings.
+        /// </summary>
+        /// <param name="judgeDaemon">The judge daemon.</param>
+        /// <returns>The task for fetching results.</returns>
+        public static async Task<List<UnfinishedJudging>> Register(
+            this JudgeDaemon judgeDaemon)
+        {
+            using var register = await judgeDaemon.HttpClient.PostAsync("judgehosts",
+                new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("hostname", judgeDaemon.HostName) }));
+            var stream = await register.Content.ReadAsStreamAsync();
+            return await JsonSerializer.DeserializeAsync<List<UnfinishedJudging>>(stream);
+        }
+
+        /// <summary>
         /// Disable the judgehost.
         /// </summary>
         /// <param name="judgeDaemon">The judge daemon.</param>

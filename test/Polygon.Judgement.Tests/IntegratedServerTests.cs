@@ -68,17 +68,34 @@ namespace SatelliteSite.Tests
 
             var judgehost1 = _factory.Services.GetJudgehost("fake-judgehost-1");
             var judgehost2 = _factory.Services.GetJudgehost("fake-judgehost-2");
+            var judgehost3 = _factory.Services.GetJudgehost("fake-judgehost-3");
+            var judgehost4 = _factory.Services.GetJudgehost("fake-judgehost-4");
 
             await judgehost1.ManualStartAsync(default);
-            await Task.Delay(1000);
+            await Task.Delay(2000);
             await judgehost1.StopAsync(default);
             Assert.False(judgehost1.Error);
 
             await judgehost2.ManualStartAsync(default);
-            if (!await judgehost2.Strategy.Semaphore.WaitAsync(60 * 1000))
+            await judgehost3.ManualStartAsync(default);
+            await judgehost4.ManualStartAsync(default);
+
+            const int totalDelay = 60 * 1000;
+            var t1 = Task.Delay(totalDelay);
+            var t2 = Task.WhenAll(
+                judgehost2.Strategy.Semaphore.WaitAsync(),
+                judgehost3.Strategy.Semaphore.WaitAsync(),
+                judgehost4.Strategy.Semaphore.WaitAsync());
+
+            if (t1 == await Task.WhenAny(t1, t2))
                 throw new System.TimeoutException();
+
             await judgehost2.StopAsync(default);
+            await judgehost3.StopAsync(default);
+            await judgehost4.StopAsync(default);
             Assert.False(judgehost2.Error);
+            Assert.False(judgehost3.Error);
+            Assert.False(judgehost4.Error);
 
             await _factory.RunScoped(async sp =>
             {
@@ -89,15 +106,15 @@ namespace SatelliteSite.Tests
                 var jstore = sp.GetRequiredService<IJudgingStore>();
                 var list = await jstore.ListAsync(j => j.Active, 1000);
 
-                Assert.Equal(2, list[0].SubmissionId);
-                Assert.Equal(3, list[1].SubmissionId);
-                Assert.Equal(4, list[2].SubmissionId);
-                Assert.Equal(1, list[3].SubmissionId);
+                Assert.Equal(3, list[0].SubmissionId);
+                Assert.Equal(4, list[1].SubmissionId);
+                Assert.Equal(1, list[2].SubmissionId);
+                Assert.Equal(2, list[3].SubmissionId);
 
-                Assert.Equal(Verdict.Accepted, list[0].Status);
-                Assert.Equal(Verdict.WrongAnswer, list[1].Status);
-                Assert.Equal(Verdict.TimeLimitExceeded, list[2].Status);
-                Assert.Equal(Verdict.Pending, list[3].Status);
+                Assert.Equal(Verdict.WrongAnswer, list[0].Status);
+                Assert.Equal(Verdict.TimeLimitExceeded, list[1].Status);
+                Assert.Equal(Verdict.Pending, list[2].Status);
+                Assert.Equal(Verdict.Accepted, list[3].Status);
             });
         }
     }

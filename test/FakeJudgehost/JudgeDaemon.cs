@@ -108,10 +108,7 @@ namespace Polygon.FakeJudgehost
                 {
                     Logger.LogInformation("Registering judgehost on endpoint...");
 
-                    using var register = await HttpClient.PostAsync("judgehosts", new FormUrlEncodedContent(new Dictionary<string, string> { ["hostname"] = HostName }));
-                    var stream = await register.Content.ReadAsStreamAsync();
-                    var result = await JsonSerializer.DeserializeAsync<List<UnfinishedJudging>>(stream);
-
+                    var result = await this.Register();
                     foreach (var item in result)
                     {
                         Logger.LogWarning("Found unfinished judging j{judgingId} in my name; given back", item.JudgingId);

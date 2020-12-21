@@ -25,6 +25,8 @@ namespace SatelliteSite.Tests
                             .AddJudgehost<InternalErrorActivity>("fake-judgehost-0")
                             .AddJudgehost<FakeJudgeActivity>("fake-judgehost-1")
                             .AddJudgehost<FakeJudgeActivity>("fake-judgehost-2")
+                            .AddJudgehost<FakeJudgeActivity>("fake-judgehost-3")
+                            .AddJudgehost<FakeJudgeActivity>("fake-judgehost-4")
                             .AddFakeSeeds<TestContext>()
                             .AddHttpClientFactory(_ =>
                             {

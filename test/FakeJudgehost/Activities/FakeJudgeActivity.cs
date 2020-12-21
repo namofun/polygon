@@ -60,6 +60,15 @@ namespace Polygon.FakeJudgehost
             };
         }
 
+        private async Task ThrowIfCancelled(JudgeDaemon service, CancellationToken stoppingToken)
+        {
+            if (stoppingToken.IsCancellationRequested)
+            {
+                await service.Register();
+                stoppingToken.ThrowIfCancellationRequested();
+            }
+        }
+
         private async Task Judge(JudgeDaemon service, Judgement.NextJudging row, CancellationToken stoppingToken)
         {
             service.Logger.LogInformation(
@@ -81,6 +90,8 @@ namespace Polygon.FakeJudgehost
             await service.DbConfigGet<int>("process_limit");
             await service.DbConfigGet<int>("output_storage_limit");
 
+            await ThrowIfCancelled(service, stoppingToken);
+
             try
             {
                 await FetchFile(service, Exec(row.Compile), row.CompileMd5sum);
@@ -93,9 +104,13 @@ namespace Polygon.FakeJudgehost
                     row.JudgingId, row.ContestId);
             }
 
+            await ThrowIfCancelled(service, stoppingToken);
+
             var submission = await FetchSubmission(service, row.ContestId, row.SubmissionId);
             await service.UpdateJudging(row.JudgingId, submission != "C", "ok");
             if (submission == "C") return;
+
+            await ThrowIfCancelled(service, stoppingToken);
 
             await service.DbConfigGet<string>("timelimit_overshoot");
             var update_every_X_seconds = TimeSpan.FromSeconds(await service.DbConfigGet<int>("update_judging_seconds"));
@@ -109,6 +124,8 @@ namespace Polygon.FakeJudgehost
 
             async Task<string> RunTestcase(Judgement.TestcaseToJudge ttj)
             {
+                await ThrowIfCancelled(service, stoppingToken);
+
                 service.Logger.LogInformation("Running testcase {rank}...", ttj.Rank);
                 var ch = ttj.Rank - 1 > submission!.Length ? 'A' : submission[ttj.Rank - 1];
                 var verd = Map(ch);
