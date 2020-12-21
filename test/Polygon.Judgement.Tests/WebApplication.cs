@@ -1,17 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Polygon;
 using Polygon.FakeJudgehost;
 using SatelliteSite.IdentityModule.Entities;
-using SatelliteSite.IdentityModule.Services;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace SatelliteSite.Tests
 {
-    public class WebApplication : SubstrateApplicationBase, Xunit.IAsyncLifetime
+    public class WebApplication : SubstrateApplicationBase
     {
         protected override Assembly EntryPointAssembly => typeof(DefaultContext).Assembly;
 
@@ -28,6 +24,7 @@ namespace SatelliteSite.Tests
                         services.AddJudgehost<InternalErrorActivity>("fake-judgehost-0");
                         services.AddJudgehost<FakeJudgeActivity>("fake-judgehost-1");
                         services.AddJudgehost<FakeJudgeActivity>("fake-judgehost-2");
+                        services.AddFakeJudgehostAccount();
 
                         services.ConfigureJudgeDaemon(options =>
                         {
@@ -46,24 +43,5 @@ namespace SatelliteSite.Tests
 
         protected override void CleanupHost(IHost host) =>
             host.EnsureDeleted<TestContext>();
-
-        public Task InitializeAsync()
-        {
-            return this.RunScoped(async sp =>
-            {
-                var um = sp.GetRequiredService<IUserManager>();
-                var opt = sp.GetRequiredService<IOptions<DaemonOptions>>();
-                var newUser = um.CreateEmpty(opt.Value.UserName);
-                newUser.Email = "test@test.com";
-                await um.CreateAsync(newUser, opt.Value.Password);
-                await um.AddToRoleAsync(newUser, "Judgehost");
-            });
-        }
-
-        public Task DisposeAsync()
-        {
-            Dispose();
-            return Task.CompletedTask;
-        }
     }
 }

@@ -18,6 +18,7 @@ namespace Polygon.FakeJudgehost
     public class JudgeDaemon : BackgroundService
     {
         private readonly Lazy<HttpClient> _httpClient;
+        private bool _started;
 
         /// <summary>
         /// The judgehost execution logic
@@ -71,15 +72,31 @@ namespace Polygon.FakeJudgehost
         }
 
         /// <inheritdoc cref="BackgroundService.StartAsync(CancellationToken)" />
-        public Task ManualStartAsync(CancellationToken cancellationToken)
+        public Task ManualStartAsync(CancellationToken cancellationToken = default)
         {
+            if (_started) return Task.CompletedTask;
             return base.StartAsync(cancellationToken);
         }
 
         /// <inheritdoc />
-        public override Task StartAsync(CancellationToken cancellationToken)
+        public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            var init = Services.GetService<InitializeFakeJudgehostService>();
+            if (init != null) await init.EnsureAsync();
+
+            var env = Services.GetRequiredService<IHostEnvironment>();
+            if (!env.IsEnvironment("Testing"))
+            {
+                await base.StartAsync(cancellationToken);
+                _started = true;
+            }
+            else
+            {
+                Logger.LogWarning(
+                    "This judgehost has not been started.\r\n" +
+                    "Please await IServiceProvider.GetJudgehost(\"{hostname}\").ManualStartAsync();",
+                    HostName);
+            }
         }
 
         /// <inheritdoc />

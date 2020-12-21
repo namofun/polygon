@@ -49,6 +49,42 @@ namespace Polygon
         }
 
         /// <summary>
+        /// Creates a random password generator.
+        /// </summary>
+        /// <returns>The thread-unsafe random password generator.</returns>
+        private static Func<string> CreatePasswordGenerator()
+        {
+            const string passwordSource = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789";
+            var rng = new Random(unchecked((int)DateTimeOffset.Now.Ticks));
+            return () =>
+            {
+                Span<char> pwd = stackalloc char[8];
+                for (int i = 0; i < 8; i++) pwd[i] = passwordSource[rng.Next(passwordSource.Length)];
+                return pwd.ToString();
+            };
+        }
+
+        /// <summary>
+        /// Generate random judgehost account and let the startup of fake judgehost finish the account creating.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The service collection.</returns>
+        public static IServiceCollection AddFakeJudgehostAccount(this IServiceCollection services)
+        {
+            var pwd = CreatePasswordGenerator().Invoke();
+            
+            services.ConfigureJudgeDaemon(options =>
+            {
+                options.Password = pwd;
+                options.UserName = "judgehost-" + pwd[0..4];
+            });
+
+            services.AddSingleton<InitializeFakeJudgehostService>();
+
+            return services;
+        }
+
+        /// <summary>
         /// Find the correct judgehost, or throwing an exception when not found.
         /// </summary>
         /// <param name="serviceProvider">The service provider.</param>
