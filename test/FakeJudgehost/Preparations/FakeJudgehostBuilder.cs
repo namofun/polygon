@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Polygon.FakeJudgehost;
 using System;
@@ -18,22 +17,6 @@ namespace Polygon
         public IServiceCollection Services { get; }
 
         /// <summary>
-        /// Creates a random password generator.
-        /// </summary>
-        /// <returns>The thread-unsafe random password generator.</returns>
-        private static Func<string> CreatePasswordGenerator()
-        {
-            const string passwordSource = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789";
-            var rng = new Random(unchecked((int)DateTimeOffset.Now.Ticks));
-            return () =>
-            {
-                Span<char> pwd = stackalloc char[8];
-                for (int i = 0; i < 8; i++) pwd[i] = passwordSource[rng.Next(passwordSource.Length)];
-                return pwd.ToString();
-            };
-        }
-
-        /// <summary>
         /// Initialize the fake judgehost builder.
         /// </summary>
         /// <param name="services">The service collection.</param>
@@ -41,25 +24,6 @@ namespace Polygon
         {
             Services = services;
             services.AddOptions<DaemonOptions>();
-        }
-
-        /// <summary>
-        /// Generate random judgehost account and let the startup of fake judgehost finish the account creating.
-        /// </summary>
-        /// <returns>The builder to chain calls.</returns>
-        public FakeJudgehostBuilder AddFakeAccount()
-        {
-            var pwd = CreatePasswordGenerator().Invoke();
-
-            ConfigureJudgeDaemon(options =>
-            {
-                options.Password = pwd;
-                options.UserName = "judgehost-" + pwd[0..4];
-            });
-
-            Services.AddSingleton<InitializeFakeJudgehostService>();
-
-            return this;
         }
 
         /// <summary>
@@ -75,17 +39,6 @@ namespace Polygon
                 options.Password = password;
                 options.UserName = username;
             });
-        }
-
-        /// <summary>
-        /// Add fake item seeds to context.
-        /// </summary>
-        /// <typeparam name="TContext">The databse context.</typeparam>
-        /// <returns>The service collection.</returns>
-        public FakeJudgehostBuilder AddFakeSeeds<TContext>() where TContext : DbContext
-        {
-            Services.AddDbModelSupplier<TContext, FakeSeedConfiguration<TContext>>();
-            return this;
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ namespace Polygon.Entities
         IEntityTypeConfiguration<Language>
         where TContext : DbContext
     {
-        private Language NL(
+        private static Language NL(
             string langid,
             string externalid,
             string name,
@@ -36,11 +36,12 @@ namespace Polygon.Entities
             };
         }
 
-        public void Configure(EntityTypeBuilder<Language> entity)
+        public static List<Language> GetSeedLanguages()
         {
             const string NULL = null;
 
-            entity.HasData(
+            return new List<Language>
+            {
                 NL("adb", "ada", "Ada", "[\"adb\"]", 0, NULL, 0, 1, 1, "adb"),
                 NL("awk", "awk", "AWK", "[\"awk\"]", 0, NULL, 0, 1, 1, "awk"),
                 NL("bash", "bash", "Bash shell", "[\"bash\"]", 0, "Main file", 0, 1, 1, "bash"),
@@ -62,11 +63,18 @@ namespace Polygon.Entities
                 NL("rb", "ruby", "Ruby", "[\"rb\"]", 0, "Main file", 0, 1, 1, "rb"),
                 NL("scala", "scala", "Scala", "[\"scala\"]", 0, NULL, 0, 1, 1, "scala"),
                 NL("sh", "sh", "POSIX shell", "[\"sh\"]", 0, "Main file", 0, 1, 1, "sh"),
-                NL("swift", "swift", "Swift", "[\"swift\"]", 0, "Main file", 0, 1, 1, "swift")
-            );
+                NL("swift", "swift", "Swift", "[\"swift\"]", 0, "Main file", 0, 1, 1, "swift"),
+            };
         }
 
-        public void Configure(EntityTypeBuilder<Executable> entity)
+        public void Configure(EntityTypeBuilder<Language> entity)
+        {
+            var more = GetSeedLanguages();
+            ClearUp(more, "Id", e => e.Id, entity.Metadata);
+            entity.HasData(more);
+        }
+
+        public static List<Executable> GetSeedExecutables()
         {
             var executables = new List<Executable>();
 
@@ -106,7 +114,35 @@ namespace Polygon.Entities
                 });
             }
 
-            entity.HasData(executables);
+            return executables;
+        }
+
+        public void Configure(EntityTypeBuilder<Executable> entity)
+        {
+            var more = GetSeedExecutables();
+            ClearUp(more, "Id", e => e.Id, entity.Metadata);
+            entity.HasData(more);
+        }
+
+        public static void ClearUp<T, TId>(
+            List<T> more,
+            string idColumn,
+            Func<T, TId> idSelector,
+            Microsoft.EntityFrameworkCore.Metadata.IMutableEntityType entityType)
+        {
+            var existing = entityType.GetSeedData()
+                .Select(e => e[idColumn])
+                .Cast<TId>()
+                .ToList();
+
+            for (int i = 0; i < more.Count; i++)
+            {
+                if (existing.Contains(idSelector(more[i])))
+                {
+                    more.RemoveAt(i);
+                    i--;
+                }
+            }
         }
     }
 }

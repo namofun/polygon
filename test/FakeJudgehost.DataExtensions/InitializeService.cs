@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.FakeJudgehost
 {
-    internal class InitializeFakeJudgehostService
+    internal class InitializeFakeJudgehostService : IInitializeFakeJudgehostService
     {
         private bool _finished;
         private readonly IServiceProvider _service;

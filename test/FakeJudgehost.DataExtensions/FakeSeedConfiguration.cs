@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Polygon.Entities;
 using System;
+using System.Linq;
 
 namespace Polygon
 {
@@ -13,7 +14,12 @@ namespace Polygon
     {
         public void Configure(EntityTypeBuilder<Language> entity)
         {
-            entity.HasData(new Language
+            var more = SeedConfiguration<TContext>
+                .GetSeedLanguages()
+                .Where(e => e.Id == "cpp")
+                .ToList();
+
+            more.Add(new Language
             {
                 Id = "fake",
                 AllowJudge = true,
@@ -23,13 +29,21 @@ namespace Polygon
                 TimeFactor = 1,
                 Name = "Fake Language",
             });
+
+            SeedConfiguration<TContext>.ClearUp(more, "Id", e => e.Id, entity.Metadata);
+            entity.HasData(more);
         }
 
         public void Configure(EntityTypeBuilder<Executable> entity)
         {
             var count = new byte[10];
 
-            entity.HasData(new Executable
+            var more = SeedConfiguration<TContext>
+                .GetSeedExecutables()
+                .Where(e => e.Type != "compile" && e.Id != "cpp")
+                .ToList();
+
+            more.Add(new Executable
             {
                 Id = "fake",
                 Description = "compiler for fake",
@@ -38,6 +52,9 @@ namespace Polygon
                 ZipFile = count,
                 Type = "compile",
             });
+
+            SeedConfiguration<TContext>.ClearUp(more, "Id", e => e.Id, entity.Metadata);
+            entity.HasData(more);
         }
     }
 }

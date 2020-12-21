@@ -81,7 +81,7 @@ namespace Polygon.FakeJudgehost
         /// <inheritdoc />
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
-            var init = Services.GetService<InitializeFakeJudgehostService>();
+            var init = Services.GetService<IInitializeFakeJudgehostService>();
             if (init != null) await init.EnsureAsync();
 
             var env = Services.GetRequiredService<IHostEnvironment>();

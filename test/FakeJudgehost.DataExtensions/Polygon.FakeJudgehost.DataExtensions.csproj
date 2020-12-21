@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <DescriptionAttach>The fake judgehost data to make tests</DescriptionAttach>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Import Project="..\..\build\NugetPackage.props" />
+
+  <ItemGroup>
+    <PackageReference Include="SatelliteSite.DataAccess" Version="$(SubstrateVersion)" />
+    <PackageReference Include="SatelliteSite.IdentityCore" Version="$(SubstrateVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Seeds\Polygon.Seeds.csproj" />
+    <ProjectReference Include="..\FakeJudgehost\Polygon.FakeJudgehost.csproj" />
+  </ItemGroup>
+
+</Project>

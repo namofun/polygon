@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Host\SatelliteSite.Host.csproj" />
+    <ProjectReference Include="..\FakeJudgehost.DataExtensions\Polygon.FakeJudgehost.DataExtensions.csproj" />
     <ProjectReference Include="..\FakeJudgehost\Polygon.FakeJudgehost.csproj" />
   </ItemGroup>
 
