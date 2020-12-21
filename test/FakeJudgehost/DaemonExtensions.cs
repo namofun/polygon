@@ -1,6 +1,9 @@
-﻿using Polygon.Judgement;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Polygon.Judgement;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -14,6 +17,31 @@ namespace Polygon.FakeJudgehost
     /// </summary>
     public static class DaemonExtensions
     {
+        /// <summary>
+        /// Find the correct judgehost, or throwing an exception when not found.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider.</param>
+        /// <param name="hostname">The judgehost hostname.</param>
+        /// <returns>The judgehost.</returns>
+        public static JudgeDaemon GetJudgehost(this IServiceProvider serviceProvider, string hostname)
+        {
+            return serviceProvider
+                .GetServices<IHostedService>()
+                .OfType<JudgeDaemon>()
+                .Where(j => j.HostName == hostname)
+                .Single();
+        }
+
+        /// <summary>
+        /// Add the fake judgehost related things to service collection.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The fake judgehost builder.</returns>
+        public static FakeJudgehostBuilder AddFakeJudgehost(this IServiceCollection services)
+        {
+            return new FakeJudgehostBuilder(services);
+        }
+
         /// <summary>
         /// Disable the judgehost.
         /// </summary>

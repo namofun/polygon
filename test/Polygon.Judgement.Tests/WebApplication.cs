@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
-using Polygon;
 using Polygon.FakeJudgehost;
 using SatelliteSite.IdentityModule.Entities;
 using System.Reflection;
@@ -13,7 +12,7 @@ namespace SatelliteSite.Tests
 
         protected override IHostBuilder CreateHostBuilder() =>
             Host.CreateDefaultBuilder()
-                .MarkDomain<Program>()
+                .MarkTest()
                 .AddModule<IdentityModule.IdentityModule<User, Role, TestContext>>()
                 .AddModule<PolygonModule.PolygonModule<Polygon.TestRole<User, Role, TestContext>>>()
                 .AddDatabaseInMemory<TestContext>("0x8c")
@@ -21,20 +20,18 @@ namespace SatelliteSite.Tests
                 {
                     b.ConfigureServices(services =>
                     {
-                        services.AddJudgehost<InternalErrorActivity>("fake-judgehost-0");
-                        services.AddJudgehost<FakeJudgeActivity>("fake-judgehost-1");
-                        services.AddJudgehost<FakeJudgeActivity>("fake-judgehost-2");
-                        services.AddFakeJudgehostAccount();
-
-                        services.ConfigureJudgeDaemon(options =>
-                        {
-                            options.HttpClientFactory = _ =>
+                        services.AddFakeJudgehost()
+                            .AddFakeAccount()
+                            .AddJudgehost<InternalErrorActivity>("fake-judgehost-0")
+                            .AddJudgehost<FakeJudgeActivity>("fake-judgehost-1")
+                            .AddJudgehost<FakeJudgeActivity>("fake-judgehost-2")
+                            .AddFakeSeeds<TestContext>()
+                            .AddHttpClientFactory(_ =>
                             {
                                 var client = CreateClient();
                                 client.BaseAddress = new System.Uri("http://localhost/api/");
                                 return client;
-                            };
-                        });
+                            });
                     });
                 });
 
