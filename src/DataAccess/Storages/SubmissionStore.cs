@@ -65,9 +65,10 @@ namespace Polygon.Storages
                 .SingleOrDefaultAsync();
         }
 
-        Task<Dictionary<int, string>> ISubmissionStore.GetAuthorNamesAsync(Expression<Func<Submission, bool>> sids)
+        async Task<Dictionary<int, string>> ISubmissionStore.GetAuthorNamesAsync(Expression<Func<Submission, bool>> sids)
         {
-            return Context.Author(sids).ToDictionaryAsync(s => s.SubmissionId, s => s.ToString());
+            var result = await Context.FetchAuthorAsync(sids);
+            return result.ToDictionary(s => s.SubmissionId, s => s.ToString());
         }
 
         Task<SubmissionFile> ISubmissionStore.GetFileAsync(int submissionId)

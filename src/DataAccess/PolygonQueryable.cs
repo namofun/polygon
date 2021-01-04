@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Polygon.Entities;
+﻿using Polygon.Entities;
 using Polygon.Models;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
@@ -13,7 +13,7 @@ namespace Polygon.Storages
     public interface IPolygonQueryable
     {
         /// <summary>
-        /// Create an <see cref="IQueryable{SolutionAuthor}"/> to query solution authors.
+        /// Create a task to fetch <see cref="SolutionAuthor"/>s.
         /// </summary>
         /// <param name="predicate">The submission filter.</param>
         /// <returns>The solution author models.</returns>
@@ -28,7 +28,7 @@ namespace Polygon.Storages
         /// <c>select new SolutionAuthor(s.Id, s.ContestId, s.TeamId, u.UserName, t.TeamName);</c>
         /// </para>
         /// </remarks>
-        IQueryable<SolutionAuthor> Author(Expression<Func<Submission, bool>> predicate);
+        Task<List<SolutionAuthor>> FetchAuthorAsync(Expression<Func<Submission, bool>> predicate);
 
         /// <summary>
         /// Create an expression to calculate the duration seconds between two <see cref="DateTimeOffset"/>.
