@@ -147,46 +147,37 @@ namespace Polygon.Storages
 
         Task<Rejudging> IRejudgingStore.FindAsync(int cid, int rjid)
         {
-            var query =
-                from r in Rejudgings
-                where r.ContestId == cid && r.Id == rjid
-                join u in Context.Set<TUser>() on r.IssuedBy equals u.Id
-                into uu1 from u1 in uu1.DefaultIfEmpty()
-                join u in Context.Set<TUser>() on r.OperatedBy equals u.Id
-                into uu2 from u2 in uu2.DefaultIfEmpty()
-                select new Rejudging(r, u1.UserName, u2.UserName);
-            return query.SingleOrDefaultAsync();
+            return Rejudgings
+                .Where(r => r.ContestId == cid && r.Id == rjid)
+                .SingleOrDefaultAsync();
         }
 
-        async Task<List<Rejudging>> IRejudgingStore.ListAsync(int contestId)
+        async Task<List<Rejudging>> IRejudgingStore.ListAsync(int contestId, bool includeStat)
         {
-            var query =
-                from r in Rejudgings
-                where r.ContestId == contestId
-                join u in Context.Set<TUser>() on r.IssuedBy equals u.Id
-                into uu1 from u1 in uu1.DefaultIfEmpty()
-                join u in Context.Set<TUser>() on r.OperatedBy equals u.Id
-                into uu2 from u2 in uu2.DefaultIfEmpty()
-                select new Rejudging(r, u1.UserName, u2.UserName);
-            var model = await query.ToListAsync();
+            var model = await Rejudgings
+                .Where(r => r.ContestId == contestId)
+                .ToListAsync();
 
-            var query2 =
-                from j in Judgings
-                where (from r in Rejudgings
-                       where r.ContestId == contestId && r.OperatedBy == null
-                       select (int?)r.Id).Contains(j.RejudgingId)
-                group 1 by new { j.RejudgingId, j.Status } into g
-                select new { g.Key, Cnt = g.Count() };
-            var q2 = await query2.ToListAsync();
-
-            foreach (var qqq in q2.GroupBy(a => a.Key.RejudgingId))
+            if (includeStat)
             {
-                int tot = qqq.Sum(a => a.Cnt);
-                int ped = qqq
-                    .Where(a => a.Key.Status == Verdict.Pending || a.Key.Status == Verdict.Running)
-                    .DefaultIfEmpty()
-                    .Sum(a => a?.Cnt) ?? 0;
-                model.First(r => r.Id == qqq.Key).Ready = (tot, ped);
+                var query2 =
+                    from j in Judgings
+                    where (from r in Rejudgings
+                           where r.ContestId == contestId && r.OperatedBy == null
+                           select (int?)r.Id).Contains(j.RejudgingId)
+                    group 1 by new { j.RejudgingId, j.Status } into g
+                    select new { g.Key, Cnt = g.Count() };
+                var q2 = await query2.ToListAsync();
+
+                foreach (var qqq in q2.GroupBy(a => a.Key.RejudgingId))
+                {
+                    int tot = qqq.Sum(a => a.Cnt);
+                    int ped = qqq
+                        .Where(a => a.Key.Status == Verdict.Pending || a.Key.Status == Verdict.Running)
+                        .DefaultIfEmpty()
+                        .Sum(a => a?.Cnt) ?? 0;
+                    model.First(r => r.Id == qqq.Key).Ready = (tot, ped);
+                }
             }
 
             return model;

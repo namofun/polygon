@@ -53,8 +53,9 @@ namespace Polygon.Storages
         /// List the rejudging for certain contest.
         /// </summary>
         /// <param name="contestId">The contest ID.</param>
+        /// <param name="includeStat">Whether to include statistics about undone rejudging progress.</param>
         /// <returns>The task for fetching rejudging entities.</returns>
-        Task<List<Rejudging>> ListAsync(int contestId);
+        Task<List<Rejudging>> ListAsync(int contestId, bool includeStat = true);
 
         /// <summary>
         /// View the rejudging difference.

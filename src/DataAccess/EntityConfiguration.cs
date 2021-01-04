@@ -262,8 +262,6 @@ namespace Polygon.Storages
                 .HasForeignKey(e => e.OperatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.Ignore(e => e.Issuer);
-            entity.Ignore(e => e.Operator);
             entity.Ignore(e => e.Ready);
         }
 
