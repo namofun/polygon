@@ -15,6 +15,7 @@ namespace Polygon.Storages
     /// </summary>
     /// <remarks>
     /// This service should be <see cref="ServiceLifetime.Singleton"/>, and can't rely on any scoped services.
+    /// If you want to utilize other scoped services, it is preferred to take action with IHttpContextAccessor.
     /// </remarks>
     public abstract class QueryCacheBase<TContext> where TContext : DbContext
     {
@@ -66,6 +67,16 @@ namespace Polygon.Storages
         /// <list type="bullet">For InMemory, it may be <c>(start, end) => (end - start).TotalSeconds</c>.</list>
         /// </remarks>
         protected abstract Expression<Func<DateTimeOffset, DateTimeOffset, double>> CalculateDuration { get; }
+
+        /// <summary>
+        /// Create a task to fetch permitted users of one problem.
+        /// </summary>
+        /// <param name="context">The query database context.</param>
+        /// <param name="probid">The problem ID.</param>
+        /// <returns>The user information list.</returns>
+        public abstract Task<IEnumerable<(int UserId, string UserName, string NickName)>> FetchPermittedUserAsync(TContext context, int probid);
+
+
 
         #region Judgehost Load Query
 

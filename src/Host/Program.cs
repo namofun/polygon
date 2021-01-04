@@ -23,7 +23,7 @@ namespace SatelliteSite
             Host.CreateDefaultBuilder(args)
                 .MarkDomain<Program>()
                 .AddModule<IdentityModule.IdentityModule<User, Role, DefaultContext>>()
-                .AddModule<PolygonModule.PolygonModule<Polygon.DefaultRole<DefaultContext, DefaultQueryCache>>>()
+                .AddModule<PolygonModule.PolygonModule<Polygon.DefaultRole<DefaultContext, QueryCache<DefaultContext>>>>()
                 .AddModule<HostModule>()
                 //.ConfigureServices(services => services.AddDbModelSupplier<DefaultContext, SeedConfiguration<DefaultContext>>())
                 .AddDatabaseMssql<DefaultContext>("UserDbConnection")

@@ -50,15 +50,9 @@ namespace Polygon.Storages
                     .ToPagedListAsync(page, perCount);
         }
 
-        async Task<IEnumerable<(int UserId, string UserName, string NickName)>> IProblemStore.ListPermittedUserAsync(int pid)
+        Task<IEnumerable<(int UserId, string UserName, string NickName)>> IProblemStore.ListPermittedUserAsync(int pid)
         {
-            throw new NotImplementedException();
-//#warning Shouldn't join TUser
-            //var result = await Authors
-            //    .Where(r => r.ProblemId == pid)
-            //    .Join(Context.Set<TUser>(), ur => ur.UserId, u => u.Id, (ur, u) => new { u.Id, u.UserName, u.NickName })
-            //    .ToListAsync();
-            //return result.Select(a => (a.Id, a.UserName, a.NickName));
+            return QueryCache.FetchPermittedUserAsync(Context, pid);
         }
 
         Task IProblemStore.RebuildStatisticsAsync()
