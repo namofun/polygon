@@ -7,11 +7,11 @@ namespace Polygon.Storages
     /// <summary>
     /// The big facade interface with one implemention.
     /// </summary>
-    /// <typeparam name="TUser">The user type.</typeparam>
     /// <typeparam name="TContext">The context type.</typeparam>
-    public partial class PolygonFacade<TUser, TContext> : IPolygonFacade
-        where TContext : DbContext, IPolygonQueryable
-        where TUser : SatelliteSite.IdentityModule.Entities.User
+    /// <typeparam name="TQueryCache">The query cache type.</typeparam>
+    public partial class PolygonFacade<TContext, TQueryCache> : IPolygonFacade
+        where TContext : DbContext
+        where TQueryCache : QueryCacheBase<TContext>
     {
         /// <inheritdoc />
         IProblemStore IPolygonFacade.Problems => this;
@@ -48,9 +48,9 @@ namespace Polygon.Storages
 
         public IMediator Mediator { get; }
 
-        public QueryCache<TContext> QueryCache { get; }
+        public TQueryCache QueryCache { get; }
 
-        public PolygonFacade(TContext context, IJudgingFileProvider jf, IProblemFileProvider pf, IMediator mediator, QueryCache<TContext> queryCache)
+        public PolygonFacade(TContext context, IJudgingFileProvider jf, IProblemFileProvider pf, IMediator mediator, TQueryCache queryCache)
         {
             Context = context;
             JudgingFiles = jf;

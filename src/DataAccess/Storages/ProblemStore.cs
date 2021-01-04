@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Polygon.Entities;
 using System;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TContext> : IProblemStore
+    public partial class PolygonFacade<TContext, TQueryCache> : IProblemStore
     {
         DbSet<Problem> Problems => Context.Set<Problem>();
 
@@ -53,12 +52,13 @@ namespace Polygon.Storages
 
         async Task<IEnumerable<(int UserId, string UserName, string NickName)>> IProblemStore.ListPermittedUserAsync(int pid)
         {
-#warning Shouldn't join TUser
-            var result = await Authors
-                .Where(r => r.ProblemId == pid)
-                .Join(Context.Set<TUser>(), ur => ur.UserId, u => u.Id, (ur, u) => new { u.Id, u.UserName, u.NickName })
-                .ToListAsync();
-            return result.Select(a => (a.Id, a.UserName, a.NickName));
+            throw new NotImplementedException();
+//#warning Shouldn't join TUser
+            //var result = await Authors
+            //    .Where(r => r.ProblemId == pid)
+            //    .Join(Context.Set<TUser>(), ur => ur.UserId, u => u.Id, (ur, u) => new { u.Id, u.UserName, u.NickName })
+            //    .ToListAsync();
+            //return result.Select(a => (a.Id, a.UserName, a.NickName));
         }
 
         Task IProblemStore.RebuildStatisticsAsync()

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TContext> : IExecutableStore
+    public partial class PolygonFacade<TContext, TQueryCache> : IExecutableStore
     {
         public DbSet<Executable> Executables => Context.Set<Executable>();
 

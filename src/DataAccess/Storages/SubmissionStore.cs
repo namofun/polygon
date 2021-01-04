@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TContext> : ISubmissionStore
+    public partial class PolygonFacade<TContext, TQueryCache> : ISubmissionStore
     {
         DbSet<Submission> Submissions => Context.Set<Submission>();
 
@@ -67,7 +67,7 @@ namespace Polygon.Storages
 
         async Task<Dictionary<int, string>> ISubmissionStore.GetAuthorNamesAsync(Expression<Func<Submission, bool>> sids)
         {
-            var result = await Context.FetchAuthorAsync(sids);
+            var result = await QueryCache.FetchSolutionAuthorAsync(Context, sids);
             return result.ToDictionary(s => s.SubmissionId, s => s.ToString());
         }
 

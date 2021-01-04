@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TContext> : IJudgehostStore
+    public partial class PolygonFacade<TContext, TQueryCache> : IJudgehostStore
     {
         DbSet<Judgehost> Judgehosts => Context.Set<Judgehost>();
 
@@ -57,7 +57,8 @@ namespace Polygon.Storages
         {
             var returns = new Dictionary<string, (double, double, double)>();
 
-            await foreach (var item in QueryCache.JudgehostLoad(Context))
+            var loads = await QueryCache.FetchJudgehostLoadAsync(Context);
+            foreach (var item in loads)
             {
                 returns.TryAdd(item.HostName, default);
                 var current = returns[item.HostName];

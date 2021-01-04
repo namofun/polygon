@@ -14,7 +14,7 @@ namespace SatelliteSite.Tests
             Host.CreateDefaultBuilder()
                 .MarkTest(this)
                 .AddModule<IdentityModule.IdentityModule<User, Role, TestContext>>()
-                .AddModule<PolygonModule.PolygonModule<Polygon.TestRole<User, Role, TestContext>>>()
+                .AddModule<PolygonModule.PolygonModule<TestRole>>()
                 .AddDatabaseInMemory<TestContext>("0x8c")
                 .ConfigureSubstrateDefaults<TestContext>(b =>
                 {

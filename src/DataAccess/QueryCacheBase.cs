@@ -6,23 +6,68 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public class QueryCache<TContext> where TContext : DbContext, IPolygonQueryable
+    /// <summary>
+    /// The query cache base for providing external queries.
+    /// </summary>
+    /// <remarks>
+    /// This service should be <see cref="ServiceLifetime.Singleton"/>, and can't rely on any scoped services.
+    /// </remarks>
+    public abstract class QueryCacheBase<TContext> where TContext : DbContext
     {
-        public Func<TContext, IAsyncEnumerable<JudgehostLoad>> JudgehostLoad { get; }
+        private Func<TContext, IAsyncEnumerable<JudgehostLoad>>? _judgehostLoad;
 
-        public IServiceProvider Services { get; }
-
-        public QueryCache(IServiceProvider serviceProvider)
+        /// <summary>
+        /// Create a task to fetch <see cref="JudgehostLoad"/>s.
+        /// </summary>
+        /// <param name="context">The query database context.</param>
+        /// <returns>The judgehost load models.</returns>
+        public virtual async Task<List<JudgehostLoad>> FetchJudgehostLoadAsync(TContext context)
         {
-            Services = serviceProvider;
+            _judgehostLoad ??= EF.CompileAsyncQuery(CreateJudgehostLoadQuery(CalculateDuration));
 
-            using var scope = Services.CreateScope();
-            using var context = scope.ServiceProvider.GetRequiredService<TContext>();
-            JudgehostLoad = EF.CompileAsyncQuery(CreateJudgehostLoadQuery(context.CalculateDuration));
+            var results = new List<JudgehostLoad>();
+            await foreach (var item in _judgehostLoad(context))
+            {
+                results.Add(item);
+            }
+
+            return results;
         }
+
+        /// <summary>
+        /// Create a task to fetch <see cref="SolutionAuthor"/>s.
+        /// </summary>
+        /// <param name="context">The query database context.</param>
+        /// <param name="predicate">The submission filter.</param>
+        /// <returns>The solution author models.</returns>
+        /// <remarks>
+        /// Returning a query like these:
+        /// <para>
+        /// <c>from s in Submissions.WhereIf(predicate != null, predicate)</c><br />
+        /// <c>join u in Users on new { s.ContestId, s.TeamId } equals new { ContestId = 0, TeamId = u.Id }</c><br />
+        /// <c>into uu from u in uu.DefaultIfEmpty()</c><br />
+        /// <c>join t in Teams on new { s.ContestId, s.TeamId } equals new { t.ContestId, t.TeamId }</c><br />
+        /// <c>into tt from t in tt.DefaultIfEmpty()</c><br />
+        /// <c>select new SolutionAuthor(s.Id, s.ContestId, s.TeamId, u.UserName, t.TeamName);</c>
+        /// </para>
+        /// </remarks>
+        public abstract Task<List<SolutionAuthor>> FetchSolutionAuthorAsync(TContext context, Expression<Func<Submission, bool>> predicate);
+
+        /// <summary>
+        /// Create an expression to calculate the duration seconds between two <see cref="DateTimeOffset"/>.
+        /// </summary>
+        /// <remarks>
+        /// Usually, it can be expressed in several ways.
+        /// <list type="bullet">For SqlServer, it may be <c>(start, end) => EF.Functions.DateDiffMillisecond(start, end) / 1000.0</c>.</list>
+        /// <list type="bullet">For InMemory, it may be <c>(start, end) => (end - start).TotalSeconds</c>.</list>
+        /// </remarks>
+        protected abstract Expression<Func<DateTimeOffset, DateTimeOffset, double>> CalculateDuration { get; }
+
+        #region Judgehost Load Query
 
         private static Expression<Func<TContext, IQueryable<JudgehostLoad>>> CreateJudgehostLoadQuery(
             Expression<Func<DateTimeOffset, DateTimeOffset, double>> source)
@@ -95,5 +140,7 @@ namespace Polygon.Storages
                 }
             }
         }
+
+        #endregion
     }
 }

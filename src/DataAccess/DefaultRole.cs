@@ -2,15 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Polygon.Storages;
 using Polygon.Storages.Handlers;
-using SatelliteSite.IdentityModule.Entities;
 using System.IO;
 
 namespace Polygon
 {
-    public class DefaultRole<TUser, TRole, TContext> : IServiceRole
-        where TUser : User, new()
-        where TRole : Role, new()
-        where TContext : DbContext, IPolygonQueryable
+    public class DefaultRole<TContext, TQueryCache> : IServiceRole
+        where TContext : DbContext
+        where TQueryCache : QueryCacheBase<TContext>
     {
         private static void EnsureDirectoryExists(string directory)
         {
@@ -22,9 +20,9 @@ namespace Polygon
 
         public void Configure(IServiceCollection services)
         {
-            services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TContext>>();
-            services.AddPolygonStorage<PolygonFacade<TUser, TContext>>();
-            services.AddSingleton<QueryCache<TContext>>();
+            services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TContext>>();
+            services.AddPolygonStorage<PolygonFacade<TContext, TQueryCache>>();
+            services.AddSingleton<TQueryCache>();
 
             MediatR.Registration.ServiceRegistrar.AddMediatRClasses(services, new[] { typeof(Auditlogging).Assembly });
 

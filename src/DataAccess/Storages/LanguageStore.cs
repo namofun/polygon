@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TContext> : ILanguageStore
+    public partial class PolygonFacade<TContext, TQueryCache> : ILanguageStore
     {
         DbSet<Language> Languages => Context.Set<Language>();
 

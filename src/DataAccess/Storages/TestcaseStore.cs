@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TContext> : ITestcaseStore
+    public partial class PolygonFacade<TContext, TQueryCache> : ITestcaseStore
     {
         DbSet<Testcase> Testcases => Context.Set<Testcase>();
 
@@ -23,7 +23,7 @@ namespace Polygon.Storages
 
         async Task<int> ITestcaseStore.CascadeDeleteAsync(Testcase testcase)
         {
-            using var tran = await Context.Database.BeginTransactionAsync();
+            await using var tran = await Context.Database.BeginTransactionAsync();
             int dts;
 
             try

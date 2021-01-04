@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TContext> : IInternalErrorStore
+    public partial class PolygonFacade<TContext, TQueryCache> : IInternalErrorStore
     {
         public DbSet<InternalError> InternalErrors => Context.Set<InternalError>();
 

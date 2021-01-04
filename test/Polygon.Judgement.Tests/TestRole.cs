@@ -1,17 +1,15 @@
 ﻿using Markdig;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Polygon;
+using Polygon.Entities;
 using Polygon.Storages;
 using Polygon.Storages.Handlers;
-using SatelliteSite.IdentityModule.Entities;
 using SatelliteSite.Tests;
 
-namespace Polygon
+namespace SatelliteSite
 {
-    public class TestRole<TUser, TRole, TContext> : IServiceRole
-        where TUser : User, new()
-        where TRole : Role, new()
-        where TContext : DbContext, IPolygonQueryable
+    public class TestRole : IServiceRole
     {
         private class InMemoryProblemFileProvider : InMemoryMutableFileProvider, IProblemFileProvider { }
 
@@ -19,10 +17,10 @@ namespace Polygon
 
         public void Configure(IServiceCollection services)
         {
-            services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TUser, TContext>>();
-            services.AddDbModelSupplier<TContext, Entities.SeedConfiguration<TContext>>();
-            services.AddPolygonStorage<PolygonFacade<TUser, TContext>>();
-            services.AddSingleton<QueryCache<TContext>>();
+            services.AddDbModelSupplier<TestContext, PolygonEntityConfiguration<TestContext>>();
+            services.AddDbModelSupplier<TestContext, SeedConfiguration<TestContext>>();
+            services.AddPolygonStorage<PolygonFacade<TestContext, TestQueryCache>>();
+            services.AddSingleton<TestQueryCache>();
 
             services.AddMarkdown();
 

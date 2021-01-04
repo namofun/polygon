@@ -7,10 +7,9 @@ namespace Polygon.Storages
     /// <summary>
     /// Entity configuration for polygon backend.
     /// </summary>
-    /// <typeparam name="TUser">The user type.</typeparam>
     /// <typeparam name="TContext">The DbContext type.</typeparam>
     /// <remarks>Should make entity inclusion on Contest to Rejudging.</remarks>
-    public class PolygonEntityConfiguration<TUser, TContext> :
+    public class PolygonEntityConfiguration<TContext> :
         EntityTypeConfigurationSupplier<TContext>,
         IEntityTypeConfiguration<Executable>,
         IEntityTypeConfiguration<InternalError>,
@@ -24,8 +23,7 @@ namespace Polygon.Storages
         IEntityTypeConfiguration<SubmissionStatistics>,
         IEntityTypeConfiguration<Testcase>,
         IEntityTypeConfiguration<ProblemAuthor>
-        where TContext : DbContext, IPolygonQueryable
-        where TUser : SatelliteSite.IdentityModule.Entities.User
+        where TContext : DbContext
     {
         public void Configure(EntityTypeBuilder<Executable> entity)
         {
@@ -248,19 +246,22 @@ namespace Polygon.Storages
             //     .WithMany()
             //     .HasForeignKey(e => e.ContestId)
             //     .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.ContestId);
 
             entity.Property(e => e.Reason)
                 .IsRequired();
 
-            entity.HasOne<TUser>()
-                .WithMany()
-                .HasForeignKey(e => e.IssuedBy)
-                .OnDelete(DeleteBehavior.Restrict);
+            // entity.HasOne<TUser>()
+            //     .WithMany()
+            //     .HasForeignKey(e => e.IssuedBy)
+            //     .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.IssuedBy);
 
-            entity.HasOne<TUser>()
-                .WithMany()
-                .HasForeignKey(e => e.OperatedBy)
-                .OnDelete(DeleteBehavior.Restrict);
+            // entity.HasOne<TUser>()
+            //     .WithMany()
+            //     .HasForeignKey(e => e.OperatedBy)
+            //     .OnDelete(DeleteBehavior.Restrict);
+            entity.HasIndex(e => e.OperatedBy);
 
             entity.Ignore(e => e.Ready);
         }
@@ -372,6 +373,12 @@ namespace Polygon.Storages
                 .WithMany()
                 .HasForeignKey(e => e.ProblemId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // entity.HasOne<TUser>()
+            //     .WithMany()
+            //     .HasForeignKey(e => e.UserId)
+            //     .OnDelete(DeleteBehavior.Cascade);
+            entity.HasIndex(e => e.UserId);
         }
     }
 }

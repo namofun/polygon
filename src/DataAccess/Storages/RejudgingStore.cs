@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Polygon.Storages
 {
-    public partial class PolygonFacade<TUser, TContext> : IRejudgingStore
+    public partial class PolygonFacade<TContext, TQueryCache> : IRejudgingStore
     {
         private static readonly ConcurrentAsyncLock _beingRejudged = new ConcurrentAsyncLock();
 
