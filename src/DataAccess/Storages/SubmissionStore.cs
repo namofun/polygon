@@ -133,25 +133,22 @@ namespace Polygon.Storages
 
         Task ISubmissionStore.UpdateStatisticsAsync(int cid, int teamid, int probid, bool ac)
         {
-            return SubmissionStatistics.MergeAsync(
-                sourceTable: new[] { new { cid, teamid, probid, acc = ac ? 1 : 0 } },
-                targetKey: s => new { teamid = s.TeamId, cid = s.ContestId, probid = s.ProblemId },
-                sourceKey: s => new { s.teamid, s.cid, s.probid },
-                delete: false,
-
-                updateExpression: (s, s2) => new SubmissionStatistics
-                {
-                    AcceptedSubmission = s.AcceptedSubmission + s2.acc,
-                    TotalSubmission = s.TotalSubmission + 1,
-                },
+            return SubmissionStatistics.UpsertAsync(
+                source: new { ContestId = cid, TeamId = teamid, ProblemId = probid, Accepted = ac ? 1 : 0 },
 
                 insertExpression: s2 => new SubmissionStatistics
                 {
-                    TeamId = s2.teamid,
-                    ContestId = s2.cid,
-                    ProblemId = s2.probid,
-                    AcceptedSubmission = s2.acc,
+                    TeamId = s2.TeamId,
+                    ContestId = s2.ContestId,
+                    ProblemId = s2.ProblemId,
+                    AcceptedSubmission = s2.Accepted,
                     TotalSubmission = 1,
+                },
+
+                updateExpression: (s, s2) => new SubmissionStatistics
+                {
+                    AcceptedSubmission = s.AcceptedSubmission + s2.AcceptedSubmission,
+                    TotalSubmission = s.TotalSubmission + 1,
                 });
         }
     }

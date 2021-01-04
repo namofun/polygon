@@ -53,6 +53,7 @@ namespace Polygon.Storages
 
         async Task<IEnumerable<(int UserId, string UserName, string NickName)>> IProblemStore.ListPermittedUserAsync(int pid)
         {
+#warning Shouldn't join TUser
             var result = await Authors
                 .Where(r => r.ProblemId == pid)
                 .Join(Context.Set<TUser>(), ur => ur.UserId, u => u.Id, (ur, u) => new { u.Id, u.UserName, u.NickName })
@@ -75,11 +76,8 @@ namespace Polygon.Storages
                     AcceptedSubmission = g.Sum(v => v == Verdict.Accepted ? 1 : 0)
                 };
 
-            return SubmissionStatistics.MergeAsync(
-                sourceTable: source,
-                targetKey: ss => new { ss.TeamId, ss.ContestId, ss.ProblemId },
-                sourceKey: ss => new { ss.TeamId, ss.ContestId, ss.ProblemId },
-                delete: true,
+            return SubmissionStatistics.UpsertAsync(
+                sources: source,
 
                 updateExpression: (_, ss) => new SubmissionStatistics
                 {

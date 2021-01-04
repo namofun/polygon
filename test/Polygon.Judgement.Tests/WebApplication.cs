@@ -12,7 +12,7 @@ namespace SatelliteSite.Tests
 
         protected override IHostBuilder CreateHostBuilder() =>
             Host.CreateDefaultBuilder()
-                .MarkTest()
+                .MarkTest(this)
                 .AddModule<IdentityModule.IdentityModule<User, Role, TestContext>>()
                 .AddModule<PolygonModule.PolygonModule<Polygon.TestRole<User, Role, TestContext>>>()
                 .AddDatabaseInMemory<TestContext>("0x8c")
