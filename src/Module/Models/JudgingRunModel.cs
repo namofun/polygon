@@ -1,4 +1,5 @@
-﻿using Polygon.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using Polygon.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,48 +16,56 @@ namespace SatelliteSite.PolygonModule.Models
         /// The ID of the testcase of the run to add
         /// </summary>
         [JsonPropertyName("testcaseid")]
+        [FromForm(Name = "testcaseid")]
         public string TestcaseId { get; set; }
 
         /// <summary>
         /// The result of the run
         /// </summary>
         [JsonPropertyName("runresult")]
+        [FromForm(Name = "runresult")]
         public string RunResult { get; set; }
 
         /// <summary>
         /// The runtime of the run
         /// </summary>
         [JsonPropertyName("runtime")]
+        [FromForm(Name = "runtime")]
         public string RunTime { get; set; }
 
         /// <summary>
         /// The (base64-encoded) output of the run
         /// </summary>
         [JsonPropertyName("output_run")]
+        [FromForm(Name = "output_run")]
         public string OutputRun { get; set; }
 
         /// <summary>
         /// The (base64-encoded) output diff of the run
         /// </summary>
         [JsonPropertyName("output_diff")]
+        [FromForm(Name = "output_diff")]
         public string OutputDiff { get; set; }
 
         /// <summary>
         /// The (base64-encoded) error output of the run
         /// </summary>
         [JsonPropertyName("output_error")]
+        [FromForm(Name = "output_error")]
         public string OutputError { get; set; }
 
         /// <summary>
         /// The (base64-encoded) system output of the run
         /// </summary>
         [JsonPropertyName("output_system")]
+        [FromForm(Name = "output_system")]
         public string OutputSystem { get; set; }
 
         /// <summary>
         /// The (base64-encoded) metadata
         /// </summary>
         [JsonPropertyName("metadata")]
+        [FromForm(Name = "metadata")]
         public string MetaData { get; set; }
 
         static JudgingRunModel()

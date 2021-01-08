@@ -43,8 +43,6 @@ namespace SatelliteSite.PolygonModule
 
         public override void RegisterServices(IServiceCollection services)
         {
-            services.ConfigureSwaggerGen(options => options.OperationFilter<SwaggerFixFilter>());
-
             services.AddScoped<IExportProvider, KattisExportProvider>();
             services.AddScoped<IStatementProvider, MarkdownStatementProvider>();
             services.AddScoped<IStatementWriter, MarkdownStatementWriter>();

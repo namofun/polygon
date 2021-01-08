@@ -149,7 +149,8 @@ namespace SatelliteSite.PolygonModule.Apis
         /// </summary>
         /// <param name="hostname">The hostname of the judgehost that wants to add the judging run</param>
         /// <param name="judgingId">The ID of the judging to add a run to</param>
-        /// <param name="batch">Model</param>
+        /// <param name="batch">The judging run model (form-value encoded JSON array of JudgingRunModel)</param>
+        /// <!--<param name="model">Model sample</param>-->
         /// <param name="mediator"></param>
         /// <response code="200">When the judging run has been added</response>
         [HttpPost("[action]/{hostname}/{judgingId}")]
@@ -160,9 +161,13 @@ namespace SatelliteSite.PolygonModule.Apis
             [FromRoute] string hostname,
             [FromRoute] int judgingId,
             [FromForm, ModelBinder(typeof(JudgingRunBinder))] List<JudgingRunModel> batch,
+            // [FromForm] JudgingRunModel model,
             [FromServices] IMediator mediator)
         {
+            // if (batch is null && model?.TestcaseId != null)
+            //     batch = new List<JudgingRunModel> { model };
             if (batch is null) return BadRequest();
+
             var request = new AddJudgingRunRequest(
                 hostname: hostname,
                 judgingid: judgingId,
