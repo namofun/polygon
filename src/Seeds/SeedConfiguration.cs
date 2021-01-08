@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Polygon.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Polygon.Entities
+namespace Polygon.Storages
 {
     public class SeedConfiguration<TContext> :
         EntityTypeConfigurationSupplier<TContext>,

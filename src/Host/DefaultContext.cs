@@ -36,31 +36,5 @@ namespace SatelliteSite
         public virtual DbSet<Testcase> Testcases { get; set; }
 
         public virtual DbSet<Testcase> ProblemAuthors { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-
-            builder.Entity<Rejudging>(entity =>
-            {
-                entity.HasOne<User>()
-                    .WithMany()
-                    .HasForeignKey(e => e.IssuedBy)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne<User>()
-                    .WithMany()
-                    .HasForeignKey(e => e.OperatedBy)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
-
-            builder.Entity<ProblemAuthor>(entity =>
-            {
-                entity.HasOne<User>()
-                    .WithMany()
-                    .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
-            });
-        }
     }
 }
