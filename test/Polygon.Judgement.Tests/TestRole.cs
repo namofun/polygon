@@ -24,8 +24,7 @@ namespace SatelliteSite
 
             services.AddMarkdown();
 
-            MediatR.Registration.ServiceRegistrar.AddMediatRClasses(services, new[] { typeof(Auditlogging).Assembly });
-
+            services.AddMediatRAssembly(typeof(Auditlogging).Assembly);
             services.AddSingleton<IJudgingFileProvider, InMemoryJudgingFileProvider>();
             services.AddSingleton<IProblemFileProvider, InMemoryProblemFileProvider>();
         }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Polygon.Storages
@@ -223,6 +223,22 @@ namespace Polygon.Storages
         public static Task<IFileInfo> GetOutputAsync(this ITestcaseStore store, Testcase testcase)
         {
             return store.GetFileAsync(testcase, "out");
+        }
+
+        /// <summary>
+        /// List available problems.
+        /// </summary>
+        /// <param name="store">The problem store.</param>
+        /// <param name="page">The page.</param>
+        /// <param name="perCount">The count per page.</param>
+        /// <param name="user">The user claims principal.</param>
+        /// <returns>The task for paginated list of problems.</returns>
+        public static Task<IPagedList<Problem>> ListAsync(this IProblemStore store, int page, int perCount, ClaimsPrincipal user)
+        {
+            var uid = user.IsInRole("Administrator")
+                ? default(int?)
+                : int.Parse(user.GetUserId());
+            return store.ListAsync(page, perCount, uid);
         }
 
         /// <summary>

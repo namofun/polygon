@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Polygon.Entities;
 using Polygon.Packaging;
 using Polygon.Storages;
-using SatelliteSite.IdentityModule.Services;
 using SatelliteSite.PolygonModule.Models;
 using System;
 using System.Linq;
@@ -69,7 +69,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator,Problem")]
-        [AuditPoint(Entities.AuditlogType.Problem)]
+        [AuditPoint(AuditlogType.Problem)]
         public async Task<IActionResult> Edit(ProblemEditModel model)
         {
             if (model.RunScript == "upload" && model.UploadedRun == null)
@@ -164,7 +164,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Administrator,Problem")]
-        [AuditPoint(Entities.AuditlogType.Problem)]
+        [AuditPoint(AuditlogType.Problem)]
         public async Task<IActionResult> Export(
             [FromServices] IExportProvider export)
         {
@@ -254,7 +254,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator,Problem")]
-        [AuditPoint(Entities.AuditlogType.Problem)]
+        [AuditPoint(AuditlogType.Problem)]
         public async Task<IActionResult> Delete(int pid)
         {
             try

@@ -110,7 +110,7 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="pid">The problem ID.</param>
         /// <returns>The list of permitted users.</returns>
-        Task<IEnumerable<(int UserId, string UserName, string NickName)>> ListPermittedUserAsync(int pid);
+        Task<IEnumerable<(int UserId, string UserName)>> ListPermittedUserAsync(int pid);
 
         /// <summary>
         /// Write file to problem repository.

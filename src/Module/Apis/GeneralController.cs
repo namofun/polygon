@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Polygon.Models;
 using Polygon.Storages;
-using SatelliteSite.IdentityModule.Services;
 using SatelliteSite.PolygonModule.Models;
 using SatelliteSite.Services;
 using System.Collections.Generic;

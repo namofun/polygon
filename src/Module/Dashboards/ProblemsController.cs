@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polygon;
 using Polygon.Entities;
 using Polygon.Storages;
-using SatelliteSite.IdentityModule.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
     [Area("Dashboard")]
     [Route("[area]/[controller]")]
     [Authorize(Roles = "Administrator,Problem")]
-    [AuditPoint(Entities.AuditlogType.Problem)]
+    [AuditPoint(AuditlogType.Problem)]
     public class ProblemsController : ViewControllerBase
     {
         private IPolygonFacade Facade { get; }
@@ -43,11 +43,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
         public async Task<IActionResult> List(int page = 1)
         {
             if (page < 1) return NotFound();
-            var uid = User.IsInRole("Administrator")
-                ? default(int?)
-                : int.Parse(User.GetUserId());
-
-            var model = await Store.ListAsync(page, 50, uid);
+            var model = await Store.ListAsync(page, 50, User);
             return View(model);
         }
 

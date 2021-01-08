@@ -23,8 +23,7 @@ namespace Polygon
             services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TContext>>();
             services.AddPolygonStorage<PolygonFacade<TContext, TQueryCache>>();
             services.AddSingleton<TQueryCache>();
-
-            MediatR.Registration.ServiceRegistrar.AddMediatRClasses(services, new[] { typeof(Auditlogging).Assembly });
+            services.AddMediatRAssembly(typeof(Auditlogging).Assembly);
 
             services.AddOptions<PolygonPhysicalOptions>()
                 .PostConfigure(options =>

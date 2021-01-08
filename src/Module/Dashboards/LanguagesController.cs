@@ -11,7 +11,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
     [Area("Dashboard")]
     [Authorize(Roles = "Administrator")]
     [Route("[area]/[controller]")]
-    [AuditPoint(Entities.AuditlogType.Language)]
+    [AuditPoint(AuditlogType.Language)]
     public class LanguagesController : ViewControllerBase
     {
         private IPolygonFacade Facade { get; }

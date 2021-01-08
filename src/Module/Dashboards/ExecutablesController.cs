@@ -13,7 +13,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
     [Area("Dashboard")]
     [Authorize(Roles = "Administrator")]
     [Route("[area]/[controller]")]
-    [AuditPoint(Entities.AuditlogType.Executable)]
+    [AuditPoint(AuditlogType.Executable)]
     public class ExecutablesController : ViewControllerBase
     {
         private IExecutableStore Store { get; }

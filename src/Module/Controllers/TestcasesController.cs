@@ -11,7 +11,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 {
     [Area("Polygon")]
     [Route("[area]/{pid}/[controller]")]
-    [AuditPoint(Entities.AuditlogType.Testcase)]
+    [AuditPoint(AuditlogType.Testcase)]
     public class TestcasesController : PolygonControllerBase
     {
         private ITestcaseStore Store => Facade.Testcases;

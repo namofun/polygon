@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Polygon.Events;
-using SatelliteSite.Entities;
+using SatelliteSite;
 using SatelliteSite.Services;
 using System;
 using System.Threading;

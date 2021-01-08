@@ -9,7 +9,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
     [Area("Dashboard")]
     [Authorize(Roles = "Administrator")]
     [Route("[area]/[controller]")]
-    [AuditPoint(Entities.AuditlogType.InternalError)]
+    [AuditPoint(AuditlogType.InternalError)]
     public class InternalErrorsController : ViewControllerBase
     {
         private IPolygonFacade Facade { get; }

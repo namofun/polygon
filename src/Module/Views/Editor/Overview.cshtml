@@ -2,7 +2,7 @@
 @inject IMenuProvider Menu
 @{
     ViewData["Title"] = "Problem " + Model.Id;
-    IEnumerable<(int, string un, string nn)> urs = ViewBag.Users;
+    IEnumerable<(int, string un)> urs = ViewBag.Users;
 }
 
 <h2 class="mt-2">Problem @(Model.Title)</h2>
@@ -136,22 +136,20 @@
                 <tr>
                     <th scope="col">UID</th>
                     <th scope="col">User name</th>
-                    <th scope="col">Nick name</th>
                     <th><a asp-in-roles="Administrator" asp-action="Authorize" data-toggle="ajaxWindow" data-target="authProb" class="text-reset"><i class="fas fa-plus"></i></a></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var (uid, uname, nname) in urs)
+                @foreach (var (uid, uname) in urs)
                 {
                     <tr asp-action="Show" asp-route-username="@uname" asp-controller="Profile" asp-area="Account">
                         <td use-a>u@(uid)</td>
                         <td use-a>@uname</td>
-                        <td use-a>@nname</td>
                         <td><a asp-in-roles="Administrator" asp-action="Unauthorize" asp-route-uid="@uid" data-toggle="ajaxWindow" data-target="unauthProb"><i class="fas fa-trash-alt"></i></a></td>
                     </tr>
                 }
                 <tr asp-show-if="urs.Count() == 0">
-                    <td colspan="4">No data available.</td>
+                    <td colspan="3">No data available.</td>
                 </tr>
             </tbody>
         </table>

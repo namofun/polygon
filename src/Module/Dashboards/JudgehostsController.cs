@@ -10,7 +10,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
     [Area("Dashboard")]
     [Authorize(Roles = "Administrator")]
     [Route("[area]/[controller]")]
-    [AuditPoint(Entities.AuditlogType.Judgehost)]
+    [AuditPoint(AuditlogType.Judgehost)]
     public class JudgehostsController : ViewControllerBase
     {
         private IJudgehostStore Store { get; }

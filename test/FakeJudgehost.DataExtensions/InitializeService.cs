@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SatelliteSite.IdentityModule.Services;
 using System;
 using System.Threading.Tasks;
 
@@ -23,11 +23,26 @@ namespace Polygon.FakeJudgehost
             var sp = scope.ServiceProvider;
 
             var userManager = sp.GetRequiredService<IUserManager>();
-            var newUser = userManager.CreateEmpty(options.Value.UserName);
-            newUser.Email = "fake-test@fake-test.com";
-            newUser.EmailConfirmed = true;
-            await userManager.CreateAsync(newUser, options.Value.Password);
-            await userManager.AddToRoleAsync(newUser, "Judgehost");
+
+            IUser? user = await userManager.FindByNameAsync(options.Value.UserName);
+            if (user != null)
+            {
+                var token = await userManager.GeneratePasswordResetTokenAsync(user);
+                await userManager.ResetPasswordAsync(user, token, options.Value.Password);
+                if (!await userManager.IsInRoleAsync(user, "Judgehost"))
+                {
+                    await userManager.AddToRoleAsync(user, "Judgehost");
+                }
+            }
+            else
+            {
+                user = userManager.CreateEmpty(options.Value.UserName);
+                user.Email = options.Value.UserName + "@acm.xylab.fun";
+                user.EmailConfirmed = false;
+                await userManager.CreateAsync(user, options.Value.Password);
+                await userManager.AddToRoleAsync(user, "Judgehost");
+            }
+
             _finished = true;
         }
 
