@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.FileProviders;
 using System;
 using System.Buffers;
-using System.IO;
+using System.Buffers.Text;
 using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Mvc
@@ -18,31 +18,36 @@ namespace Microsoft.AspNetCore.Mvc
         const int byteLen = 1024 * 3 * 256;
         const int charLen = 1024 * 4 * 256;
         private static readonly ArrayPool<byte> opts = ArrayPool<byte>.Create(byteLen, 16);
-        private static readonly ArrayPool<char> ress = ArrayPool<char>.Create(charLen, 16);
+        private static readonly ArrayPool<byte> ress = ArrayPool<byte>.Create(charLen, 16);
+        private static readonly byte[] qoute = System.Text.Encoding.UTF8.GetBytes("\"");
 
         public override async Task ExecuteResultAsync(ActionContext context)
         {
             var response = context.HttpContext.Response;
+            var cancellationToken = context.HttpContext.RequestAborted;
             response.StatusCode = 200;
             response.ContentType = "application/json";
             response.ContentLength = (FileInfo.Length + 2) / 3 * 4 + 2;
             using var f1 = FileInfo.CreateReadStream();
 
             byte[] opt = opts.Rent(byteLen);
-            char[] res = ress.Rent(charLen);
-            var sw = new StreamWriter(response.Body);
-            await sw.WriteAsync('"');
+            byte[] res = ress.Rent(charLen);
+            await response.BodyWriter.WriteAsync(qoute, cancellationToken);
+            long left = FileInfo.Length;
 
-            while (true)
+            while (left > 0)
             {
-                int len = await f1.ReadAsync(opt, 0, byteLen);
-                if (len == 0) break;
-                int len2 = Convert.ToBase64CharArray(opt, 0, len, res, 0);
-                await sw.WriteAsync(res, 0, len2);
+                int readLen = left > byteLen ? byteLen : checked((int)left);
+                for (int len = 0; len < readLen; )
+                    len += await f1.ReadAsync(opt, len, readLen - len);
+                var s = Base64.EncodeToUtf8(opt[0..readLen], res, out int len1, out int len2, true);
+                if (s != OperationStatus.Done || len1 != readLen)
+                    throw new InvalidOperationException();
+                await response.BodyWriter.WriteAsync(res[0..len2], cancellationToken);
+                left -= readLen;
             }
 
-            await sw.WriteAsync('"');
-            await sw.DisposeAsync();
+            await response.BodyWriter.WriteAsync(qoute, cancellationToken);
             opts.Return(opt);
             ress.Return(res);
         }
