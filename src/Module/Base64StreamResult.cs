@@ -40,10 +40,10 @@ namespace Microsoft.AspNetCore.Mvc
                 int readLen = left > byteLen ? byteLen : checked((int)left);
                 for (int len = 0; len < readLen; )
                     len += await f1.ReadAsync(opt, len, readLen - len);
-                var s = Base64.EncodeToUtf8(opt[0..readLen], res, out int len1, out int len2, true);
+                var s = Base64.EncodeToUtf8(opt.AsSpan(0, readLen), res, out int len1, out int len2, true);
                 if (s != OperationStatus.Done || len1 != readLen)
                     throw new InvalidOperationException();
-                await response.BodyWriter.WriteAsync(res[0..len2], cancellationToken);
+                await response.BodyWriter.WriteAsync(res.AsMemory(0, len2), cancellationToken);
                 left -= readLen;
             }
 
