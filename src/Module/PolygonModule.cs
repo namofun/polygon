@@ -39,6 +39,10 @@ namespace SatelliteSite.PolygonModule
                 title: "Polygon Module",
                 description: "DOMjudge judgehost compatible API",
                 version: "v7.2.0");
+
+            endpoints.WithErrorHandler("Polygon", "Editor")
+                .MapFallbackNotFound("/polygon/{pid}/{**slug}")
+                .MapStatusCode("/polygon/{pid}/{**slug}");
         }
 
         public override void RegisterServices(IServiceCollection services)
