@@ -30,6 +30,6 @@ namespace Polygon.Storages
 
         DbSet<Testcase> Testcases { get; set; }
 
-        DbSet<Testcase> ProblemAuthors { get; set; }
+        DbSet<ProblemAuthor> ProblemAuthors { get; set; }
     }
 }

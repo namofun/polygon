@@ -35,6 +35,6 @@ namespace SatelliteSite
 
         public virtual DbSet<Testcase> Testcases { get; set; }
 
-        public virtual DbSet<Testcase> ProblemAuthors { get; set; }
+        public virtual DbSet<ProblemAuthor> ProblemAuthors { get; set; }
     }
 }
