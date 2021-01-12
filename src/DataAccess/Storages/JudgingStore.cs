@@ -12,21 +12,23 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : IJudgingStore
     {
-        DbSet<Judging> Judgings => Context.Set<Judging>();
-
-        DbSet<JudgingRun> Details => Context.Set<JudgingRun>();
-
         Task<Judging> IJudgingStore.CreateAsync(Judging entity) => CreateEntityAsync(entity);
 
         Task IJudgingStore.UpdateAsync(Judging entity) => UpdateEntityAsync(entity);
 
-        Task IJudgingStore.UpdateAsync(int id, Expression<Func<Judging, Judging>> expression) => Judgings.Where(j => j.Id == id).BatchUpdateAsync(expression);
+        Task IJudgingStore.UpdateAsync(int id, Expression<Func<Judging, Judging>> expression)
+        {
+            return Context.Judgings.Where(j => j.Id == id).BatchUpdateAsync(expression);
+        }
 
-        Task<int> IJudgingStore.CountAsync(Expression<Func<Judging, bool>> predicate) => Judgings.Where(predicate).CountAsync();
+        Task<int> IJudgingStore.CountAsync(Expression<Func<Judging, bool>> predicate)
+        {
+            return Context.Judgings.Where(predicate).CountAsync();
+        }
 
         Task<T> IJudgingStore.FindAsync<T>(Expression<Func<Judging, bool>> predicate, Expression<Func<Judging, T>> selector)
         {
-            return Judgings.Where(predicate).OrderBy(j => j.Id).Select(selector).FirstOrDefaultAsync();
+            return Context.Judgings.Where(predicate).OrderBy(j => j.Id).Select(selector).FirstOrDefaultAsync();
         }
 
         async Task<IEnumerable<T>> IJudgingStore.GetDetailsAsync<T>(int problemId, int judgingId, Expression<Func<Testcase, JudgingRun?, T>> selector)
@@ -36,11 +38,11 @@ namespace Polygon.Storages
                 objectTemplate2: default(JudgingRun),
                 place1: (a, d) => a.t, place2: (a, d) => d);
 
-            var query = Context.Set<Testcase>()
+            var query = Context.Testcases
                 .Where(t => t.ProblemId == problemId)
                 .OrderBy(t => t.Rank)
                 .GroupJoin(
-                    inner: Context.Set<JudgingRun?>(),
+                    inner: (DbSet<JudgingRun?>)Context.JudgingRuns!,
                     outerKeySelector: t => new { TestcaseId = t.Id, JudgingId = judgingId },
                     innerKeySelector: d => new { d!.TestcaseId, d!.JudgingId },
                     resultSelector: (t, dd) => new { t, dd })
@@ -60,8 +62,8 @@ namespace Polygon.Storages
                 objectTemplate: new { t = default(Testcase)!, d = default(JudgingRun)! },
                 place1: a => a.t, place2: a => a.d);
 
-            return await Details
-                .Join(Testcases, d => d.TestcaseId, t => t.Id, (d, t) => new { t, d })
+            return await Context.JudgingRuns
+                .Join(Context.Testcases, d => d.TestcaseId, t => t.Id, (d, t) => new { t, d })
                 .WhereIf(_predicate != null, _predicate)
                 .OrderBy(a => a.d.Id)
                 .Select(_selector)
@@ -71,10 +73,10 @@ namespace Polygon.Storages
 
         async Task<List<ServerStatus>> IJudgingStore.GetJudgeQueueAsync(int? cid)
         {
-            var judgingStatus = await Submissions
+            var judgingStatus = await Context.Submissions
                 .WhereIf(cid.HasValue, s => s.ContestId == cid)
                 .Join(
-                    inner: Judgings,
+                    inner: Context.Judgings,
                     outerKeySelector: s => s.Id,
                     innerKeySelector: j => j.SubmissionId,
                     resultSelector: (s, j) => new { j.Status, s.ContestId })
@@ -98,12 +100,12 @@ namespace Polygon.Storages
 
         Task<List<T>> IJudgingStore.ListAsync<T>(Expression<Func<Judging, bool>> predicate, Expression<Func<Judging, T>> selector, int topCount)
         {
-            return Judgings.Where(predicate).OrderByDescending(j => j.Id).Take(topCount).Select(selector).ToListAsync();
+            return Context.Judgings.Where(predicate).OrderByDescending(j => j.Id).Take(topCount).Select(selector).ToListAsync();
         }
 
         Task<List<Judging>> IJudgingStore.ListAsync(Expression<Func<Judging, bool>> predicate, int topCount)
         {
-            return Judgings.Where(predicate).OrderBy(j => j.Id).Take(topCount).ToListAsync();
+            return Context.Judgings.Where(predicate).OrderBy(j => j.Id).Take(topCount).ToListAsync();
         }
 
         async Task<IFileInfo> IJudgingStore.GetRunFileAsync(int jid, int rid, string type, int? sid, int? pid)
@@ -112,7 +114,7 @@ namespace Polygon.Storages
             var fileInfo = await JudgingFiles.GetFileInfoAsync($"j{jid}/r{rid}.{type}");
             if (!fileInfo.Exists) return notfound;
 
-            var validation = await Details
+            var validation = await Context.JudgingRuns
                 .Where(r => r.JudgingId == jid && r.Id == rid)
                 .Select(r => new { SubmissionId = r.j.s.Id, r.j.s.ProblemId })
                 .SingleOrDefaultAsync();
@@ -129,9 +131,9 @@ namespace Polygon.Storages
         Task<JudgingRun> IJudgingStore.SummarizeAsync(int judgingId)
         {
             var query =
-                from d in Details
+                from d in Context.JudgingRuns
                 where d.JudgingId == judgingId
-                join t in Testcases on d.TestcaseId equals t.Id
+                join t in Context.Testcases on d.TestcaseId equals t.Id
                 group new { d.Status, d.ExecuteMemory, d.ExecuteTime, t.Point } by d.JudgingId into g
                 select new JudgingRun
                 {

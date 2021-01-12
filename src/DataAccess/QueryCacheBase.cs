@@ -17,7 +17,7 @@ namespace Polygon.Storages
     /// This service should be <see cref="ServiceLifetime.Singleton"/>, and can't rely on any scoped services.
     /// If you want to utilize other scoped services, it is preferred to take action with IHttpContextAccessor.
     /// </remarks>
-    public abstract class QueryCacheBase<TContext> where TContext : DbContext
+    public abstract class QueryCacheBase<TContext> where TContext : DbContext, IPolygonDbContext
     {
         private Func<TContext, IAsyncEnumerable<JudgehostLoad>>? _judgehostLoad;
 
@@ -86,17 +86,17 @@ namespace Polygon.Storages
             Expression<Func<TContext, Func<DateTimeOffset, DateTimeOffset, double>, IQueryable<JudgehostLoad>>>
                 superLoader = (context, diff) =>
                 (
-                    from j in context.Set<Judging>()
+                    from j in context.Judgings
                     where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddDays(-2) || j.StopTime == null)
                     group diff(j.StartTime ?? DateTimeOffset.Now.AddDays(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
                     select new JudgehostLoad { HostName = g.Key, Load = g.Sum(), Type = 3 }
                 ).Concat(
-                    from j in context.Set<Judging>()
+                    from j in context.Judgings
                     where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddHours(-2) || j.StopTime == null)
                     group diff(j.StartTime ?? DateTimeOffset.Now.AddHours(-2), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
                     select new JudgehostLoad { HostName = g.Key, Load = g.Sum(), Type = 2 }
                 ).Concat(
-                    from j in context.Set<Judging>()
+                    from j in context.Judgings
                     where j.Server != null && (j.StopTime > DateTimeOffset.Now.AddMinutes(-5) || j.StopTime == null)
                     group diff(j.StartTime ?? DateTimeOffset.Now.AddMinutes(-5), j.StopTime ?? DateTimeOffset.Now) by j.Server into g
                     select new JudgehostLoad { HostName = g.Key, Load = g.Sum(), Type = 1 }

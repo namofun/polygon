@@ -12,11 +12,9 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : ITestcaseStore
     {
-        DbSet<Testcase> Testcases => Context.Set<Testcase>();
-
         Task<int> ITestcaseStore.BatchScoreAsync(int pid, int lower, int upper, int score)
         {
-            return Testcases
+            return Context.Testcases
                 .Where(t => t.ProblemId == pid && t.Rank >= lower && t.Rank <= upper)
                 .BatchUpdateAsync(t => new Testcase { Point = score });
         }
@@ -29,10 +27,10 @@ namespace Polygon.Storages
             try
             {
                 // details are set ON DELETE NO ACTION, so we have to delete it before
-                dts = await Details.Where(d => d.TestcaseId == testcase.Id).BatchDeleteAsync();
-                await Testcases.Where(t => t.Id == testcase.Id).BatchDeleteAsync();
+                dts = await Context.JudgingRuns.Where(d => d.TestcaseId == testcase.Id).BatchDeleteAsync();
+                await Context.Testcases.Where(t => t.Id == testcase.Id).BatchDeleteAsync();
                 // set the rest testcases correct rank
-                await Testcases
+                await Context.Testcases
                     .Where(t => t.Rank > testcase.Rank && t.ProblemId == testcase.ProblemId)
                     .BatchUpdateAsync(t => new Testcase { Rank = t.Rank - 1 });
                 await tran.CommitAsync();
@@ -47,13 +45,13 @@ namespace Polygon.Storages
 
         async Task ITestcaseStore.ChangeRankAsync(int pid, int tid, bool up)
         {
-            var tc = await Testcases
+            var tc = await Context.Testcases
                 .Where(t => t.ProblemId == pid && t.Id == tid)
                 .FirstOrDefaultAsync();
             if (tc == null) return;
 
             int rk2 = tc.Rank + (up ? -1 : 1);
-            var tc2 = await Testcases
+            var tc2 = await Context.Testcases
                 .Where(t => t.ProblemId == pid && t.Rank == rk2)
                 .FirstOrDefaultAsync();
 
@@ -62,13 +60,13 @@ namespace Polygon.Storages
                 var tcid1 = tc.Id;
                 var tcid2 = tc2.Id;
                 var rk1 = tc.Rank;
-                await Testcases
+                await Context.Testcases
                     .Where(t => t.Id == tcid1)
                     .BatchUpdateAsync(t => new Testcase { Rank = -1 });
-                await Testcases
+                await Context.Testcases
                     .Where(t => t.Id == tcid2)
                     .BatchUpdateAsync(t => new Testcase { Rank = rk1 });
-                await Testcases
+                await Context.Testcases
                     .Where(t => t.Id == tcid1)
                     .BatchUpdateAsync(t => new Testcase { Rank = rk2 });
             }
@@ -76,14 +74,14 @@ namespace Polygon.Storages
 
         Task<int> ITestcaseStore.CountAsync(int pid)
         {
-            return Testcases
+            return Context.Testcases
                 .Where(p => p.ProblemId == pid)
                 .CountAsync();
         }
 
         async Task<(int, int)> ITestcaseStore.CountAndScoreAsync(int pid)
         {
-            var q = await Testcases
+            var q = await Context.Testcases
                 .Where(t => t.ProblemId == pid)
                 .GroupBy(t => 1)
                 .Select(g => new { Count = g.Count(), Score = g.Sum(t => t.Point) })
@@ -95,7 +93,7 @@ namespace Polygon.Storages
 
         Task<Testcase> ITestcaseStore.FindAsync(int tid, int? pid)
         {
-            return Testcases
+            return Context.Testcases
                 .WhereIf(pid.HasValue, t => t.ProblemId == pid)
                 .Where(t => t.Id == tid)
                 .SingleOrDefaultAsync();
@@ -108,7 +106,7 @@ namespace Polygon.Storages
 
         Task<List<Testcase>> ITestcaseStore.ListAsync(int problemId, bool? secret)
         {
-            return Testcases
+            return Context.Testcases
                 .Where(t => t.ProblemId == problemId)
                 .WhereIf(secret.HasValue, t => t.IsSecret == secret)
                 .OrderBy(t => t.Rank)
@@ -122,6 +120,9 @@ namespace Polygon.Storages
 
         Task ITestcaseStore.UpdateAsync(Testcase entity) => UpdateEntityAsync(entity);
 
-        Task ITestcaseStore.UpdateAsync(int id, Expression<Func<Testcase, Testcase>> expression) => Testcases.Where(t => t.Id == id).BatchUpdateAsync(expression);
+        Task ITestcaseStore.UpdateAsync(int id, Expression<Func<Testcase, Testcase>> expression)
+        {
+            return Context.Testcases.Where(t => t.Id == id).BatchUpdateAsync(expression);
+        }
     }
 }

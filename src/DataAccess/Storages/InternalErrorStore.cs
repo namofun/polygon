@@ -11,36 +11,34 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : IInternalErrorStore
     {
-        public DbSet<InternalError> InternalErrors => Context.Set<InternalError>();
-
         Task<InternalError> IInternalErrorStore.CreateAsync(InternalError entity) => CreateEntityAsync(entity);
 
         Task IInternalErrorStore.UpdateAsync(InternalError entity) => UpdateEntityAsync(entity);
 
         Task IInternalErrorStore.UpdateAsync(int id, Expression<Func<InternalError, InternalError>> expression)
         {
-            return InternalErrors
+            return Context.InternalErrors
                 .Where(e => e.Id == id)
                 .BatchUpdateAsync(expression);
         }
 
         Task<int> IInternalErrorStore.CountOpenAsync()
         {
-            return InternalErrors
+            return Context.InternalErrors
                 .Where(ie => ie.Status == InternalErrorStatus.Open)
                 .CountAsync();
         }
 
         Task<InternalError> IInternalErrorStore.FindAsync(int id)
         {
-            return InternalErrors
+            return Context.InternalErrors
                 .Where(e => e.Id == id)
                 .SingleOrDefaultAsync();
         }
 
         Task<IPagedList<InternalError>> IInternalErrorStore.ListAsync(int page, int count)
         {
-            return InternalErrors
+            return Context.InternalErrors
                 .OrderByDescending(e => e.Id)
                 .Select(e => new InternalError(e.Id, e.Status, e.Time, e.Description))
                 .ToPagedListAsync(page, count);

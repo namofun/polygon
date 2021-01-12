@@ -9,20 +9,18 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : IJudgehostStore
     {
-        DbSet<Judgehost> Judgehosts => Context.Set<Judgehost>();
-
         Task<Judgehost> IJudgehostStore.CreateAsync(Judgehost entity) => CreateEntityAsync(entity);
 
         Task<Judgehost> IJudgehostStore.FindAsync(string name)
         {
-            return Judgehosts
+            return Context.Judgehosts
                 .Where(h => h.ServerName == name)
                 .SingleOrDefaultAsync();
         }
 
         Task<IPagedList<Judging>> IJudgehostStore.FetchJudgingsAsync(string hostname, int page, int count)
         {
-            return Judgings
+            return Context.Judgings
                 .Where(j => j.Server == hostname)
                 .OrderByDescending(g => g.Id)
                 .ToPagedListAsync(page, count);
@@ -30,14 +28,14 @@ namespace Polygon.Storages
 
         Task<int> IJudgehostStore.CountFailureAsync()
         {
-            return Judgehosts
+            return Context.Judgehosts
                 .Where(jh => jh.PollTime < DateTimeOffset.Now.AddSeconds(-120) && jh.Active)
                 .CountAsync();
         }
 
         Task<List<Judgehost>> IJudgehostStore.ListAsync()
         {
-            return Judgehosts.ToListAsync();
+            return Context.Judgehosts.ToListAsync();
         }
 
         Task IJudgehostStore.NotifyPollAsync(Judgehost host)
@@ -48,7 +46,7 @@ namespace Polygon.Storages
 
         Task<int> IJudgehostStore.ToggleAsync(string? hostname, bool active)
         {
-            return Judgehosts
+            return Context.Judgehosts
                 .WhereIf(hostname != null, h => h.ServerName == hostname)
                 .BatchUpdateAsync(h => new Judgehost { Active = active });
         }

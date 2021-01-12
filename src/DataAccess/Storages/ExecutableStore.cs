@@ -14,8 +14,6 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : IExecutableStore
     {
-        public DbSet<Executable> Executables => Context.Set<Executable>();
-
         Task<Executable> IExecutableStore.CreateAsync(Executable entity) => CreateEntityAsync(entity);
 
         Task IExecutableStore.DeleteAsync(Executable entity) => DeleteEntityAsync(entity);
@@ -24,21 +22,21 @@ namespace Polygon.Storages
 
         Task IExecutableStore.UpdateAsync(string id, Expression<Func<Executable, Executable>> expression)
         {
-            return Executables
+            return Context.Executables
                 .Where(e => e.Id == id)
                 .BatchUpdateAsync(expression);
         }
 
         Task<Executable> IExecutableStore.FindAsync(string execid)
         {
-            return Executables
+            return Context.Executables
                 .Where(e => e.Id == execid)
                 .SingleOrDefaultAsync();
         }
 
         Task<List<Executable>> IExecutableStore.ListAsync(string? type)
         {
-            return Executables
+            return Context.Executables
                 .WhereIf(type != null, e => e.Type == type)
                 .Select(e => new Executable(e.Id, e.Md5sum, e.ZipSize, e.Description, e.Type))
                 .ToListAsync();
@@ -47,7 +45,7 @@ namespace Polygon.Storages
         Task<Dictionary<string, string>> IExecutableStore.ListMd5Async(params string[] targets)
         {
             targets = (targets ?? Array.Empty<string>()).Distinct().ToArray();
-            return Executables
+            return Context.Executables
                 .Where(e => targets.Contains(e.Id))
                 .Select(e => new { e.Id, e.Md5sum })
                 .ToDictionaryAsync(e => e.Id, e => e.Md5sum);
@@ -82,15 +80,15 @@ namespace Polygon.Storages
 
         async Task<ILookup<string, string>> IExecutableStore.ListUsageAsync(string execid)
         {
-            var compile = await Context.Set<Language>()
+            var compile = await Context.Languages
                 .Where(l => l.CompileScript == execid)
                 .Select(l => new { l.Id, Type = "compile" })
                 .ToListAsync();
-            var run = await Context.Set<Problem>()
+            var run = await Context.Problems
                 .Where(p => p.RunScript == execid)
                 .Select(p => new { Id = p.Id.ToString(), Type = "run" })
                 .ToListAsync();
-            var compare = await Context.Set<Problem>()
+            var compare = await Context.Problems
                 .Where(p => p.CompareScript == execid)
                 .Select(p => new { Id = p.Id.ToString(), Type = "compare" })
                 .ToListAsync();

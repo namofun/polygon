@@ -12,21 +12,20 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : IProblemStore
     {
-        DbSet<Problem> Problems => Context.Set<Problem>();
-
-        DbSet<ProblemAuthor> Authors => Context.Set<ProblemAuthor>();
-
         Task<Problem> IProblemStore.CreateAsync(Problem entity) => CreateEntityAsync(entity);
 
         Task IProblemStore.DeleteAsync(Problem entity) => DeleteEntityAsync(entity);
 
         Task IProblemStore.UpdateAsync(Problem entity) => UpdateEntityAsync(entity);
 
-        Task IProblemStore.UpdateAsync(int id, Expression<Func<Problem, Problem>> expression) => Problems.Where(p => p.Id == id).BatchUpdateAsync(expression);
+        Task IProblemStore.UpdateAsync(int id, Expression<Func<Problem, Problem>> expression)
+        {
+            return Context.Problems.Where(p => p.Id == id).BatchUpdateAsync(expression);
+        }
 
         Task<Problem> IProblemStore.FindAsync(int pid)
         {
-            return Problems
+            return Context.Problems
                 .Where(p => p.Id == pid)
                 .SingleOrDefaultAsync();
         }
@@ -39,13 +38,13 @@ namespace Polygon.Storages
         Task<IPagedList<Problem>> IProblemStore.ListAsync(int page, int perCount, int? uid)
         {
             if (uid.HasValue)
-                return Authors
+                return Context.ProblemAuthors
                     .Where(pa => pa.UserId == uid)
                     .OrderBy(pa => pa.ProblemId)
-                    .Join(Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
+                    .Join(Context.Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
                     .ToPagedListAsync(page, perCount);
             else
-                return Problems
+                return Context.Problems
                     .OrderBy(p => p.Id)
                     .ToPagedListAsync(page, perCount);
         }
@@ -58,8 +57,8 @@ namespace Polygon.Storages
         Task IProblemStore.RebuildStatisticsAsync()
         {
             var source =
-                from s in Submissions
-                join j in Judgings on new { s.Id, Active = true } equals new { Id = j.SubmissionId, j.Active }
+                from s in Context.Submissions
+                join j in Context.Judgings on new { s.Id, Active = true } equals new { Id = j.SubmissionId, j.Active }
                 group j.Status by new { s.ProblemId, s.TeamId, s.ContestId } into g
                 select new SubmissionStatistics
                 {
@@ -70,7 +69,7 @@ namespace Polygon.Storages
                     AcceptedSubmission = g.Sum(v => v == Verdict.Accepted ? 1 : 0)
                 };
 
-            return SubmissionStatistics.UpsertAsync(
+            return Context.SubmissionStatistics.UpsertAsync(
                 sources: source,
 
                 updateExpression: (_, ss) => new SubmissionStatistics
@@ -91,14 +90,14 @@ namespace Polygon.Storages
 
         Task IProblemStore.ToggleJudgeAsync(int pid, bool tobe)
         {
-            return Problems
+            return Context.Problems
                 .Where(p => p.Id == pid)
                 .BatchUpdateAsync(p => new Problem { AllowJudge = tobe });
         }
 
         Task IProblemStore.ToggleSubmitAsync(int pid, bool tobe)
         {
-            return Problems
+            return Context.Problems
                 .Where(p => p.Id == pid)
                 .BatchUpdateAsync(p => new Problem { AllowSubmit = tobe });
         }
@@ -120,7 +119,7 @@ namespace Polygon.Storages
 
         Task<Dictionary<int, string>> IProblemStore.ListNameAsync(Expression<Func<Problem, bool>> condition)
         {
-            return Problems
+            return Context.Problems
                 .Where(condition)
                 .Select(p => new { p.Id, p.Title })
                 .ToDictionaryAsync(p => p.Id, p => p.Title);
@@ -128,10 +127,9 @@ namespace Polygon.Storages
 
         Task<Dictionary<int, string>> IProblemStore.ListNameAsync(Expression<Func<Submission, bool>> condition)
         {
-            return Submissions
+            return Context.Submissions
                 .Where(condition)
-                .Join(Problems, s => s.ProblemId, p => p.Id, (s, p) => p)
-                .Select(p => new { p.Id, p.Title })
+                .Join(Context.Problems, s => s.ProblemId, p => p.Id, (s, p) => new { p.Id, p.Title })
                 .Distinct()
                 .ToDictionaryAsync(p => p.Id, p => p.Title);
         }
@@ -144,7 +142,7 @@ namespace Polygon.Storages
 
         async Task IProblemStore.AuthorizeAsync(int problemId, int userId, bool allow)
         {
-            var auth = await Authors
+            var auth = await Context.ProblemAuthors
                 .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
                 .FirstOrDefaultAsync();
 
@@ -164,9 +162,9 @@ namespace Polygon.Storages
 
         Task<Problem> IProblemStore.FindByPermissionAsync(int problemId, int userId)
         {
-            return Authors
+            return Context.ProblemAuthors
                 .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
-                .Join(Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
+                .Join(Context.Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
                 .SingleOrDefaultAsync();
         }
     }

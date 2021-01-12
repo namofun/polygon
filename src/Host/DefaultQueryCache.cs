@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 namespace SatelliteSite
 {
     public class QueryCache<TContext> : QueryCacheBase<TContext>
-        where TContext : IdentityDbContext<User, Role, int>
+        where TContext : IdentityDbContext<User, Role, int>, IPolygonDbContext
     {
         public override Task<List<SolutionAuthor>> FetchSolutionAuthorAsync(TContext context, Expression<Func<Submission, bool>> predicate)
         {
             var query =
-                from s in context.Set<Submission>().WhereIf(predicate != null, predicate)
+                from s in context.Submissions.WhereIf(predicate != null, predicate)
                 join u in context.Users on new { s.ContestId, s.TeamId } equals new { ContestId = 0, TeamId = u.Id }
                 into uu from u in uu.DefaultIfEmpty()
                 // join t in Set<Team>() on new { s.ContestId, s.Author } equals new { t.ContestId, Author = t.TeamId }
@@ -30,7 +30,7 @@ namespace SatelliteSite
         public override async Task<IEnumerable<(int UserId, string UserName)>> FetchPermittedUserAsync(TContext context, int probid)
         {
             var query =
-                from pa in context.Set<ProblemAuthor>()
+                from pa in context.ProblemAuthors
                 where pa.ProblemId == probid
                 join u in context.Users on pa.UserId equals u.Id
                 select new { u.Id, u.UserName, u.NickName };

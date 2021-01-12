@@ -13,13 +13,9 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : ISubmissionStore
     {
-        DbSet<Submission> Submissions => Context.Set<Submission>();
-
-        DbSet<SubmissionStatistics> SubmissionStatistics => Context.Set<SubmissionStatistics>();
-
         async Task<Submission> ISubmissionStore.CreateAsync(string code, string language, int problemId, int? contestId, int teamId, IPAddress ipAddr, string via, string username, Verdict? expected, DateTimeOffset? time, bool fullJudge)
         {
-            var s = Submissions.Add(new Submission
+            var s = Context.Submissions.Add(new Submission
             {
                 TeamId = teamId,
                 CodeLength = code.Length,
@@ -30,18 +26,15 @@ namespace Polygon.Storages
                 Time = time ?? DateTimeOffset.Now,
                 SourceCode = code.ToBase64(),
                 ExpectedResult = expected,
-            });
-
-            await Context.SaveChangesAsync();
-
-            bool fullTest = fullJudge || expected.HasValue;
-
-            Judgings.Add(new Judging
-            {
-                SubmissionId = s.Entity.Id,
-                FullTest = fullTest,
-                Active = true,
-                Status = Verdict.Pending,
+                Judgings = new List<Judging>
+                {
+                    new Judging
+                    {
+                        FullTest = fullJudge || expected.HasValue,
+                        Active = true,
+                        Status = Verdict.Pending,
+                    }
+                },
             });
 
             await Context.SaveChangesAsync();
@@ -51,7 +44,7 @@ namespace Polygon.Storages
 
         Task<Submission> ISubmissionStore.FindAsync(int submissionId, bool includeJudgings)
         {
-            return Submissions
+            return Context.Submissions
                 .Where(s => s.Id == submissionId)
                 .IncludeIf(includeJudgings, s => s.Judgings)
                 .SingleOrDefaultAsync();
@@ -59,7 +52,7 @@ namespace Polygon.Storages
 
         Task<Submission> ISubmissionStore.FindByJudgingAsync(int jid)
         {
-            return Judgings
+            return Context.Judgings
                 .Where(j => j.Id == jid)
                 .Select(j => j.s)
                 .SingleOrDefaultAsync();
@@ -73,7 +66,7 @@ namespace Polygon.Storages
 
         Task<SubmissionFile> ISubmissionStore.GetFileAsync(int submissionId)
         {
-            return Submissions
+            return Context.Submissions
                 .Where(s => s.Id == submissionId)
                 .Select(s => new SubmissionFile(s.Id, s.SourceCode, s.l.FileExtension))
                 .SingleOrDefaultAsync();
@@ -81,7 +74,7 @@ namespace Polygon.Storages
 
         Task<List<T>> ISubmissionStore.ListAsync<T>(Expression<Func<Submission, T>> projection, Expression<Func<Submission, bool>>? predicate)
         {
-            return Submissions
+            return Context.Submissions
                 .WhereIf(predicate != null, predicate)
                 .Select(projection)
                 .ToListAsync();
@@ -89,11 +82,11 @@ namespace Polygon.Storages
 
         Task<IPagedList<T>> ISubmissionStore.ListWithJudgingAsync<T>((int Page, int PageCount) pagination, Expression<Func<Submission, Judging, T>> selector, Expression<Func<Submission, bool>>? predicate)
         {
-            return Submissions
+            return Context.Submissions
                 .WhereIf(predicate != null, predicate!)
                 .OrderByDescending(s => s.Id)
                 .Join(
-                    inner: Judgings,
+                    inner: Context.Judgings,
                     outerKeySelector: s => new { s.Id, Active = true },
                     innerKeySelector: j => new { Id = j.SubmissionId, j.Active },
                     resultSelector: selector)
@@ -102,12 +95,12 @@ namespace Polygon.Storages
 
         Task<List<T>> ISubmissionStore.ListWithJudgingAsync<T>(Expression<Func<Submission, Judging, T>> selector, Expression<Func<Submission, bool>>? predicate, int? limits)
         {
-            return Submissions
+            return Context.Submissions
                 .WhereIf(predicate != null, predicate!)
                 .OrderByDescending(s => s.Id)
                 .TakeIf(limits)
                 .Join(
-                    inner: Judgings,
+                    inner: Context.Judgings,
                     outerKeySelector: s => new { s.Id, Active = true },
                     innerKeySelector: j => new { Id = j.SubmissionId, j.Active },
                     resultSelector: selector)
@@ -116,7 +109,7 @@ namespace Polygon.Storages
 
         Task<List<SubmissionStatistics>> ISubmissionStore.StatisticsAsync(int contestId, int teamId)
         {
-            return SubmissionStatistics
+            return Context.SubmissionStatistics
                 .AsNoTracking()
                 .Where(s => s.TeamId == teamId && s.ContestId == contestId)
                 .ToListAsync();
@@ -126,14 +119,14 @@ namespace Polygon.Storages
 
         Task ISubmissionStore.UpdateAsync(int id, Expression<Func<Submission, Submission>> expression)
         {
-            return Submissions
+            return Context.Submissions
                 .Where(s => s.Id == id)
                 .BatchUpdateAsync(expression);
         }
 
         Task ISubmissionStore.UpdateStatisticsAsync(int cid, int teamid, int probid, bool ac)
         {
-            return SubmissionStatistics.UpsertAsync(
+            return Context.SubmissionStatistics.UpsertAsync(
                 source: new { ContestId = cid, TeamId = teamid, ProblemId = probid, Accepted = ac ? 1 : 0 },
 
                 insertExpression: s2 => new SubmissionStatistics
