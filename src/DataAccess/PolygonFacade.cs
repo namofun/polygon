@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Polygon.Entities;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Polygon.Storages
@@ -9,8 +11,8 @@ namespace Polygon.Storages
     /// </summary>
     /// <typeparam name="TContext">The context type.</typeparam>
     /// <typeparam name="TQueryCache">The query cache type.</typeparam>
-    public partial class PolygonFacade<TContext, TQueryCache> : IPolygonFacade
-        where TContext : DbContext
+    public partial class PolygonFacade<TContext, TQueryCache> : IPolygonFacade, IPolygonQueryableStore
+        where TContext : DbContext, IPolygonDbContext
         where TQueryCache : QueryCacheBase<TContext>
     {
         /// <inheritdoc />
@@ -39,6 +41,42 @@ namespace Polygon.Storages
 
         /// <inheritdoc />
         IRejudgingStore IPolygonFacade.Rejudgings => this;
+
+        /// <inheritdoc />
+        IQueryable<Executable> IPolygonQueryableStore.Executables => Context.Executables;
+
+        /// <inheritdoc />
+        IQueryable<InternalError> IPolygonQueryableStore.InternalErrors => Context.InternalErrors;
+
+        /// <inheritdoc />
+        IQueryable<Judgehost> IPolygonQueryableStore.Judgehosts => Context.Judgehosts;
+
+        /// <inheritdoc />
+        IQueryable<Judging> IPolygonQueryableStore.Judgings => Context.Judgings;
+
+        /// <inheritdoc />
+        IQueryable<JudgingRun> IPolygonQueryableStore.JudgingRuns => Context.JudgingRuns;
+
+        /// <inheritdoc />
+        IQueryable<Language> IPolygonQueryableStore.Languages => Context.Languages;
+
+        /// <inheritdoc />
+        IQueryable<Problem> IPolygonQueryableStore.Problems => Context.Problems;
+
+        /// <inheritdoc />
+        IQueryable<Rejudging> IPolygonQueryableStore.Rejudgings => Context.Rejudgings;
+
+        /// <inheritdoc />
+        IQueryable<Submission> IPolygonQueryableStore.Submissions => Context.Submissions;
+
+        /// <inheritdoc />
+        IQueryable<SubmissionStatistics> IPolygonQueryableStore.SubmissionStatistics => Context.SubmissionStatistics;
+
+        /// <inheritdoc />
+        IQueryable<Testcase> IPolygonQueryableStore.Testcases => Context.Testcases;
+
+        /// <inheritdoc />
+        IQueryable<ProblemAuthor> IPolygonQueryableStore.ProblemAuthors => Context.ProblemAuthors;
 
         public TContext Context { get; }
 

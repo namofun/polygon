@@ -7,7 +7,7 @@ using System.IO;
 namespace Polygon
 {
     public class DefaultRole<TContext, TQueryCache> : IServiceRole
-        where TContext : DbContext
+        where TContext : DbContext, IPolygonDbContext
         where TQueryCache : QueryCacheBase<TContext>
     {
         private static void EnsureDirectoryExists(string directory)
