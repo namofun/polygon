@@ -84,10 +84,12 @@ namespace Polygon.Storages
         /// <typeparam name="T">The DTO entity.</typeparam>
         /// <param name="projection">The entity shaper.</param>
         /// <param name="predicate">The submission filter.</param>
+        /// <param name="limit">The submission count to take.</param>
         /// <returns>The submission list.</returns>
         Task<List<T>> ListAsync<T>(
             Expression<Func<Submission, T>> projection,
-            Expression<Func<Submission, bool>>? predicate = null);
+            Expression<Func<Submission, bool>>? predicate = null,
+            int? limit = null);
 
         /// <summary>
         /// List the paginated solutions satisfying some conditions.

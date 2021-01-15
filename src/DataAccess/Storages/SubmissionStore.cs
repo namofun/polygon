@@ -72,11 +72,12 @@ namespace Polygon.Storages
                 .SingleOrDefaultAsync();
         }
 
-        Task<List<T>> ISubmissionStore.ListAsync<T>(Expression<Func<Submission, T>> projection, Expression<Func<Submission, bool>>? predicate)
+        Task<List<T>> ISubmissionStore.ListAsync<T>(Expression<Func<Submission, T>> projection, Expression<Func<Submission, bool>>? predicate, int? limit)
         {
             return Context.Submissions
                 .WhereIf(predicate != null, predicate)
                 .Select(projection)
+                .TakeIf(limit)
                 .ToListAsync();
         }
 
@@ -84,7 +85,7 @@ namespace Polygon.Storages
         {
             return Context.Submissions
                 .WhereIf(predicate != null, predicate!)
-                .OrderByDescending(s => s.Id)
+                .OrderByDescending(s => s.Time)
                 .Join(
                     inner: Context.Judgings,
                     outerKeySelector: s => new { s.Id, Active = true },
@@ -97,7 +98,7 @@ namespace Polygon.Storages
         {
             return Context.Submissions
                 .WhereIf(predicate != null, predicate!)
-                .OrderByDescending(s => s.Id)
+                .OrderByDescending(s => s.Time)
                 .TakeIf(limits)
                 .Join(
                     inner: Context.Judgings,
