@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\test\FakeJudgehost.DataExtensions\Polygon.FakeJudgehost.DataExtensions.csproj" />
+    <ProjectReference Include="..\..\test\FakeJudgehost\Polygon.FakeJudgehost.csproj" />
     <ProjectReference Include="..\DataAccess\Polygon.DataAccess.csproj" />
     <ProjectReference Include="..\Module\SatelliteSite.PolygonModule.csproj" />
     <ProjectReference Include="..\Seeds\Polygon.Seeds.csproj" />

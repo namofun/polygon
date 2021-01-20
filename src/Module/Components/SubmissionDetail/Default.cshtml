@@ -157,7 +157,7 @@
                 /
                 <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Testcases" asp-action="Fetch" asp-route-tid="@detail.TestcaseId" asp-route-filetype="output">Reference Output</a>
                 /
-                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Submissions" asp-action="RunDetails" asp-route-jid="@detail.JudgingId" asp-route-rid="@detail.Id" asp-route-type="out">Team Output</a>
+                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Submissions" asp-route-sid="@Model.SubmissionId" asp-action="RunDetails" asp-route-jid="@detail.JudgingId" asp-route-rid="@detail.Id" asp-route-type="out">Team Output</a>
             </td>
         </tr>
         <tr>
@@ -170,23 +170,12 @@
         </tr>
     </table></td><td></td></tr></table>
 
-    <h5 class="pt-0">Metadata</h5>
-    <snippet class="mb-3" base64="@detail.MetaData" nodata="Metadata is not collected." />
-
-    <h5 class="pt-0">Diff output</h5>
-    <snippet class="mb-3" base64="@detail.OutputDiff" nodata="There was no diff output." />
-
-    <h5 class="pt-0" asp-show-if="Model.CombinedRunCompare">Validator/Submission interaction</h5>
-    <interactive asp-show-if="Model.CombinedRunCompare" filename="Runs/j@(detail.JudgingId)/r@(detail.Id).out" />
-
-    <h5 class="pt-0" asp-show-if="!Model.CombinedRunCompare">Program output</h5>
-    <snippet class="mb-3" asp-show-if="!Model.CombinedRunCompare" filename="Runs/j@(detail.JudgingId)/r@(detail.Id).out" nodata="There was no stdout output." />
-
-    <h5 class="pt-0">Program error output</h5>
-    <snippet class="mb-3" filename="Runs/j@(detail.JudgingId)/r@(detail.Id).err" nodata="There was no stderr output." />
-
-    <h5 class="pt-0">Judging system output (info/debug/errors)</h5>
-    <snippet class="mb-4" base64="@detail.OutputSystem" />
+    <snippet h5-title="Metadata" class="mb-3" base64="@detail.MetaData" nodata="Metadata is not collected." />
+    <snippet h5-title="Diff output" class="mb-3" base64="@detail.OutputDiff" nodata="There was no diff output." />
+    <interactive h5-title="Validator/Submission interaction" class="mb-3" asp-show-if="Model.CombinedRunCompare" filename="@(detail.JudgingId)/@(detail.Id)/out" />
+    <snippet h5-title="Program output" class="mb-3" asp-show-if="!Model.CombinedRunCompare" filename="@(detail.JudgingId)/@(detail.Id)/out" nodata="There was no stdout output." />
+    <snippet h5-title="Program error output" class="mb-3" filename="@(detail.JudgingId)/@(detail.Id)/err" nodata="There was no stderr output." />
+    <snippet h5-title="Judging system output (info/debug/errors)" class="mb-4" base64="@detail.OutputSystem" />
 </div>
 
     }

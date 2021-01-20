@@ -13,6 +13,12 @@ namespace Polygon.FakeJudgehost
 {
     public class FakeJudgeActivity : IDaemonStrategy
     {
+        const string Interactor = "[  0.008s/2]>: O\n\n[  0.012s/4]<: 0 1\n\n[  0.012s/2]>: I\n\n[  0.012s/4]<: 1 3\n\n[  0.012s/2]>: T\n\n[  0.012s/4]<: 2 4\n\n[  0.012s/2]>: Z\n\n[  0.012s/4]<: 1 7\n\n[  0.012s/2]>: S\n\n[  0.012s/4]<: 1 9\n\n[  0.012s/2]>: W\n\n";
+        const string ValidatorOutput = " 4 |..I.......|\n 3 |..I....ZS.|\n 2 |OOITTTZZSS|\n 1 |OOI.T.Z..S|\nCorrect!\n";
+        const string SystemOutput = "Correct!\nruntime: 0.002s cpu, 0.002s wall\nmemory used: 262144 bytes\n";
+        const string ProgramOutput = "272.000000000\n";
+        const string Metadata = "memory-bytes: 262144\nexitcode: 0\nwall-time: 0.002\nuser-time: 0.000\nsys-time: 0.000\ncpu-time: 0.001\ntime-used: cpu-time\ntime-result:\noutput-truncated:\nstdin-bytes: 0\nstdout-bytes: 13\nstderr-bytes: 0\n";
+
         public SemaphoreSlim Semaphore { get; } = new SemaphoreSlim(0, 1);
 
         public Dictionary<string, (string, byte[])> Files { get; }
@@ -155,11 +161,11 @@ namespace Polygon.FakeJudgehost
                 {
                     TestcaseId = ttj.TestcaseId.ToString(),
                     RunResult = JudgingRun.Map(verd),
-                    OutputRun = row.FullJudge ? $"output run for j{row.JudgingId}t{ttj.TestcaseId}".ToBase64() : null,
-                    OutputError = row.FullJudge ? $"output error for j{row.JudgingId}t{ttj.TestcaseId}".ToBase64() : null,
-                    OutputDiff = $"output diff for j{row.JudgingId}t{ttj.TestcaseId}".ToBase64(),
-                    OutputSystem = $"output system for j{row.JudgingId}t{ttj.TestcaseId}".ToBase64(),
-                    MetaData = $"output metadata for j{row.JudgingId}t{ttj.TestcaseId}".ToBase64(),
+                    OutputRun = row.FullJudge ? (row.CombinedRunCompare ? Interactor : ProgramOutput).ToBase64() : null,
+                    OutputError = row.FullJudge ? (verd == Entities.Verdict.Accepted ? string.Empty : ProgramOutput).ToBase64() : null,
+                    OutputDiff = (verd == Entities.Verdict.Accepted ? string.Empty : ValidatorOutput).ToBase64(),
+                    OutputSystem = SystemOutput.ToBase64(),
+                    MetaData = Metadata.ToBase64(),
                     RunTime = $"{runtime / 1000.0}",
                 };
 

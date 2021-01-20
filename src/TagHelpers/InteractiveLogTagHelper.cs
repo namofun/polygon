@@ -1,20 +1,25 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
+using Polygon.Storages;
 using System;
-using System.Threading.Tasks;
 
 namespace Polygon.TagHelpers
 {
     [HtmlTargetElement("interactive")]
-    public class InteractiveLogTagHelper : XysTagHelper
+    public class InteractiveLogTagHelper : JudgingResultTagHelperBase
     {
-        [HtmlAttributeName("h5-title")]
-        public string Header5 { get; set; }
-
-        [HtmlAttributeName("filename")]
-        public string FileName { get; set; }
-
-        private static void ParseLog(ReadOnlySpan<char> log, TagHelperContent sb)
+        public InteractiveLogTagHelper(IJudgingStore judgingStore)
+            : base(judgingStore, 2000)
         {
+        }
+
+        protected override void Render(TagHelperOutput output, string source, int? truncatedLength)
+        {
+            output.TagName = "table";
+            output.TagMode = TagMode.StartTagAndEndTag;
+            var sb = output.Content;
+            sb.AppendHtml("<tr><th>time</th><th>validator</th><th>submission<th></tr>\n");
+            var log = source.AsSpan();
+
             int idx = 0;
             while (idx < log.Length)
             {
@@ -45,41 +50,13 @@ namespace Polygon.TagHelpers
                 sb.AppendHtml("</td></tr>");
                 idx += len + 4;
             }
-        }
 
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-        {
-            if (!System.IO.File.Exists(FileName))
+            if (truncatedLength.HasValue)
             {
-                if (!string.IsNullOrEmpty(Header5))
-                {
-                    output.TagName = "p";
-                    output.TagMode = TagMode.StartTagAndEndTag;
-                    output.Attributes.Add("class", "nodata");
-                    output.Content.Append("Record has been deleted.");
-                }
-                else
-                {
-                    output.TagName = null;
-                }
-
-                return;
+                sb.AppendHtml("<caption class=\"pb-0 pt-1 text-dark\">")
+                    .Append($"[content display truncated after {truncatedLength}B]")
+                    .AppendHtml("</caption>");
             }
-
-            int len = 0;
-            var arr = new char[2000];
-            using (var sr = new System.IO.StreamReader(FileName))
-                len = await sr.ReadBlockAsync(arr, 0, 2000);
-
-            output.TagName = null;
-            output.Content.AppendHtml("<table><tr><th>time</th><th>validator</th><th>submission<th></tr>\n");
-            ParseLog(new ReadOnlySpan<char>(arr, 0, len), output.Content);
-            output.Content.AppendHtml("</table>\n");
-            if (len >= 2000)
-                output.Content.Append("[content display truncated after 2000B]");
-
-            if (!string.IsNullOrWhiteSpace(Header5))
-                output.PreContent.AppendHtml("<h5>").Append(Header5).AppendHtml("</h5>");
         }
     }
 }
