@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Polygon;
 using Polygon.Packaging;
-using Polygon.Storages;
 using SatelliteSite;
 
 [assembly: RoleDefinition(10, "Judgehost", "judgehost", "(Internal/System) Judgehost")]
@@ -42,7 +41,7 @@ namespace SatelliteSite.PolygonModule
 
             endpoints.WithErrorHandler("Polygon", "Editor")
                 .MapFallbackNotFound("/polygon/{pid}/{**slug}")
-                .MapStatusCode("/polygon/{pid}/{**slug}");
+                .MapStatusCode("/polygon/{pid:problem}/{**slug}");
         }
 
         public override void RegisterServices(IServiceCollection services)
@@ -62,6 +61,11 @@ namespace SatelliteSite.PolygonModule
             new TRole().Configure(services);
 
             services.PostConfigure<PolygonOptions>(o => o.FinalizeSettings());
+
+            services.ConfigureRouting(options =>
+            {
+                options.ConstraintMap.Add("problem", typeof(RequirePolygonFeatureConstraint));
+            });
         }
 
         public override void RegisterMenu(IMenuContributor menus)

@@ -40,6 +40,12 @@ namespace SatelliteSite.PolygonModule.Controllers
         /// <returns>If validation passed, <c>null</c>.</returns>
         private async Task<IActionResult> ValidateAsync()
         {
+            if (HttpContext.Features.Get<IPolygonFeature>() is { Problem: var problem })
+            {
+                ViewData["ProblemItself"] = Problem = problem;
+                return null;
+            }
+
             if (!RouteData.Values.TryGetValue("pid", out var _pid) ||
                 !int.TryParse(_pid as string, out int pid) ||
                 !User.IsSignedIn())
@@ -52,6 +58,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
             if (Problem == null) return base.NotFound();
             ViewData["ProblemItself"] = Problem;
+            HttpContext.Features.Set<IPolygonFeature>(new PolygonFeature(Problem));
             return null;
         }
 
