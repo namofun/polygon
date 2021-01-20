@@ -6,7 +6,7 @@ namespace SatelliteSite
 {
     public class HostModule : AbstractModule
     {
-        public override string Area => "Hosting";
+        public override string Area => string.Empty;
 
         public override void Initialize()
         {

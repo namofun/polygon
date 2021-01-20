@@ -36,7 +36,7 @@ namespace SatelliteSite
                         services.AddDbModelSupplier<DefaultContext, PolygonIdentityEntityConfiguration<User, DefaultContext>>();
                         //services.AddDbModelSupplier<DefaultContext, SeedConfiguration<DefaultContext>>();
 
-                        services.Configure<Polygon.PolygonPhysicalOptions>(options =>
+                        services.ConfigurePolygonStorage(options =>
                         {
                             options.JudgingDirectory = Path.Combine(context.HostingEnvironment.ContentRootPath, "Runs");
                             options.ProblemDirectory = Path.Combine(context.HostingEnvironment.ContentRootPath, "Problems");

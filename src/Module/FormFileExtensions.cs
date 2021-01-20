@@ -12,7 +12,7 @@ namespace Microsoft.AspNetCore.Mvc
     /// <summary>
     /// Extensions for ASP.NET Core MVC.
     /// </summary>
-    public static class FormFileExtensions
+    internal static class FormFileExtensions
     {
         /// <summary>
         /// Read the form file content.

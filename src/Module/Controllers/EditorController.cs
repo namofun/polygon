@@ -14,6 +14,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 {
     [Area("Polygon")]
     [Route("[area]/{pid}/[action]")]
+    [SupportStatusCodePage]
     public class EditorController : PolygonControllerBase
     {
         private IProblemStore Store => Facade.Problems;
