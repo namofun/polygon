@@ -52,8 +52,8 @@ namespace Polygon.TagHelpers
             return Value switch
             {
                 0 => ("sol", "XCPC"),
-                1 => ("sol", "CF"),
-                2 => ("sol", "IOI"),
+                1 => ("sol", "IOI"),
+                2 => ("sol", "CF"),
                 _ => ("sol sol_incorrect", "UKE"),
             };
         }
