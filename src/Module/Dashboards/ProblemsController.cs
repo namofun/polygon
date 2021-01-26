@@ -91,8 +91,8 @@ namespace SatelliteSite.PolygonModule.Dashboards
             else
                 return RedirectToAction(
                     actionName: "Detail",
-                    controllerName: "Submissions",
-                    new { area = "Contest", cid = item.ContestId, sid = item.Id, jid });
+                    controllerName: "JurySubmissions",
+                    new { area = "Contest", cid = item.ContestId, submitid = item.Id, judgingid = jid });
         }
 
 
