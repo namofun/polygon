@@ -74,6 +74,21 @@ namespace Polygon.Storages
         Task<Problem> FindByPermissionAsync(int problemId, int userId);
 
         /// <summary>
+        /// Check the problem permission via ID.
+        /// </summary>
+        /// <param name="problemId">The problem ID.</param>
+        /// <param name="userId">The user ID.</param>
+        /// <returns>The task for checking.</returns>
+        Task<bool> CheckPermissionAsync(int problemId, int userId);
+
+        /// <summary>
+        /// Check the problems.
+        /// </summary>
+        /// <param name="userId">The user ID.</param>
+        /// <returns>The task for checking.</returns>
+        Task<IEnumerable<(int, string)>> ListPermissionAsync(int userId);
+
+        /// <summary>
         /// List available problems.
         /// </summary>
         /// <param name="page">The page.</param>

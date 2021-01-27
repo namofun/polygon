@@ -167,5 +167,23 @@ namespace Polygon.Storages
                 .Join(Context.Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
                 .SingleOrDefaultAsync();
         }
+
+        Task<bool> IProblemStore.CheckPermissionAsync(int problemId, int userId)
+        {
+            return Context.ProblemAuthors
+                .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
+                .AnyAsync();
+        }
+
+        async Task<IEnumerable<(int, string)>> IProblemStore.ListPermissionAsync(int userId)
+        {
+            var items = await Context.ProblemAuthors
+                .Where(pa => pa.UserId == userId)
+                .Join(Context.Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
+                .Select(p => new { p.Id, p.Title })
+                .ToListAsync();
+
+            return items.Select(a => (a.Id, a.Title));
+        }
     }
 }
