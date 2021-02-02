@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Logging;
 using Polygon.Storages;
 using SatelliteSite.Services;
@@ -10,7 +9,7 @@ namespace Polygon.Judgement
     {
         public IPolygonFacade Facade { get; }
 
-        public TelemetryClient Telemetry { get; }
+        public ITelemetryClient Telemetry { get; }
 
         public IMediator Mediator { get; }
 
@@ -20,7 +19,7 @@ namespace Polygon.Judgement
 
         public DOMjudgeLikeHandlers(
             IPolygonFacade facade,
-            TelemetryClient telemetry,
+            ITelemetryClient telemetry,
             IMediator mediator,
             IAuditlogger auditlogger,
             ILogger<DOMjudgeLikeHandlers> logger)

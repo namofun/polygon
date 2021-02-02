@@ -4,13 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
     <DescriptionAttach>The import and export package definitions</DescriptionAttach>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <Import Project="..\..\build\NugetPackage.Backend.props" />
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\testlib.h" />

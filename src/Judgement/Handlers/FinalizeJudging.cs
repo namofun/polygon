@@ -17,7 +17,7 @@ namespace Polygon.Judgement
 
             Telemetry.TrackDependency(
                 dependencyTypeName: "JudgeHost",
-                dependencyName: e.Judging.Server,
+                dependencyName: e.Judging.Server!,
                 data: $"j{e.Judging.Id} judged " + e.Judging.Status,
                 startTime: e.Judging.StartTime ?? DateTimeOffset.Now,
                 duration: (e.Judging.StopTime - e.Judging.StartTime) ?? TimeSpan.Zero,

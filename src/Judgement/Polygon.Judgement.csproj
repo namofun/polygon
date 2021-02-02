@@ -4,17 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
     <DescriptionAttach>The judgedaemon functional implements</DescriptionAttach>
-  </PropertyGroup>
-
-  <Import Project="..\..\build\NugetPackage.Backend.props" />
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.16.0" />
-  </ItemGroup>
+  <Import Project="..\..\build\NugetPackage.Backend.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />

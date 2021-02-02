@@ -5,13 +5,10 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Polygon.Storages</RootNamespace>
     <DescriptionAttach>The storage implementations in EFCore</DescriptionAttach>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <Import Project="..\..\build\NugetPackage.Backend.props" />
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />

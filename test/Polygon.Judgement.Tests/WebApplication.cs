@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Polygon.FakeJudgehost;
 using SatelliteSite.IdentityModule.Entities;
@@ -15,7 +16,7 @@ namespace SatelliteSite.Tests
                 .MarkTest(this)
                 .AddModule<IdentityModule.IdentityModule<User, Role, TestContext>>()
                 .AddModule<PolygonModule.PolygonModule<TestRole>>()
-                .AddDatabaseInMemory<TestContext>("0x8c")
+                .AddDatabase<TestContext>(b => b.UseInMemoryDatabase("0x8c", b => b.UseBulk()))
                 .ConfigureSubstrateDefaults<TestContext>(b =>
                 {
                     b.ConfigureServices(services =>
