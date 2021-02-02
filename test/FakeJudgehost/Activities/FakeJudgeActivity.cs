@@ -56,7 +56,6 @@ namespace Polygon.FakeJudgehost
             return ch switch
             {
                 'A' => Entities.Verdict.Accepted,
-                'C' => Entities.Verdict.CompileError,
                 'M' => Entities.Verdict.MemoryLimitExceeded,
                 'O' => Entities.Verdict.OutputLimitExceeded,
                 'R' => Entities.Verdict.RuntimeError,
@@ -113,8 +112,15 @@ namespace Polygon.FakeJudgehost
             await ThrowIfCancelled(service, stoppingToken);
 
             var submission = await FetchSubmission(service, row.ContestId, row.SubmissionId);
-            await service.UpdateJudging(row.JudgingId, submission != "C", "ok");
-            if (submission == "C") return;
+
+            bool shouldCompileError =
+                submission.Length < row.Testcases.Count ||
+                submission.Any(a => Map(a) == Entities.Verdict.UndefinedError);
+            bool wilTimeLimitExceeded =
+                submission.Any(a => Map(a) == Entities.Verdict.TimeLimitExceeded);
+
+            await service.UpdateJudging(row.JudgingId, !shouldCompileError, "ok");
+            if (shouldCompileError) return;
 
             await ThrowIfCancelled(service, stoppingToken);
 
@@ -124,7 +130,7 @@ namespace Polygon.FakeJudgehost
             int totalcases = 0;
             bool lastcase_correct = true;
             var last_sent = DateTimeOffset.Now;
-            int tl = (int)(row.MaxRunTime * 1000) + 1000;
+            int tl = (int)(row.MaxRunTime * 1000);
             var random = new Random();
             var unsent_judging_runs = new Queue<JudgingRun>();
 
@@ -137,8 +143,10 @@ namespace Polygon.FakeJudgehost
                 var verd = Map(ch);
                 var verd2 = JudgingRun.Map(verd);
                 int runtime = verd == Entities.Verdict.TimeLimitExceeded
-                    ? random!.Next(tl - 1000, tl + 1)
-                    : random!.Next(0, tl - 1000 + 1);
+                    ? tl + random!.Next(0, 1001)
+                    : wilTimeLimitExceeded
+                    ? random!.Next(0, tl)
+                    : random!.Next(0, tl) / 3;
 
                 try
                 {
