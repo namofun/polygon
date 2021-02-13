@@ -60,9 +60,9 @@ namespace Polygon.Storages
             {
                 returns.TryAdd(item.HostName, default);
                 var current = returns[item.HostName];
-                if (item.Type == 1) current.Item1 = item.Load / 5.0;
-                else if (item.Type == 2) current.Item2 = item.Load / (2.0 * 60);
-                else if (item.Type == 3) current.Item3 = item.Load / (2.0 * 24 * 60);
+                if (item.Type == 1) current.Item1 = item.Load / (5.0 * 60);
+                else if (item.Type == 2) current.Item2 = item.Load / (2.0 * 60 * 60);
+                else if (item.Type == 3) current.Item3 = item.Load / (2.0 * 24 * 60 * 60);
                 returns[item.HostName] = current;
             }
 
