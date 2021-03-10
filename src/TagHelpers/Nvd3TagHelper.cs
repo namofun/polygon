@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 
 namespace Polygon.TagHelpers
 {
@@ -33,9 +34,6 @@ namespace Polygon.TagHelpers
         public IEnumerable<object> DataObject { get; set; }
 
         [HtmlAttributeNotBound]
-        public string GeneratedValue { get; set; }
-
-        [HtmlAttributeNotBound]
         public JavaScriptEncoder JSEncoder { get; }
 
         public Nvd3TagHelper(JavaScriptEncoder encoder)
@@ -49,7 +47,10 @@ namespace Polygon.TagHelpers
             output.TagMode = TagMode.StartTagAndEndTag;
             output.Attributes.Add("style", "display: inline-block");
             output.Attributes.Add("id", Id);
-            GeneratedValue = new { key = KeyName, values = DataObject }.ToJson();
+
+            var generatedObject = JsonSerializer.Serialize(
+                new { key = KeyName, values = DataObject },
+                new JsonSerializerOptions { Encoder = JSEncoder });
 
             var e = new IndentHtmlContentBuilderWrapper(output.Content);
 
@@ -60,7 +61,7 @@ namespace Polygon.TagHelpers
 
             using (e.Indent())
             {
-                e.L().H("var curdata = [").H(GeneratedValue).H("];");
+                e.L().H("var curdata = [").H(generatedObject).H("];");
                 e.L().H("nv.addGraph(function () {");
 
                 using (e.Indent())
