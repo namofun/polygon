@@ -128,21 +128,21 @@ namespace Polygon.Storages
             return JudgingFiles.WriteBinaryAsync($"j{jid}/r{rid}.{type}", content);
         }
 
-        Task<JudgingRun> IJudgingStore.SummarizeAsync(int judgingId)
+        Task<RunSummary> IJudgingStore.SummarizeAsync(int judgingId)
         {
             var query =
                 from d in Context.JudgingRuns
                 where d.JudgingId == judgingId
                 join t in Context.Testcases on d.TestcaseId equals t.Id
                 group new { d.Status, d.ExecuteMemory, d.ExecuteTime, t.Point } by d.JudgingId into g
-                select new JudgingRun
+                select new RunSummary
                 {
                     JudgingId = g.Key,
-                    Status = g.Min(a => a.Status),
-                    TestcaseId = g.Count(),
-                    ExecuteMemory = g.Max(a => a.ExecuteMemory),
-                    ExecuteTime = g.Max(a => a.ExecuteTime),
-                    Id = g.Sum(a => a.Status == Verdict.Accepted ? a.Point : 0)
+                    FinalVerdict = g.Min(a => a.Status),
+                    Testcases = g.Count(),
+                    HighestMemory = g.Max(a => a.ExecuteMemory),
+                    LongestTime = g.Max(a => a.ExecuteTime),
+                    TotalScore = g.Sum(a => a.Status == Verdict.Accepted ? a.Point : 0)
                 };
 
             return query.FirstOrDefaultAsync();

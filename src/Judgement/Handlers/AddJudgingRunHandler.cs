@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Logging;
 using Polygon.Entities;
 using Polygon.Events;
+using Polygon.Storages;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,17 +18,14 @@ namespace Polygon.Judgement
             if (host is null) return false; // Unknown or inactive judgehost requested
             await Facade.Judgehosts.NotifyPollAsync(host);
 
-            var js = await Facade.Judgings.FindAsync(
-                predicate: j => j.Id == request.JudgingId,
-                selector: j => new { j, j.s.ProblemId, j.s.ContestId, j.s.TeamId, j.s.Time });
-            if (js == null)
-                throw new InvalidOperationException("Unknown judging occurred.");
-
-            var (judging, pid, cid, uid, time) = (js.j, js.ProblemId, js.ContestId, js.TeamId, js.Time);
+            var (judging, pid, cid, uid, time) = await Facade.Judgings.FindAsync(request.JudgingId);
+            if (judging == null) throw new InvalidOperationException("Unknown judging occurred.");
+            var runList = new List<JudgingRun>();
 
             foreach (var (run, output_run, output_error) in request.Batch(request.JudgingId, host.PollTime!.Value))
             {
                 var detail = await Facade.Judgings.InsertAsync(run);
+                runList.Add(detail);
 
                 if (output_error != null || output_run != null)
                 {
@@ -42,25 +41,24 @@ namespace Polygon.Judgement
                         Logger.LogError(ex, "An error occurred when saving OutputError and OutputRun for j{judgingId}, r{runId}", judging.Id, detail.Id);
                     }
                 }
-
-                await Mediator.Publish(new JudgingRunEmitted(detail, judging, cid, pid, uid, time));
             }
 
             // Check for the final status
             var countTc = await Facade.Testcases.CountAsync(pid);
             var verdict = await Facade.Judgings.SummarizeAsync(judging.Id);
-            // testId for score, testcaseId for count of tested cases
 
-            bool anyRejected = !judging.FullTest && verdict.Status != Verdict.Accepted;
-            bool fullTested = verdict.TestcaseId >= countTc && countTc > 0;
+            await Mediator.Publish(new JudgingRunEmitted(runList, judging, cid, pid, uid, time, verdict.Testcases - runList.Count + 1));
+
+            bool anyRejected = !judging.FullTest && verdict.FinalVerdict != Verdict.Accepted;
+            bool fullTested = verdict.Testcases >= countTc && countTc > 0;
 
             if (anyRejected || fullTested)
             {
-                judging.ExecuteMemory = verdict.ExecuteMemory;
-                judging.ExecuteTime = verdict.ExecuteTime;
-                judging.Status = verdict.Status;
+                judging.ExecuteMemory = verdict.HighestMemory;
+                judging.ExecuteTime = verdict.LongestTime;
+                judging.Status = verdict.FinalVerdict;
                 judging.StopTime = host.PollTime;
-                judging.TotalScore = verdict.Id;
+                judging.TotalScore = verdict.TotalScore;
                 await FinalizeJudging(new JudgingFinishedEvent(judging, cid, pid, uid, time));
             }
 

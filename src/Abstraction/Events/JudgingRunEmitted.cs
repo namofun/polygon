@@ -1,12 +1,13 @@
 ﻿using MediatR;
 using Polygon.Entities;
 using System;
+using System.Collections.Generic;
 
 namespace Polygon.Events
 {
     public class JudgingRunEmitted : INotification
     {
-        public JudgingRun Run { get; }
+        public IReadOnlyList<JudgingRun> Runs { get; }
 
         public Judging Judging { get; }
 
@@ -18,15 +19,18 @@ namespace Polygon.Events
 
         public DateTimeOffset SubmitTime { get; }
 
-        public JudgingRunEmitted(JudgingRun r, Judging j, int? cid, int pid, int uid, DateTimeOffset subtime)
+        public int RankOfFirst { get; }
+
+        public JudgingRunEmitted(IReadOnlyList<JudgingRun> r, Judging j, int? cid, int pid, int uid, DateTimeOffset subtime, int rank0)
         {
             if (cid == 0) cid = null;
-            Run = r;
+            Runs = r;
             Judging = j;
             ContestId = cid;
             ProblemId = pid;
             TeamId = uid;
             SubmitTime = subtime;
+            RankOfFirst = rank0;
         }
     }
 }

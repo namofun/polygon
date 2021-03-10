@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Polygon.Entities;
+using Polygon.Storages;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,25 +17,23 @@ namespace Polygon.Judgement
             if (host is null) return null;
             await Facade.Judgehosts.NotifyPollAsync(host);
 
-            var js = await Facade.Judgings.FindAsync(
-                predicate: j => j.Id == request.JudgingId,
-                selector: j => new { j, j.s.ProblemId, j.s.ContestId, j.s.TeamId, j.s.Time });
-            if (js is null) return null;
+            var (judging, problemId, contestId, teamId, time) = await Facade.Judgings.FindAsync(request.JudgingId);
+            if (judging == null) return null;
 
-            js.j.CompileError = request.CompilerOutput ?? "";
+            judging.CompileError = request.CompilerOutput ?? "";
 
             if (request.Success != 1)
             {
-                js.j.Status = Verdict.CompileError;
-                js.j.StopTime = DateTimeOffset.Now;
-                await FinalizeJudging(new Events.JudgingFinishedEvent(js.j, js.ContestId, js.ProblemId, js.TeamId, js.Time));
+                judging.Status = Verdict.CompileError;
+                judging.StopTime = DateTimeOffset.Now;
+                await FinalizeJudging(new Events.JudgingFinishedEvent(judging, contestId, problemId, teamId, time));
             }
             else
             {
-                await Facade.Judgings.UpdateAsync(js.j);
+                await Facade.Judgings.UpdateAsync(judging);
             }
 
-            return js.j;
+            return judging;
         }
     }
 }
