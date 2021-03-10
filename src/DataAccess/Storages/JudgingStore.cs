@@ -114,12 +114,16 @@ namespace Polygon.Storages
             var fileInfo = await JudgingFiles.GetFileInfoAsync($"j{jid}/r{rid}.{type}");
             if (!fileInfo.Exists) return notfound;
 
-            var validation = await Context.JudgingRuns
-                .Where(r => r.JudgingId == jid && r.Id == rid)
-                .Select(r => new { SubmissionId = r.j.s.Id, r.j.s.ProblemId })
-                .SingleOrDefaultAsync();
-            if (sid.HasValue && validation.SubmissionId != sid.Value) return notfound;
-            if (pid.HasValue && validation.ProblemId != pid.Value) return notfound;
+            if (sid.HasValue || pid.HasValue)
+            {
+                var validation = await Context.JudgingRuns
+                    .Where(r => r.JudgingId == jid && r.Id == rid)
+                    .Select(r => new { SubmissionId = r.j.s.Id, r.j.s.ProblemId })
+                    .SingleOrDefaultAsync();
+                if (sid.HasValue && validation.SubmissionId != sid.Value) return notfound;
+                if (pid.HasValue && validation.ProblemId != pid.Value) return notfound;
+            }
+
             return fileInfo;
         }
 
