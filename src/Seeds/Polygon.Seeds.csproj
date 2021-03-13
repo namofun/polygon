@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="SatelliteSite.DataAccess" Version="$(SubstrateVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(AspNetCoreVersion)" />
   </ItemGroup>
 
   <ItemGroup>
