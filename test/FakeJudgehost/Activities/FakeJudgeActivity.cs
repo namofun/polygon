@@ -169,8 +169,8 @@ namespace Polygon.FakeJudgehost
                 {
                     TestcaseId = ttj.TestcaseId.ToString(),
                     RunResult = JudgingRun.Map(verd),
-                    OutputRun = row.FullJudge ? (row.CombinedRunCompare ? Interactor : ProgramOutput).ToBase64() : null,
-                    OutputError = row.FullJudge ? (verd == Entities.Verdict.Accepted ? string.Empty : ProgramOutput).ToBase64() : null,
+                    OutputRun = row.SendOutputBack ? (row.CombinedRunCompare ? Interactor : ProgramOutput).ToBase64() : null,
+                    OutputError = row.SendOutputBack ? (verd == Entities.Verdict.Accepted ? string.Empty : ProgramOutput).ToBase64() : null,
                     OutputDiff = (verd == Entities.Verdict.Accepted ? string.Empty : ValidatorOutput).ToBase64(),
                     OutputSystem = SystemOutput.ToBase64(),
                     MetaData = Metadata.ToBase64(),

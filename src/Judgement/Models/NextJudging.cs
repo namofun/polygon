@@ -69,7 +69,7 @@ namespace Polygon.Judgement
         public int JudgingId { get; set; }
 
         [JsonPropertyName("full_judge")]
-        public bool FullJudge { get; set; }
+        public bool SendOutputBack { get; set; }
 
         [JsonPropertyName("testcases")]
         public Dictionary<string, TestcaseToJudge> Testcases { get; set; }
@@ -107,8 +107,14 @@ namespace Polygon.Judgement
 
             Testcases = testcases.ToDictionary(t => $"{t.Rank}", t => new TestcaseToJudge(t));
 
-            // Hello what's this?
-            FullJudge = r.Judging.FullTest && (r.ContestId == 0 || r.Judging.RejudgingId != null);
+            // Sends back when:
+            //   - the judging is required a full-test
+            //   - the contest id is 0, means that this is a polygon submission
+            //   - the rejudging id is not null, means that this is a rejudging submission
+            //
+            // Note that this is not accurate when using SYSTEM TEST feature in codeforces rules.
+            // The field name isn't changed due to historical reasons.
+            SendOutputBack = r.Judging.FullTest && (r.ContestId == 0 || r.Judging.RejudgingId != null);
         }
     }
 }
