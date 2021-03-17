@@ -127,21 +127,22 @@ namespace Polygon.Storages
 
         Task ISubmissionStore.UpdateStatisticsAsync(int cid, int teamid, int probid, bool ac)
         {
-            return Context.SubmissionStatistics.UpsertAsync(
-                source: new { ContestId = cid, TeamId = teamid, ProblemId = probid, Accepted = ac ? 1 : 0 },
+            int ac_count = ac ? 1 : 0;
 
-                insertExpression: s2 => new SubmissionStatistics
+            return Context.SubmissionStatistics.UpsertAsync(
+
+                insertExpression: () => new SubmissionStatistics
                 {
-                    TeamId = s2.TeamId,
-                    ContestId = s2.ContestId,
-                    ProblemId = s2.ProblemId,
-                    AcceptedSubmission = s2.Accepted,
+                    TeamId = teamid,
+                    ContestId = cid,
+                    ProblemId = probid,
+                    AcceptedSubmission = ac_count,
                     TotalSubmission = 1,
                 },
 
-                updateExpression: (s, s2) => new SubmissionStatistics
+                updateExpression: s => new SubmissionStatistics
                 {
-                    AcceptedSubmission = s.AcceptedSubmission + s2.AcceptedSubmission,
+                    AcceptedSubmission = s.AcceptedSubmission + ac_count,
                     TotalSubmission = s.TotalSubmission + 1,
                 });
         }
