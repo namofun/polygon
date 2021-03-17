@@ -131,18 +131,23 @@ namespace SatelliteSite.PolygonModule.Controllers
                 model.CompareScript = execid;
             }
 
-            Problem.RunScript = model.RunScript;
-            Problem.CompareScript = model.CompareScript;
-            Problem.ComapreArguments = model.CompareArgument;
-            Problem.MemoryLimit = model.MemoryLimit;
-            Problem.OutputLimit = model.OutputLimit;
-            Problem.TimeLimit = model.TimeLimit;
-            Problem.Title = model.Title;
-            Problem.Source = model.Source ?? string.Empty;
-            Problem.TagName = model.Tags ?? string.Empty;
-            Problem.CombinedRunCompare = model.RunAsCompare;
-            Problem.Shared = model.Shared;
-            await Store.UpdateAsync(Problem);
+            model.Source ??= string.Empty;
+            model.Tags ??= string.Empty;
+
+            await Store.UpdateAsync(Problem, _ => new Problem
+            {
+                RunScript = model.RunScript,
+                CompareScript = model.CompareScript,
+                ComapreArguments = model.CompareArgument,
+                MemoryLimit = model.MemoryLimit,
+                OutputLimit = model.OutputLimit,
+                TimeLimit = model.TimeLimit,
+                Title = model.Title,
+                Source = model.Source,
+                TagName = model.Tags,
+                CombinedRunCompare = model.RunAsCompare,
+                Shared = model.Shared,
+            });
 
             await HttpContext.AuditAsync("edit", $"{Problem.Id}");
             return RedirectToAction(nameof(Overview));

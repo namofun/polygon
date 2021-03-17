@@ -167,7 +167,7 @@ namespace Polygon.Packaging
         public async Task<Problem> FinalizeAsync()
         {
             Problem.AllowJudge = true;
-            await Facade.Problems.UpdateAsync(Problem);
+            await Facade.Problems.CommitChangesAsync(Problem);
             return Problem;
         }
     }

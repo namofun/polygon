@@ -21,19 +21,23 @@ namespace Polygon.Storages
         Task<Problem> CreateAsync(Problem entity);
 
         /// <summary>
-        /// Update the instance of entity.
+        /// Commits the changes on the instance of entity.
         /// </summary>
+        /// <remarks>
+        /// This method is not recommended since this may cause concurrency problems.
+        /// Preserved for import providers.
+        /// </remarks>
         /// <param name="entity">The entity.</param>
         /// <returns>The update task.</returns>
-        Task UpdateAsync(Problem entity);
+        Task CommitChangesAsync(Problem entity);
 
         /// <summary>
         /// Update the instance of entity
         /// </summary>
-        /// <param name="id">The entity id.</param>
+        /// <param name="problem">The problem entity.</param>
         /// <param name="expression">The update expression.</param>
         /// <returns>The update task.</returns>
-        Task UpdateAsync(int id, Expression<Func<Problem, Problem>> expression);
+        Task UpdateAsync(Problem problem, Expression<Func<Problem, Problem>> expression);
 
         /// <summary>
         /// Delete the instance of entity.

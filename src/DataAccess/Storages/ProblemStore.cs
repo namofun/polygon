@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Polygon.Entities;
+using Polygon.Events;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,11 +17,18 @@ namespace Polygon.Storages
 
         Task IProblemStore.DeleteAsync(Problem entity) => DeleteEntityAsync(entity);
 
-        Task IProblemStore.UpdateAsync(Problem entity) => UpdateEntityAsync(entity);
+        Task IProblemStore.CommitChangesAsync(Problem entity) => UpdateEntityAsync(entity);
 
-        Task IProblemStore.UpdateAsync(int id, Expression<Func<Problem, Problem>> expression)
+        async Task IProblemStore.UpdateAsync(Problem problem, Expression<Func<Problem, Problem>> expression)
         {
-            return Context.Problems.Where(p => p.Id == id).BatchUpdateAsync(expression);
+            int id = problem.Id;
+
+            await Context.Problems
+                .Where(p => p.Id == id)
+                .BatchUpdateAsync(expression);
+
+            await Context.Entry(problem).ReloadAsync();
+            await Mediator.Publish(new ProblemModifiedEvent(problem));
         }
 
         Task<Problem> IProblemStore.FindAsync(int pid)
@@ -102,9 +110,11 @@ namespace Polygon.Storages
                 .BatchUpdateAsync(p => new Problem { AllowSubmit = tobe });
         }
 
-        Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, string content)
+        async Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, string content)
         {
-            return ProblemFiles.WriteStringAsync($"p{problem.Id}/{fileName}", content);
+            var result = await ProblemFiles.WriteStringAsync($"p{problem.Id}/{fileName}", content);
+            if (fileName == "view.html") await Mediator.Publish(new ProblemModifiedEvent(problem));
+            return result;
         }
 
         Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, byte[] content)

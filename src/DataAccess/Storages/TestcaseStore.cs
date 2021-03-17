@@ -27,12 +27,19 @@ namespace Polygon.Storages
             try
             {
                 // details are set ON DELETE NO ACTION, so we have to delete it before
-                dts = await Context.JudgingRuns.Where(d => d.TestcaseId == testcase.Id).BatchDeleteAsync();
-                await Context.Testcases.Where(t => t.Id == testcase.Id).BatchDeleteAsync();
+                dts = await Context.JudgingRuns
+                    .Where(d => d.TestcaseId == testcase.Id)
+                    .BatchDeleteAsync();
+
+                await Context.Testcases
+                    .Where(t => t.Id == testcase.Id)
+                    .BatchDeleteAsync();
+
                 // set the rest testcases correct rank
                 await Context.Testcases
                     .Where(t => t.Rank > testcase.Rank && t.ProblemId == testcase.ProblemId)
                     .BatchUpdateAsync(t => new Testcase { Rank = t.Rank - 1 });
+
                 await tran.CommitAsync();
             }
             catch
@@ -60,12 +67,16 @@ namespace Polygon.Storages
                 var tcid1 = tc.Id;
                 var tcid2 = tc2.Id;
                 var rk1 = tc.Rank;
+                // swap the testcase
+
                 await Context.Testcases
                     .Where(t => t.Id == tcid1)
                     .BatchUpdateAsync(t => new Testcase { Rank = -1 });
+
                 await Context.Testcases
                     .Where(t => t.Id == tcid2)
                     .BatchUpdateAsync(t => new Testcase { Rank = rk1 });
+
                 await Context.Testcases
                     .Where(t => t.Id == tcid1)
                     .BatchUpdateAsync(t => new Testcase { Rank = rk2 });
