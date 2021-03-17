@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Polygon.Entities;
+using Polygon.Events;
 using Polygon.Models;
 using System;
 using System.Collections.Generic;
@@ -60,6 +61,8 @@ namespace Polygon.Storages
                 {
                     AcceptedSubmission = o.AcceptedSubmission + s.Delta
                 });
+
+            await Mediator.Publish(new RejudgingAppliedEvent(rejudge));
         }
 
         async Task<int> IRejudgingStore.BatchRejudgeAsync(Expression<Func<Submission, Judging, bool>> predicate, Rejudging? rejudge, bool fullTest)
@@ -157,23 +160,18 @@ namespace Polygon.Storages
 
             if (includeStat)
             {
-                var query2 =
-                    from j in Context.Judgings
-                    where (from r in Context.Rejudgings
-                           where r.ContestId == contestId && r.OperatedBy == null
-                           select (int?)r.Id).Contains(j.RejudgingId)
-                    group 1 by new { j.RejudgingId, j.Status } into g
-                    select new { g.Key, Cnt = g.Count() };
-                var q2 = await query2.ToListAsync();
+                var query3 =
+                    from r in Context.Rejudgings
+                    where r.ContestId == contestId && r.OperatedBy == null
+                    join j in Context.Judgings on r.Id equals j.RejudgingId
+                    group j by new { j.RejudgingId, j.Status } into g
+                    select new { RejudgingId = (int)g.Key.RejudgingId!, g.Key.Status, Count = g.Count() };
 
-                foreach (var qqq in q2.GroupBy(a => a.Key.RejudgingId))
+                foreach (var stat in await query3.ToLookupAsync(a => a.RejudgingId, a => a))
                 {
-                    int tot = qqq.Sum(a => a.Cnt);
-                    int ped = qqq
-                        .Where(a => a.Key.Status == Verdict.Pending || a.Key.Status == Verdict.Running)
-                        .DefaultIfEmpty()
-                        .Sum(a => a?.Cnt) ?? 0;
-                    model.First(r => r.Id == qqq.Key).Ready = (tot, ped);
+                    int tot = stat.Sum(a => a.Count);
+                    int ped = stat.Sum(a => a.Status == Verdict.Pending || a.Status == Verdict.Running ? 1 : 0);
+                    model.First(r => r.Id == stat.Key).Ready = (tot, ped);
                 }
             }
 

@@ -47,7 +47,7 @@ namespace Polygon.Judgement
             var countTc = await Facade.Testcases.CountAsync(pid);
             var verdict = await Facade.Judgings.SummarizeAsync(judging.Id);
 
-            await Mediator.Publish(new JudgingRunEmitted(runList, judging, cid, pid, uid, time, verdict.Testcases - runList.Count + 1));
+            await Mediator.Publish(new JudgingRunEmittedEvent(runList, judging, cid, pid, uid, time, verdict.Testcases - runList.Count + 1));
 
             bool anyRejected = !judging.FullTest && verdict.FinalVerdict != Verdict.Accepted;
             bool fullTested = verdict.Testcases >= countTc && countTc > 0;

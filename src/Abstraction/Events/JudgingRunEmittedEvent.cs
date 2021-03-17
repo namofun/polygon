@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Polygon.Events
 {
-    public class JudgingRunEmitted : INotification
+    public class JudgingRunEmittedEvent : INotification
     {
         public IReadOnlyList<JudgingRun> Runs { get; }
 
@@ -21,7 +21,7 @@ namespace Polygon.Events
 
         public int RankOfFirst { get; }
 
-        public JudgingRunEmitted(IReadOnlyList<JudgingRun> r, Judging j, int? cid, int pid, int uid, DateTimeOffset subtime, int rank0)
+        public JudgingRunEmittedEvent(IReadOnlyList<JudgingRun> r, Judging j, int? cid, int pid, int uid, DateTimeOffset subtime, int rank0)
         {
             if (cid == 0) cid = null;
             Runs = r;
