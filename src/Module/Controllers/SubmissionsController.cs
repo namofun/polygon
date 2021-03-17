@@ -192,9 +192,19 @@ namespace SatelliteSite.PolygonModule.Controllers
             var it = await Facade.Submissions.FindAsync(sid);
             if (it == null || it.ProblemId != pid) return NotFound();
 
-            it.ExpectedResult = model.Verdict == -1 ? default(Verdict?) : (Verdict)model.Verdict;
-            it.Language = model.Language;
-            await Facade.Submissions.UpdateAsync(it);
+            var expected = model.Verdict == -1 ? default(Verdict?) : (Verdict)model.Verdict;
+            var language = model.Language;
+
+            if (null == await Facade.Languages.FindAsync(language)) return NotFound();
+
+            await Facade.Submissions.UpdateAsync(
+                sid,
+                s => new Submission
+                {
+                    ExpectedResult = expected,
+                    Language = language
+                });
+
             return RedirectToAction(nameof(Detail));
         }
     }

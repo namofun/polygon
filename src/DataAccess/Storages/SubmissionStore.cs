@@ -116,8 +116,6 @@ namespace Polygon.Storages
                 .ToListAsync();
         }
 
-        Task ISubmissionStore.UpdateAsync(Submission entity) => UpdateEntityAsync(entity);
-
         Task ISubmissionStore.UpdateAsync(int id, Expression<Func<Submission, Submission>> expression)
         {
             return Context.Submissions
