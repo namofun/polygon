@@ -116,11 +116,16 @@ namespace Polygon.Storages
                 .ToListAsync();
         }
 
-        Task ISubmissionStore.UpdateAsync(int id, Expression<Func<Submission, Submission>> expression)
+        async Task ISubmissionStore.UpdateAsync(Submission entity, Expression<Func<Submission, Submission>> expression)
         {
-            return Context.Submissions
-                .Where(s => s.Id == id)
+            int id = entity.Id, cid = entity.ContestId;
+
+            var ar = await Context.Submissions
+                .Where(s => s.Id == id && s.ContestId == cid)
                 .BatchUpdateAsync(expression);
+
+            await Context.Entry(entity).ReloadAsync();
+            await Mediator.Publish(new SubmissionModifiedEvent(entity));
         }
 
         Task ISubmissionStore.UpdateStatisticsAsync(int cid, int teamid, int probid, bool ac)

@@ -198,7 +198,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             if (null == await Facade.Languages.FindAsync(language)) return NotFound();
 
             await Facade.Submissions.UpdateAsync(
-                sid,
+                it,
                 s => new Submission
                 {
                     ExpectedResult = expected,

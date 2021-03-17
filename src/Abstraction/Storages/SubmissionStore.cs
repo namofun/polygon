@@ -44,10 +44,10 @@ namespace Polygon.Storages
         /// <summary>
         /// Update the instance of entity.
         /// </summary>
-        /// <param name="id">The entity id.</param>
+        /// <param name="submission">The submission entity.</param>
         /// <param name="expression">The update expression.</param>
         /// <returns>The update task.</returns>
-        Task UpdateAsync(int id, Expression<Func<Submission, Submission>> expression);
+        Task UpdateAsync(Submission submission, Expression<Func<Submission, Submission>> expression);
 
         /// <summary>
         /// Find the submission.
