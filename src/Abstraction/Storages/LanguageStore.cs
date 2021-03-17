@@ -22,16 +22,9 @@ namespace Polygon.Storages
         /// Update the instance of entity.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        /// <returns>The update task.</returns>
-        Task UpdateAsync(Language entity);
-
-        /// <summary>
-        /// Update the instance of entity.
-        /// </summary>
-        /// <param name="id">The entity id.</param>
         /// <param name="expression">The update expression.</param>
         /// <returns>The update task.</returns>
-        Task UpdateAsync(string id, Expression<Func<Language, Language>> expression);
+        Task UpdateAsync(Language entity, Expression<Func<Language, Language>> expression);
 
         /// <summary>
         /// Delete the instance of entity.

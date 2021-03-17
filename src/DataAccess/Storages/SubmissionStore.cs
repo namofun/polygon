@@ -118,10 +118,10 @@ namespace Polygon.Storages
 
         async Task ISubmissionStore.UpdateAsync(Submission entity, Expression<Func<Submission, Submission>> expression)
         {
-            int id = entity.Id, cid = entity.ContestId;
+            int id = entity.Id;
 
             var ar = await Context.Submissions
-                .Where(s => s.Id == id && s.ContestId == cid)
+                .Where(s => s.Id == id)
                 .BatchUpdateAsync(expression);
 
             await Context.Entry(entity).ReloadAsync();

@@ -101,12 +101,14 @@ namespace SatelliteSite.PolygonModule.Dashboards
             var lang = await Store.FindAsync(langid);
             if (lang == null) return NotFound();
 
-            lang.CompileScript = model.CompileScript;
-            lang.FileExtension = model.FileExtension;
-            lang.TimeFactor = model.TimeFactor;
-            lang.Name = model.Name;
+            await Store.UpdateAsync(lang, _ => new Language
+            {
+                CompileScript = model.CompileScript,
+                FileExtension = model.FileExtension,
+                TimeFactor = model.TimeFactor,
+                Name = model.Name,
+            });
 
-            await Store.UpdateAsync(lang);
             await HttpContext.AuditAsync("updated", langid);
             return RedirectToAction(nameof(Detail), new { langid });
         }

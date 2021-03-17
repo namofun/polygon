@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Polygon.Entities;
+using Polygon.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,16 @@ namespace Polygon.Storages
 
         Task ILanguageStore.DeleteAsync(Language entity) => DeleteEntityAsync(entity);
 
-        Task ILanguageStore.UpdateAsync(Language entity) => UpdateEntityAsync(entity);
-
-        Task ILanguageStore.UpdateAsync(string id, Expression<Func<Language, Language>> expression)
+        async Task ILanguageStore.UpdateAsync(Language entity, Expression<Func<Language, Language>> expression)
         {
-            return Context.Languages.Where(l => l.Id == id).BatchUpdateAsync(expression);
+            string id = entity.Id;
+
+            await Context.Languages
+                .Where(l => l.Id == id)
+                .BatchUpdateAsync(expression);
+
+            await Context.Entry(entity).ReloadAsync();
+            await Mediator.Publish(new LanguageModifiedEvent(entity));
         }
 
         Task<Language> ILanguageStore.FindAsync(string langid)
