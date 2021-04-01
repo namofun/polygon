@@ -13,28 +13,28 @@ namespace SatelliteSite
         {
         }
 
-        public virtual DbSet<Executable> Executables { get; set; }
+        public DbSet<Executable> Executables => Set<Executable>();
 
-        public virtual DbSet<InternalError> InternalErrors { get; set; }
+        public DbSet<InternalError> InternalErrors => Set<InternalError>();
 
-        public virtual DbSet<Judgehost> Judgehosts { get; set; }
+        public DbSet<Judgehost> Judgehosts => Set<Judgehost>();
 
-        public virtual DbSet<Judging> Judgings { get; set; }
+        public DbSet<Judging> Judgings => Set<Judging>();
 
-        public virtual DbSet<JudgingRun> JudgingRuns { get; set; }
+        public DbSet<JudgingRun> JudgingRuns => Set<JudgingRun>();
 
-        public virtual DbSet<Language> Languages { get; set; }
+        public DbSet<Language> Languages => Set<Language>();
 
-        public virtual DbSet<Problem> Problems { get; set; }
+        public DbSet<Problem> Problems => Set<Problem>();
 
-        public virtual DbSet<Rejudging> Rejudgings { get; set; }
+        public DbSet<Rejudging> Rejudgings => Set<Rejudging>();
 
-        public virtual DbSet<Submission> Submissions { get; set; }
+        public DbSet<Submission> Submissions => Set<Submission>();
 
-        public virtual DbSet<SubmissionStatistics> SubmissionStatistics { get; set; }
+        public DbSet<SubmissionStatistics> SubmissionStatistics => Set<SubmissionStatistics>();
 
-        public virtual DbSet<Testcase> Testcases { get; set; }
+        public DbSet<Testcase> Testcases => Set<Testcase>();
 
-        public virtual DbSet<ProblemAuthor> ProblemAuthors { get; set; }
+        public DbSet<ProblemAuthor> ProblemAuthors => Set<ProblemAuthor>();
     }
 }

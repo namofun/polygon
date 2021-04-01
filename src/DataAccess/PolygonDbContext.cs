@@ -13,62 +13,62 @@ namespace Polygon.Storages
         /// <summary>
         /// Gets the database set for <see cref="Executable"/>.
         /// </summary>
-        DbSet<Executable> Executables { get; set; }
+        DbSet<Executable> Executables { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="InternalError"/>.
         /// </summary>
-        DbSet<InternalError> InternalErrors { get; set; }
+        DbSet<InternalError> InternalErrors { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="Judgehost"/>.
         /// </summary>
-        DbSet<Judgehost> Judgehosts { get; set; }
+        DbSet<Judgehost> Judgehosts { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="Judging"/>.
         /// </summary>
-        DbSet<Judging> Judgings { get; set; }
+        DbSet<Judging> Judgings { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="JudgingRun"/>.
         /// </summary>
-        DbSet<JudgingRun> JudgingRuns { get; set; }
+        DbSet<JudgingRun> JudgingRuns { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="Language"/>.
         /// </summary>
-        DbSet<Language> Languages { get; set; }
+        DbSet<Language> Languages { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="Problem"/>.
         /// </summary>
-        DbSet<Problem> Problems { get; set; }
+        DbSet<Problem> Problems { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="Rejudging"/>.
         /// </summary>
-        DbSet<Rejudging> Rejudgings { get; set; }
+        DbSet<Rejudging> Rejudgings { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="Submission"/>.
         /// </summary>
-        DbSet<Submission> Submissions { get; set; }
+        DbSet<Submission> Submissions { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="Polygon.Entities.SubmissionStatistics"/>.
         /// </summary>
-        DbSet<SubmissionStatistics> SubmissionStatistics { get; set; }
+        DbSet<SubmissionStatistics> SubmissionStatistics { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="Testcase"/>.
         /// </summary>
-        DbSet<Testcase> Testcases { get; set; }
+        DbSet<Testcase> Testcases { get; }
 
         /// <summary>
         /// Gets the database set for <see cref="ProblemAuthor"/>.
         /// </summary>
-        DbSet<ProblemAuthor> ProblemAuthors { get; set; }
+        DbSet<ProblemAuthor> ProblemAuthors { get; }
 
         /// <summary>
         /// <para>
