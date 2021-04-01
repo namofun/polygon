@@ -6,6 +6,7 @@ using Polygon.Packaging;
 using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -186,7 +187,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             [FromServices] IUserManager userManager)
         {
             var user = await userManager.FindByIdAsync(uid);
-            if (user == null) return NotFound();
+            if (user == null || (!User.IsInRole("Administrator") && user.UserName == User.GetUserName())) return NotFound();
 
             return AskPost(
                 title: "Unassign authority",
@@ -203,7 +204,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             [FromRoute] int uid)
         {
             var user = await userManager.FindByIdAsync(uid);
-            if (user == null) return NotFound();
+            if (user == null || (!User.IsInRole("Administrator") && user.UserName == User.GetUserName())) return NotFound();
             await Store.AuthorizeAsync(Problem.Id, user.Id, null);
             StatusMessage = "Role unassigned.";
             return RedirectToAction(nameof(Overview));
@@ -231,15 +232,27 @@ namespace SatelliteSite.PolygonModule.Controllers
                 return BadRequest();
             }
 
-            var user = await userManager.FindByNameAsync(username);
+            var names = username.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var users = new List<IUser>();
 
-            if (user == null)
+            foreach (var name in names)
             {
-                StatusMessage = "Error user not found.";
-                return RedirectToAction(nameof(Overview));
+                var user = await userManager.FindByNameAsync(name);
+
+                if (user == null)
+                {
+                    StatusMessage = "Error user not found.";
+                    return RedirectToAction(nameof(Overview));
+                }
+
+                users.Add(user);
             }
 
-            await Store.AuthorizeAsync(Problem.Id, user.Id, level);
+            foreach (var user in users)
+            {
+                await Store.AuthorizeAsync(Problem.Id, user.Id, level);
+            }
+
             StatusMessage = "Role assigned.";
             return RedirectToAction(nameof(Overview));
         }
