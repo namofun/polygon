@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Polygon.Entities;
+using System;
 
 namespace Microsoft.AspNetCore.Mvc
 {
-    internal interface IPolygonFeature
+    public interface IPolygonFeature
     {
         Problem Problem { get; }
 
@@ -21,6 +24,20 @@ namespace Microsoft.AspNetCore.Mvc
         {
             Problem = problem;
             AuthorLevel = level;
+        }
+    }
+
+    internal class AccessorFeature : IPolygonFeature, IViewContextAware
+    {
+        private IPolygonFeature _innerFeature;
+
+        public Problem Problem => _innerFeature?.Problem ?? throw new InvalidOperationException();
+
+        public AuthorLevel AuthorLevel => _innerFeature?.AuthorLevel ?? throw new InvalidOperationException();
+
+        public void Contextualize(ViewContext viewContext)
+        {
+            _innerFeature = viewContext.HttpContext.Features.Get<IPolygonFeature>();
         }
     }
 

@@ -74,7 +74,7 @@ namespace Polygon.Storages
         /// <param name="context">The query database context.</param>
         /// <param name="probid">The problem ID.</param>
         /// <returns>The user information list.</returns>
-        public abstract Task<IEnumerable<(int UserId, string UserName)>> FetchPermittedUserAsync(TContext context, int probid);
+        public abstract Task<IEnumerable<(int UserId, string UserName, AuthorLevel Level)>> FetchPermittedUserAsync(TContext context, int probid);
 
 
 

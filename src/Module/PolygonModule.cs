@@ -63,6 +63,7 @@ namespace SatelliteSite.PolygonModule
 
             services.PostConfigure<PolygonOptions>(o => o.FinalizeSettings());
 
+            services.AddScoped<IPolygonFeature, AccessorFeature>();
             services.ConfigureRouting(options =>
             {
                 options.ConstraintMap.Add("problem", typeof(RequirePolygonFeatureConstraint));

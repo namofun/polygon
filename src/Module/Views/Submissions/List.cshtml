@@ -57,7 +57,7 @@
 
 <p>
     <a asp-action="Submit" data-toggle="ajaxWindow" data-target="submitCode" class="btn btn-success"><i class="fas fa-cloud-upload-alt"></i>&nbsp;Submit</a>
-    <a asp-action="Rejudge" class="btn btn-secondary" data-toggle="ajaxWindow" data-target="rejudgeProb"><i class="fas fa-sync"></i>&nbsp;Rejudge</a>
+    <a asp-action="Rejudge" class="btn btn-secondary @(Feature.AuthorLevel < AuthorLevel.Writer ? "disabled" : "")" data-toggle="ajaxWindow" data-target="rejudgeProb"><i class="fas fa-sync"></i>&nbsp;Rejudge</a>
 </p>
 
 <script>

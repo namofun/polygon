@@ -7,7 +7,6 @@ using Polygon.Entities;
 using Polygon.Models;
 using Polygon.Packaging;
 using Polygon.Storages;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Controllers
@@ -56,6 +55,9 @@ namespace SatelliteSite.PolygonModule.Controllers
 
             ViewData["ProblemItself"] = Problem = feature.Problem;
             ViewData["AuthorLevel"] = AuthorLevel = feature.AuthorLevel;
+            ViewData["BigTitle"] = "Polygon";
+            ViewData["NavbarName"] = Polygon.ResourceDictionary.MenuNavbar;
+            ViewData["BigUrl"] = Url.Action("Overview", "Editor");
 
             var atLeast = HttpContext.GetEndpoint().Metadata.GetMetadata<AtLeastLevelAttribute>();
             if (atLeast != null && atLeast.Level > AuthorLevel) return StatusCode(403);

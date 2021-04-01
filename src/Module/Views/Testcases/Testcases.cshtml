@@ -32,9 +32,11 @@
             <tr>
                 <td rowspan="2" class="text-center bg-light">
                     <a asp-action="Move" asp-route-tid="@tc.Id" asp-route-direction="up"
+                       class="@(Feature.AuthorLevel < AuthorLevel.Writer ? "disabled xys-disabled" : "")"
                        title="Move testcase up"><i class="fas fa-arrow-up"></i></a><br>
                     @tc.Rank<br>
                     <a asp-action="Move" asp-route-tid="@tc.Id" asp-route-direction="down"
+                       class="@(Feature.AuthorLevel < AuthorLevel.Writer ? "disabled xys-disabled" : "")"
                        title="Move testcase down"><i class="fas fa-arrow-down"></i></a>
                 </td>
                 <td rowspan="2" style="padding-left:1em" class="bg-light">
@@ -45,12 +47,12 @@
                 </td>
                 <td scope="row" class="filename"><a asp-route-tid="@tc.Id" title="MD5: @tc.Md5sumInput" asp-action="Fetch" asp-route-filetype="input">p@(tc.ProblemId).t@(tc.Id).in</a></td>
                 <td scope="row" class="text-right">@Html.AutoUnitFileSize(tc.InputLength)</td>
-                <td><a asp-action="Edit" asp-route-tid="@tc.Id" data-toggle="ajaxWindow" data-target="editTc" class="text-reset"><i class="fas fa-edit"></i></a></td>
+                <td><a asp-show-if="Feature.AuthorLevel >= AuthorLevel.Writer" asp-action="Edit" asp-route-tid="@tc.Id" data-toggle="ajaxWindow" data-target="editTc" class="text-reset"><i class="fas fa-edit"></i></a></td>
             </tr>
             <tr>
                 <td scope="row" class="filename"><a asp-route-tid="@tc.Id" title="MD5: @tc.Md5sumOutput" asp-action="Fetch" asp-route-filetype="output">p@(tc.ProblemId).t@(tc.Id).out</a></td>
                 <td scope="row" class="text-right">@Html.AutoUnitFileSize(tc.OutputLength)</td>
-                <td><a asp-action="Delete" asp-route-tid="@tc.Id" data-toggle="ajaxWindow" data-target="delTc" class="text-reset"><i class="fas fa-trash-alt"></i></a></td>
+                <td><a asp-show-if="Feature.AuthorLevel >= AuthorLevel.Writer" asp-action="Delete" asp-route-tid="@tc.Id" data-toggle="ajaxWindow" data-target="delTc" class="text-reset"><i class="fas fa-trash-alt"></i></a></td>
             </tr>
         }
         @if (!Testcases.Any())
@@ -65,6 +67,13 @@
 </table>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary" data-toggle="ajaxWindow" data-target="createTc"><i class="fas fa-plus"></i> Create</a>
-    <a asp-action="Score" class="btn btn-secondary" data-toggle="ajaxWindow" data-target="scoreTc"><i class="fas fa-balance-scale"></i> Score</a>
+    <a asp-action="Create" class="@(Feature.AuthorLevel < AuthorLevel.Writer ? "disabled" : "") btn btn-primary" data-toggle="ajaxWindow" data-target="createTc"><i class="fas fa-plus"></i> Create</a>
+    <a asp-action="Score" class="@(Feature.AuthorLevel < AuthorLevel.Writer ? "disabled" : "") btn btn-secondary" data-toggle="ajaxWindow" data-target="scoreTc"><i class="fas fa-balance-scale"></i> Score</a>
 </p>
+
+<style>
+    .xys-disabled {
+        cursor: default;
+        pointer-events: none;
+    }
+</style>

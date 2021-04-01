@@ -27,14 +27,14 @@ namespace SatelliteSite
             return query.ToListAsync();
         }
 
-        public override async Task<IEnumerable<(int UserId, string UserName)>> FetchPermittedUserAsync(TContext context, int probid)
+        public override async Task<IEnumerable<(int UserId, string UserName, AuthorLevel Level)>> FetchPermittedUserAsync(TContext context, int probid)
         {
             var query =
                 from pa in context.ProblemAuthors
                 where pa.ProblemId == probid
                 join u in context.Users on pa.UserId equals u.Id
-                select new { u.Id, u.UserName, u.NickName };
-            return (await query.ToListAsync()).Select(a => (a.Id, a.UserName));
+                select new { u.Id, u.UserName, u.NickName, pa.Level };
+            return (await query.ToListAsync()).Select(a => (a.Id, a.UserName, a.Level));
         }
 
         protected override Expression<Func<DateTimeOffset, DateTimeOffset, double>> CalculateDuration { get; }

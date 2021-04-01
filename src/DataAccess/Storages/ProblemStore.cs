@@ -57,7 +57,7 @@ namespace Polygon.Storages
                     .ToPagedListAsync(page, perCount);
         }
 
-        Task<IEnumerable<(int UserId, string UserName)>> IProblemStore.ListPermittedUserAsync(int pid)
+        Task<IEnumerable<(int UserId, string UserName, AuthorLevel Level)>> IProblemStore.ListPermittedUserAsync(int pid)
         {
             return QueryCache.FetchPermittedUserAsync(Context, pid);
         }
