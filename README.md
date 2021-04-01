@@ -1,6 +1,6 @@
 # Project Polygon
 
-![](https://img.shields.io/travis/com/namofun/polygon/main) ![](https://img.shields.io/github/license/namofun/polygon) ![](https://img.shields.io/github/languages/code-size/namofun/polygon)
+![](https://dev.azure.com/tlylz/namomo/_apis/build/status/Polygon%20Judging%20System?branchName=main) ![](https://img.shields.io/github/license/namofun/polygon) ![](https://img.shields.io/github/languages/code-size/namofun/polygon)
 
 This is a project for Online Judge problem judging core via ASP.NET Core.
 
