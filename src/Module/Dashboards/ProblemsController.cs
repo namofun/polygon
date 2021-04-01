@@ -66,9 +66,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
             });
 
             await HttpContext.AuditAsync("created", $"{p.Id}");
-
-            if (!User.IsInRole("Administrator"))
-                await Store.AuthorizeAsync(p.Id, int.Parse(User.GetUserId()), true);
+            await Store.AuthorizeAsync(p.Id, int.Parse(User.GetUserId()), AuthorLevel.Creator);
 
             return RedirectToAction(
                 actionName: "Overview",
@@ -129,7 +127,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
                 int uid = int.Parse(User.GetUserId());
                 if (!User.IsInRole("Administrator"))
                     foreach (var prob in probs)
-                        await Store.AuthorizeAsync(prob.Id, uid, true);
+                        await Store.AuthorizeAsync(prob.Id, uid, AuthorLevel.Creator);
 
                 return RedirectToAction(
                     actionName: "Overview",

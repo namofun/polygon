@@ -120,9 +120,9 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="problemId">The problem to share.</param>
         /// <param name="userId">The user to authorize.</param>
-        /// <param name="allow">Whether to authorize or unauthorize.</param>
+        /// <param name="level">The newest level to be.</param>
         /// <returns>The task for authorizing.</returns>
-        Task AuthorizeAsync(int problemId, int userId, bool allow);
+        Task AuthorizeAsync(int problemId, int userId, AuthorLevel? level);
 
         /// <summary>
         /// List permitted users.

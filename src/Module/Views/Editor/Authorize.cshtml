@@ -3,9 +3,31 @@
     Layout = "_WindowLayout";
 }
 
+<div class="alert alert-primary">
+    If you want to change someone's permission, please remove that one
+    out of the permission list first and then add that one into the list
+    with the target permission.
+</div>
+
 <div class="form-group">
     <label for="username">Username</label>
     <input id="username" name="username" class="form-control" required />
+</div>
+
+<div class="form-group">
+    <label for="username" class="d-block">Permission Level</label>
+    <div class="custom-control custom-radio d-inline mr-2">
+        <input type="radio" id="level-reader" name="level" checked class="custom-control-input" value="0" />
+        <label class="custom-control-label" for="level-reader">Reader</label>
+    </div>
+    <div class="custom-control custom-radio d-inline mr-2">
+        <input type="radio" id="level-writer" name="level" class="custom-control-input" value="1" />
+        <label class="custom-control-label" for="level-writer">Writer</label>
+    </div>
+    <div class="custom-control custom-radio d-inline">
+        <input type="radio" id="level-creator" name="level" class="custom-control-input" value="2" />
+        <label class="custom-control-label" for="level-creator">Creator</label>
+    </div>
 </div>
 
 @section Footer {

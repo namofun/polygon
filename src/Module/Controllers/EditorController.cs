@@ -204,7 +204,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         {
             var user = await userManager.FindByIdAsync(uid);
             if (user == null) return NotFound();
-            await Store.AuthorizeAsync(Problem.Id, user.Id, false);
+            await Store.AuthorizeAsync(Problem.Id, user.Id, null);
             StatusMessage = "Role unassigned.";
             return RedirectToAction(nameof(Overview));
         }
@@ -223,8 +223,14 @@ namespace SatelliteSite.PolygonModule.Controllers
         [AtLeastLevel(AuthorLevel.Creator)]
         public async Task<IActionResult> Authorize(
             string username,
+            AuthorLevel level,
             [FromServices] IUserManager userManager)
         {
+            if (level < AuthorLevel.Reader || level > AuthorLevel.Creator)
+            {
+                return BadRequest();
+            }
+
             var user = await userManager.FindByNameAsync(username);
 
             if (user == null)
@@ -233,7 +239,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 return RedirectToAction(nameof(Overview));
             }
 
-            await Store.AuthorizeAsync(Problem.Id, user.Id, true);
+            await Store.AuthorizeAsync(Problem.Id, user.Id, level);
             StatusMessage = "Role assigned.";
             return RedirectToAction(nameof(Overview));
         }

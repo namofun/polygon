@@ -150,23 +150,23 @@ namespace Polygon.Storages
             return await fileInfo.ReadAsync();
         }
 
-        async Task IProblemStore.AuthorizeAsync(int problemId, int userId, bool allow)
+        Task IProblemStore.AuthorizeAsync(int problemId, int userId, AuthorLevel? level)
         {
-            var auth = await Context.ProblemAuthors
-                .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
-                .FirstOrDefaultAsync();
-
-            if (allow && auth == null)
+            if (level == null)
             {
-                await CreateEntityAsync(new ProblemAuthor
-                {
-                    ProblemId = problemId,
-                    UserId = userId
-                });
+                return Context.ProblemAuthors
+                    .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
+                    .BatchDeleteAsync();
             }
-            else if (!allow && auth != null)
+            else
             {
-                await DeleteEntityAsync(auth);
+                return Context.ProblemAuthors
+                    .UpsertAsync(() => new ProblemAuthor
+                    {
+                        ProblemId = problemId,
+                        UserId = userId,
+                        Level = level.Value,
+                    });
             }
         }
 
