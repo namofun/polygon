@@ -14,6 +14,8 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AssemblyVersion>$(PackageVersion).0</AssemblyVersion>
+    <FileVersion>$(PackageVersion).0</FileVersion>
   </PropertyGroup>
 
 </Project>
