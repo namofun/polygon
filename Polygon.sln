@@ -5,10 +5,16 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{71ABC5AB-083D-4FAB-80B8-F344BC633100}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
 		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		NuGet.config = NuGet.config
 		build\NugetPackage.Backend.props = build\NugetPackage.Backend.props
 		build\NugetPackage.Common.props = build\NugetPackage.Common.props
 		build\NugetPackage.props = build\NugetPackage.props
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{37978533-6CEF-46D7-8A00-D4C403E9A1BD}"
