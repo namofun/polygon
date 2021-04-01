@@ -97,15 +97,27 @@ namespace Polygon.Packaging
             var fileName = chks.Element("source").Attribute("path").Value;
             var entry = zip.GetEntry(fileName);
             using var stream = entry.Open();
-            var content = new byte[entry.Length];
-            int pos = 0;
-            while (pos < entry.Length)
-                pos += await stream.ReadAsync(content, pos, (int)entry.Length - pos);
-            var md5 = content.ToMD5().ToHexDigest(true);
 
+            var content = new byte[entry.Length];
+            for (int pos = 0; pos < entry.Length; )
+            {
+                pos += await stream.ReadAsync(content, pos, (int)entry.Length - pos);
+            }
+
+            var md5 = content.ToMD5().ToHexDigest(true);
             string cmp = "compare"; string? args = null;
-            if (Checkers.ContainsKey(md5)) args = Checkers[md5];
-            else cmp = (await CreateExecutableAsync(ctx, content, Path.GetExtension(fileName), true)).Id;
+            if (Checkers.ContainsKey(md5))
+            {
+                args = Checkers[md5];
+            }
+            else
+            {
+                var exec = await CreateExecutableAsync(ctx, content, Path.GetExtension(fileName), true);
+                cmp = exec.Id;
+            }
+
+            ctx.Problem.CompareArguments = args;
+            ctx.Problem.CompareScript = cmp;
         }
 
         private async Task GetInteractorAsync(ImportContext ctx, XElement iacs, ZipArchive zip)
@@ -116,9 +128,11 @@ namespace Polygon.Packaging
             using var stream = entry.Open();
 
             var content = new byte[entry.Length];
-            int pos = 0;
-            while (pos < entry.Length)
+            for (int pos = 0; pos < entry.Length;)
+            {
                 pos += await stream.ReadAsync(content, pos, (int)entry.Length - pos);
+            }
+
             var e = await CreateExecutableAsync(ctx, content, Path.GetExtension(fileName), false);
             ctx.Problem.RunScript = e.Id;
             ctx.Problem.CombinedRunCompare = true;
@@ -175,7 +189,9 @@ namespace Polygon.Packaging
             var testName = name.Attribute("name").Value;
             var tests = name.Element("tests").Elements("test").ToList();
             if (tests.Count != count)
+            {
                 throw new InvalidDataException("Zip corrupt.");
+            }
 
             for (int i = 1; i <= count; i++)
             {
