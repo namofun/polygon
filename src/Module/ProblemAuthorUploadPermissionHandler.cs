@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Polygon.Entities;
 using Polygon.Storages;
 using SatelliteSite.Substrate.Dashboards;
 using System;
@@ -27,8 +28,11 @@ namespace SatelliteSite.PolygonModule
                 return;
             }
 
-            var store = notification.Context.RequestServices.GetRequiredService<IProblemStore>();
-            notification.Handled = await store.CheckPermissionAsync(probid, userid);
+            var level = await notification.Context.RequestServices
+                .GetRequiredService<IProblemStore>()
+                .CheckPermissionAsync(probid, userid);
+
+            notification.Handled = level.HasValue && level.Value >= AuthorLevel.Write;
         }
     }
 }

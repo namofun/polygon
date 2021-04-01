@@ -7,15 +7,20 @@ namespace Microsoft.AspNetCore.Mvc
     internal interface IPolygonFeature
     {
         Problem Problem { get; }
+
+        AuthorLevel AuthorLevel { get; }
     }
 
     internal class PolygonFeature : IPolygonFeature
     {
         public Problem Problem { get; }
 
-        public PolygonFeature(Problem problem)
+        public AuthorLevel AuthorLevel { get; }
+
+        public PolygonFeature(Problem problem, AuthorLevel level)
         {
             Problem = problem;
+            AuthorLevel = level;
         }
     }
 

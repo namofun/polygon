@@ -170,19 +170,24 @@ namespace Polygon.Storages
             }
         }
 
-        Task<Problem> IProblemStore.FindByPermissionAsync(int problemId, int userId)
+        async Task<(Problem, AuthorLevel?)> IProblemStore.FindAsync(int problemId, int userId)
         {
-            return Context.ProblemAuthors
+            var res = await Context.ProblemAuthors
                 .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
-                .Join(Context.Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
+                .Join(Context.Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => new { pa.Level, p })
                 .SingleOrDefaultAsync();
+
+            return res == null ? default : (res.p, res.Level);
         }
 
-        Task<bool> IProblemStore.CheckPermissionAsync(int problemId, int userId)
+        async Task<AuthorLevel?> IProblemStore.CheckPermissionAsync(int problemId, int userId)
         {
-            return Context.ProblemAuthors
+            var result = await Context.ProblemAuthors
                 .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)
-                .AnyAsync();
+                .Select(pa => new { pa.Level })
+                .FirstOrDefaultAsync();
+
+            return result?.Level;
         }
 
         async Task<IEnumerable<(int, string)>> IProblemStore.ListPermissionAsync(int userId)

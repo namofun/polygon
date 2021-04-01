@@ -17,6 +17,30 @@ namespace Polygon.Storages
     public static class StorageExtensions
     {
         /// <summary>
+        /// Finds the problem via the claims principal.
+        /// </summary>
+        /// <param name="store">The problem store.</param>
+        /// <param name="problemId">The problem ID.</param>
+        /// <param name="user">The user claims principal.</param>
+        /// <returns>The task for fetching the problem and author level.</returns>
+        public static async Task<(Problem, AuthorLevel?)> FindAsync(this IProblemStore store, int problemId, ClaimsPrincipal user)
+        {
+            if (user.IsInRole("Administrator"))
+            {
+                var prob = await store.FindAsync(problemId);
+                return (prob, prob == null ? default(AuthorLevel?) : AuthorLevel.Creator);
+            }
+            else if (int.TryParse(user.GetUserId(), out int uid))
+            {
+                return await store.FindAsync(problemId, uid);
+            }
+            else
+            {
+                return default;
+            }
+        }
+
+        /// <summary>
         /// Count the testcases.
         /// </summary>
         /// <param name="that">The store.</param>

@@ -6,7 +6,6 @@ using Polygon.Entities;
 using Polygon.Models;
 using Polygon.Packaging;
 using Polygon.Storages;
-using System;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Controllers
@@ -26,7 +25,12 @@ namespace SatelliteSite.PolygonModule.Controllers
         /// <summary>
         /// The context problem
         /// </summary>
-        protected new Problem Problem { get; set; }
+        protected new Problem Problem { get; private set; }
+
+        /// <summary>
+        /// The context author level
+        /// </summary>
+        protected AuthorLevel AuthorLevel { get; private set; }
 
         /// <summary>
         /// Creates an <see cref="NotFoundResult"/> that produces a <see cref="Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound"/> response.
@@ -40,25 +44,21 @@ namespace SatelliteSite.PolygonModule.Controllers
         /// <returns>If validation passed, <c>null</c>.</returns>
         private async Task<IActionResult> ValidateAsync()
         {
-            if (HttpContext.Features.Get<IPolygonFeature>() is { Problem: var problem })
+            var feature = HttpContext.Features.Get<IPolygonFeature>();
+            if (feature == null)
             {
-                ViewData["ProblemItself"] = Problem = problem;
-                return null;
+                if (!RouteData.Values.TryGetValue("pid", out var _pid) ||
+                    !int.TryParse(_pid as string, out int pid) ||
+                    !User.IsSignedIn())
+                    return base.NotFound();
+
+                var results = await Facade.Problems.FindAsync(pid, User);
+                if (results.Item1 == null || results.Item2 == null) return base.NotFound();
+                HttpContext.Features.Set<IPolygonFeature>(feature = new PolygonFeature(results.Item1, results.Item2.Value));
             }
 
-            if (!RouteData.Values.TryGetValue("pid", out var _pid) ||
-                !int.TryParse(_pid as string, out int pid) ||
-                !User.IsSignedIn())
-                return base.NotFound();
-
-            if (!User.IsInRole("Administrator"))
-                Problem = await Facade.Problems.FindByPermissionAsync(pid, int.Parse(User.GetUserId() ?? "0"));
-            else
-                Problem = await Facade.Problems.FindAsync(pid);
-
-            if (Problem == null) return base.NotFound();
-            ViewData["ProblemItself"] = Problem;
-            HttpContext.Features.Set<IPolygonFeature>(new PolygonFeature(Problem));
+            ViewData["ProblemItself"] = Problem = feature.Problem;
+            ViewData["AuthorLevel"] = AuthorLevel = feature.AuthorLevel;
             return null;
         }
 
