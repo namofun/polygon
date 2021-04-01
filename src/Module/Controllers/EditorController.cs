@@ -55,7 +55,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 CompareScript = Problem.CompareScript,
                 RunScript = Problem.RunScript,
                 RunAsCompare = Problem.CombinedRunCompare,
-                CompareArgument = Problem.ComapreArguments,
+                CompareArgument = Problem.CompareArguments,
                 Source = Problem.Source,
                 MemoryLimit = Problem.MemoryLimit,
                 TimeLimit = Problem.TimeLimit,
@@ -138,7 +138,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             {
                 RunScript = model.RunScript,
                 CompareScript = model.CompareScript,
-                ComapreArguments = model.CompareArgument,
+                CompareArguments = model.CompareArgument,
                 MemoryLimit = model.MemoryLimit,
                 OutputLimit = model.OutputLimit,
                 TimeLimit = model.TimeLimit,

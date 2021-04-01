@@ -98,7 +98,7 @@ namespace Polygon.Judgement
 
             Run = r.Problem.RunScript;
             Compare = r.Problem.CompareScript;
-            CompareArguments = r.Problem.ComapreArguments ?? string.Empty;
+            CompareArguments = r.Problem.CompareArguments ?? string.Empty;
             CombinedRunCompare = r.Problem.CombinedRunCompare;
             Compile = r.Language.CompileScript;
             CompareMd5sum = md5s[r.Problem.CompareScript];

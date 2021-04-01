@@ -226,7 +226,7 @@ namespace Polygon.Storages
                 .HasForeignKey(e => e.CompareScript)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.Property(e => e.ComapreArguments)
+            entity.Property(e => e.CompareArguments)
                 .IsUnicode(false)
                 .HasMaxLength(128);
         }

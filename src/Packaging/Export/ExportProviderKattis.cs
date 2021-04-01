@@ -134,8 +134,8 @@ namespace Polygon.Packaging
             if (problem.OutputLimit != 4096)
                 sb.AppendLine("    output: " + (problem.OutputLimit / 1024));
             sb.AppendLine();
-            if (!string.IsNullOrEmpty(problem.ComapreArguments))
-                sb.AppendLine("validator_flags: " + problem.ComapreArguments);
+            if (!string.IsNullOrEmpty(problem.CompareArguments))
+                sb.AppendLine("validator_flags: " + problem.CompareArguments);
             if (problem.RunScript != "run")
                 sb.AppendLine("validation: custom interactive");
             else if (problem.CompareScript != "compare")

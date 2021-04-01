@@ -62,7 +62,7 @@ namespace Polygon.Packaging
             yamlParser.Add("validator_flags", (token, node) =>
             {
                 if (!string.IsNullOrEmpty(token))
-                    node.Problem.ComapreArguments = token;
+                    node.Problem.CompareArguments = token;
             });
 
             yamlParser.Add("validation", (token, node) =>
