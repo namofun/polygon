@@ -32,7 +32,7 @@ namespace SatelliteSite.PolygonModule
                 .GetRequiredService<IProblemStore>()
                 .CheckPermissionAsync(probid, userid);
 
-            notification.Handled = level.HasValue && level.Value >= AuthorLevel.Write;
+            notification.Handled = level.HasValue && level.Value >= AuthorLevel.Writer;
         }
     }
 }

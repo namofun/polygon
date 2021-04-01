@@ -146,6 +146,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpGet("[action]")]
         [ValidateAjaxWindow]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public IActionResult Rejudge()
         {
             return AskPost(
@@ -160,6 +161,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost("[action]")]
         [ValidateAntiForgeryToken]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Rejudge(int pid)
         {
             await Facade.Rejudgings.BatchRejudgeAsync(

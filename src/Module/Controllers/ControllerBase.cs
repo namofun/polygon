@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -6,6 +7,7 @@ using Polygon.Entities;
 using Polygon.Models;
 using Polygon.Packaging;
 using Polygon.Storages;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Controllers
@@ -33,12 +35,6 @@ namespace SatelliteSite.PolygonModule.Controllers
         protected AuthorLevel AuthorLevel { get; private set; }
 
         /// <summary>
-        /// Creates an <see cref="NotFoundResult"/> that produces a <see cref="Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound"/> response.
-        /// </summary>
-        /// <returns>The created <see cref="NotFoundResult"/> for the response.</returns>
-        protected new IActionResult NotFound() => StatusCodePage(404);
-
-        /// <summary>
         /// Validate the problem is ok.
         /// </summary>
         /// <returns>If validation passed, <c>null</c>.</returns>
@@ -50,15 +46,20 @@ namespace SatelliteSite.PolygonModule.Controllers
                 if (!RouteData.Values.TryGetValue("pid", out var _pid) ||
                     !int.TryParse(_pid as string, out int pid) ||
                     !User.IsSignedIn())
-                    return base.NotFound();
+                    return NotFound();
 
                 var results = await Facade.Problems.FindAsync(pid, User);
-                if (results.Item1 == null || results.Item2 == null) return base.NotFound();
-                HttpContext.Features.Set<IPolygonFeature>(feature = new PolygonFeature(results.Item1, results.Item2.Value));
+                if (results.Item1 == null || results.Item2 == null) return NotFound();
+                feature = new PolygonFeature(results.Item1, results.Item2.Value);
+                HttpContext.Features.Set<IPolygonFeature>(feature);
             }
 
             ViewData["ProblemItself"] = Problem = feature.Problem;
             ViewData["AuthorLevel"] = AuthorLevel = feature.AuthorLevel;
+
+            var atLeast = HttpContext.GetEndpoint().Metadata.GetMetadata<AtLeastLevelAttribute>();
+            if (atLeast != null && atLeast.Level > AuthorLevel) return StatusCode(403);
+
             return null;
         }
 

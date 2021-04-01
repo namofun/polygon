@@ -23,11 +23,13 @@ namespace SatelliteSite.PolygonModule.Controllers
             ViewBag.Content = @new
                 ? HttpContext.GetService<IStatementWriter>().BuildHtml(await StatementAsync())
                 : (await ReadFileAsync("view.html") ?? string.Empty);
+
             return View();
         }
 
 
         [HttpGet("{target}")]
+        [AtLeastLevel(Polygon.Entities.AuthorLevel.Writer)]
         public async Task<IActionResult> Markdown(string target)
         {
             if (!ResourceDictionary.MarkdownFiles.Contains(target))
@@ -47,6 +49,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost("{target}")]
         [ValidateAntiForgeryToken]
+        [AtLeastLevel(Polygon.Entities.AuthorLevel.Writer)]
         public async Task<IActionResult> Markdown(string target, MarkdownModel model)
         {
             if (!ResourceDictionary.MarkdownFiles.Contains(target))
@@ -62,6 +65,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
+        [AtLeastLevel(Polygon.Entities.AuthorLevel.Writer)]
         public async Task<IActionResult> Generate(
             [FromServices] IStatementWriter writer)
         {
@@ -73,6 +77,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
+        [AtLeastLevel(Polygon.Entities.AuthorLevel.Writer)]
         public async Task<IActionResult> GenerateLatex(
             [FromServices] IStatementWriter writer)
         {

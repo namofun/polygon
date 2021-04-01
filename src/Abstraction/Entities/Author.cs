@@ -29,12 +29,12 @@
         /// <summary>
         /// Authors can only make submissions.
         /// </summary>
-        Read,
+        Reader,
 
         /// <summary>
         /// Besides readonly features, authors can do operations on testcases and descriptions.
         /// </summary>
-        Write,
+        Writer,
 
         /// <summary>
         /// Besides write features, authors can add another author into the problem.

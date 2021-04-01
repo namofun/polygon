@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Polygon.Entities;
@@ -46,7 +45,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Problem")]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public IActionResult Edit()
         {
             return View(new ProblemEditModel
@@ -69,7 +68,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator,Problem")]
+        [AtLeastLevel(AuthorLevel.Writer)]
         [AuditPoint(AuditlogType.Problem)]
         public async Task<IActionResult> Edit(ProblemEditModel model)
         {
@@ -155,7 +154,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Problem")]
+        [AtLeastLevel(AuthorLevel.Creator)]
         public IActionResult Delete()
         {
             return AskPost(
@@ -169,7 +168,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "Administrator,Problem")]
+        [AtLeastLevel(AuthorLevel.Writer)]
         [AuditPoint(AuditlogType.Problem)]
         public async Task<IActionResult> Export(
             [FromServices] IExportProvider export)
@@ -181,7 +180,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet("{uid}")]
-        [Authorize(Roles = "Administrator")]
+        [AtLeastLevel(AuthorLevel.Creator)]
         public async Task<IActionResult> Unauthorize(
             [FromRoute] int uid,
             [FromServices] IUserManager userManager)
@@ -198,7 +197,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost("{uid}")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
+        [AtLeastLevel(AuthorLevel.Creator)]
         public async Task<IActionResult> Unauthorize(
             [FromServices] IUserManager userManager,
             [FromRoute] int uid)
@@ -212,7 +211,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
-        [Authorize(Roles = "Administrator")]
+        [AtLeastLevel(AuthorLevel.Creator)]
         public IActionResult Authorize()
         {
             return Window();
@@ -221,8 +220,9 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Authorize(string username,
+        [AtLeastLevel(AuthorLevel.Creator)]
+        public async Task<IActionResult> Authorize(
+            string username,
             [FromServices] IUserManager userManager)
         {
             var user = await userManager.FindByNameAsync(username);
@@ -241,6 +241,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> ToggleSubmit()
         {
             await Store.ToggleSubmitAsync(Problem.Id, !Problem.AllowSubmit);
@@ -250,6 +251,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> ToggleJudge()
         {
             await Store.ToggleJudgeAsync(Problem.Id, !Problem.AllowJudge);
@@ -259,7 +261,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator,Problem")]
+        [AtLeastLevel(AuthorLevel.Creator)]
         [AuditPoint(AuditlogType.Problem)]
         public async Task<IActionResult> Delete(int pid)
         {

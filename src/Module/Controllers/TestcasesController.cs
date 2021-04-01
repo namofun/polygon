@@ -27,6 +27,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpGet("[action]")]
         [ValidateAjaxWindow]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Score()
         {
             var upper = await Store.CountAsync(Problem.Id);
@@ -43,6 +44,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost("[action]")]
         [ValidateAntiForgeryToken]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Score(TestcaseScoreModel model)
         {
             int cnt = await Store.BatchScoreAsync(Problem.Id, model.Lower, model.Upper, model.Score);
@@ -53,6 +55,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet("{tid}/[action]")]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Edit(int tid)
         {
             var tc = await Store.FindAsync(tid, Problem.Id);
@@ -73,6 +76,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost("{tid}/[action]")]
         [ValidateAntiForgeryToken]
+        [AtLeastLevel(AuthorLevel.Writer)]
         [RequestSizeLimit(1 << 30)]
         [RequestFormLimits2(1 << 30)]
         public async Task<IActionResult> Edit(int tid, TestcaseUploadModel model)
@@ -110,6 +114,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet("[action]")]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public IActionResult Create()
         {
             ViewData["Title"] = "Add new testcase";
@@ -123,6 +128,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost("[action]")]
         [ValidateAntiForgeryToken]
+        [AtLeastLevel(AuthorLevel.Writer)]
         [RequestSizeLimit(1 << 30)]
         [RequestFormLimits2(1 << 30)]
         public async Task<IActionResult> Create(TestcaseUploadModel model)
@@ -164,6 +170,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet("{tid}/[action]")]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public IActionResult Delete(int tid)
         {
             return AskPost(
@@ -178,6 +185,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost("{tid}/[action]")]
         [ValidateAntiForgeryToken]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Delete(int pid, int tid)
         {
             var tc = await Store.FindAsync(tid, pid);
@@ -193,6 +201,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet("{tid}/[action]/{direction}")]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Move(int tid, string direction)
         {
             bool up = false;
