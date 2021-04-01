@@ -120,7 +120,7 @@
     </div>
 </div>
 
-<p asp-in-roles="Administrator,Problem">
+<p>
     <a asp-action="Edit" class="btn btn-primary @(Feature.AuthorLevel >= AuthorLevel.Writer ? "" : "disabled")" title="Edit"><i class="fas fa-edit"></i>&nbsp;Edit</a>
     <a asp-action="Delete" class="btn btn-danger @(Feature.AuthorLevel >= AuthorLevel.Creator ? "" : "disabled")" title="Delete" data-toggle="ajaxWindow" data-target="deleteProb"><i class="fas fa-trash-alt"></i>&nbsp;Delete</a>
 </p>

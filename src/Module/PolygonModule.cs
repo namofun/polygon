@@ -7,7 +7,7 @@ using Polygon.Packaging;
 using SatelliteSite;
 
 [assembly: RoleDefinition(10, "Judgehost", "judgehost", "(Internal/System) Judgehost")]
-[assembly: RoleDefinition(11, "Problem", "prob", "Problem Provider")]
+[assembly: RoleDefinition(11, "ProblemCreator", "prob", "Problem Provider")]
 
 [assembly: ConfigurationInteger(1, "Judging", "process_limit", 64, "Maximum number of processes that the submission is allowed to start (including shell and possibly interpreters).")]
 [assembly: ConfigurationInteger(2, "Judging", "script_timelimit", 30, "Maximum seconds available for compile/compare scripts. This is a safeguard against malicious code and buggy scripts, so a reasonable but large amount should do.")]
@@ -77,7 +77,7 @@ namespace SatelliteSite.PolygonModule
                 menu.HasEntry(400)
                     .HasTitle(string.Empty, "Problems")
                     .HasLink("Dashboard", "Problems", "List")
-                    .RequireRoles("Administrator,Problem");
+                    .RequireRoles("Administrator,ProblemCreator");
 
                 menu.HasEntry(401)
                     .HasTitle(string.Empty, "Executables")
@@ -140,7 +140,7 @@ namespace SatelliteSite.PolygonModule
                     .HasTitle("fas fa-book-open", "Problems")
                     .HasLink("Dashboard", "Problems", "List")
                     .ActiveWhenController("Problems")
-                    .RequireRoles("Administrator,Problem");
+                    .RequireRoles("Administrator,ProblemCreator");
             });
 
             menus.Menu(ResourceDictionary.MenuNavbar, menu =>
@@ -163,7 +163,7 @@ namespace SatelliteSite.PolygonModule
                 menu.HasEntry(4)
                     .HasTitle("fas fa-arrow-right", "Catalog")
                     .HasLink("Dashboard", "Problems", "List")
-                    .RequireRoles("Administrator,Problem");
+                    .RequireRoles("Administrator,ProblemCreator");
             });
 
             menus.Component(ResourceDictionary.ComponentProblemOverview);
@@ -171,7 +171,7 @@ namespace SatelliteSite.PolygonModule
 
         public void RegisterPolicies(IAuthorizationPolicyContainer container)
         {
-            container.AddPolicy2("HasDashboard", b => b.AcceptRole("Problem"));
+            container.AddPolicy2("HasDashboard", b => b.AcceptRole("ProblemCreator"));
         }
     }
 }

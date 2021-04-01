@@ -16,7 +16,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
 {
     [Area("Dashboard")]
     [Route("[area]/[controller]")]
-    [Authorize(Roles = "Administrator,Problem")]
+    [Authorize(Roles = "Administrator,ProblemCreator")]
     [AuditPoint(AuditlogType.Problem)]
     public class ProblemsController : ViewControllerBase
     {
