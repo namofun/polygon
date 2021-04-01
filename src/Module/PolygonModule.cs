@@ -53,12 +53,13 @@ namespace SatelliteSite.PolygonModule
             services.AddMediatRAssembly(typeof(Polygon.Judgement.DOMjudgeLikeHandlers).Assembly);
 
             services.AddImportProvider<KattisImportProvider>("kattis", "Kattis Package");
-            services.AddImportProvider<XmlImportProvider>("xysxml", "XiaoYang's XML");
+            // services.AddImportProvider<XmlImportProvider>("xysxml", "XiaoYang's XML");
             services.AddImportProvider<FpsImportProvider>("hustoj", "HUSTOJ FPS XML");
             services.AddImportProvider<CodeforcesImportProvider>("cfplyg", "CodeForces Polygon (Linux)");
             services.AddImportProvider<DataImportProvider>("data", "Data (.in and .out/.ans)");
 
             new TRole().Configure(services);
+            services.EnsureScoped<Polygon.Storages.IPolygonFacade>();
 
             services.PostConfigure<PolygonOptions>(o => o.FinalizeSettings());
 
