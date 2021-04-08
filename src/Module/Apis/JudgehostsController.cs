@@ -115,6 +115,7 @@ namespace SatelliteSite.PolygonModule.Apis
         {
             var result = await mediator.Send(new NextJudgingRequest(hostname));
             if (result == null) return new JsonResult("");
+            await mediator.Publish(new Polygon.Events.JudgingPrepublishEvent(result));
             return result;
         }
 
