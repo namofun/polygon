@@ -131,37 +131,37 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpGet("{submitid}/[action]/{judgingid}/{rid}")]
-        public async Task<IActionResult> RunDetails(int submitid, int judgingid, int rid)
+        [HttpGet("{submitid}/[action]/{judgingid}/{runid}")]
+        public async Task<IActionResult> RunDetails(int submitid, int judgingid, int runid)
         {
-            var run = await Facade.Judgings.GetDetailAsync(Problem.Id, submitid, judgingid, rid);
+            var run = await Facade.Judgings.GetDetailAsync(Problem.Id, submitid, judgingid, runid);
             if (run == null) return NotFound();
             ViewBag.CombinedRunCompare = Problem.CombinedRunCompare;
             return Window(run);
         }
 
 
-        [HttpGet("{submitid}/[action]/{judgingid}/{rid}/{type}")]
-        public async Task<IActionResult> RunDetails(int submitid, int judgingid, int rid, string type)
+        [HttpGet("{submitid}/[action]/{judgingid}/{runid}/{type}")]
+        public async Task<IActionResult> RunDetails(int submitid, int judgingid, int runid, string type)
         {
             if (type == "meta")
             {
-                var run = await Facade.Judgings.GetDetailAsync(Problem.Id, submitid, judgingid, rid);
+                var run = await Facade.Judgings.GetDetailAsync(Problem.Id, submitid, judgingid, runid);
                 if (run == null) return NotFound();
                 return File(
                     fileContents: Convert.FromBase64String(run.MetaData),
                     contentType: "text/plain",
-                    fileDownloadName: $"j{judgingid}.r{rid}.{type}");
+                    fileDownloadName: $"j{judgingid}.r{runid}.{type}");
             }
             else
             {
-                var fileInfo = await Facade.Judgings.GetRunFileAsync(judgingid, rid, type, submitid, Problem.Id);
+                var fileInfo = await Facade.Judgings.GetRunFileAsync(judgingid, runid, type, submitid, Problem.Id);
                 if (!fileInfo.Exists) return NotFound();
 
                 return File(
                     fileStream: fileInfo.CreateReadStream(),
                     contentType: "application/octet-stream",
-                    fileDownloadName: $"j{judgingid}.r{rid}.{type}");
+                    fileDownloadName: $"j{judgingid}.r{runid}.{type}");
             }
         }
 

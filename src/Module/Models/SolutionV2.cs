@@ -37,7 +37,7 @@ namespace SatelliteSite.PolygonModule.Models
                     probid = ProblemId,
                     submitid = SubmissionId,
                     judgingid = JudgingId,
-                    rid = runid,
+                    runid,
                 });
         }
 
@@ -52,7 +52,7 @@ namespace SatelliteSite.PolygonModule.Models
                     probid = ProblemId,
                     submitid = SubmissionId,
                     judgingid = JudgingId,
-                    rid = runid,
+                    runid,
                     type = file,
                 });
         }

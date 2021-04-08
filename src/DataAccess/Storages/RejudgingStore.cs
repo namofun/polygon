@@ -16,27 +16,27 @@ namespace Polygon.Storages
 
         async Task IRejudgingStore.ApplyAsync(Rejudging rejudge, int uid)
         {
-            int rid = rejudge.Id;
+            int rejid = rejudge.Id;
             var applyNew = await Context.Judgings
-                .Where(j => j.RejudgingId == rid)
+                .Where(j => j.RejudgingId == rejid)
                 .BatchUpdateAsync(j => new Judging { Active = true });
 
             var oldJudgings = Context.Judgings
-                .Where(j => j.RejudgingId == rid)
+                .Where(j => j.RejudgingId == rejid)
                 .Select(j => j.PreviousJudgingId);
             var supplyOld = await Context.Judgings
                 .Where(j => oldJudgings.Contains(j.Id))
                 .BatchUpdateAsync(j => new Judging { Active = false });
 
             var oldSubmissions = Context.Judgings
-                .Where(j => j.RejudgingId == rid)
+                .Where(j => j.RejudgingId == rejid)
                 .Select(j => j.SubmissionId);
             var resetSubmit = await Context.Submissions
                 .Where(s => oldSubmissions.Contains(s.Id))
                 .BatchUpdateAsync(s => new Submission { RejudgingId = null });
 
             await Context.Rejudgings
-                .Where(r => r.Id == rid)
+                .Where(r => r.Id == rejid)
                 .BatchUpdateAsync(r => new Rejudging
                 {
                     Applied = true,
@@ -46,7 +46,7 @@ namespace Polygon.Storages
 
             var statisticsMerge =
                 from j in Context.Judgings
-                where j.RejudgingId == rid
+                where j.RejudgingId == rejid
                 join j2 in Context.Judgings on j.PreviousJudgingId equals j2.Id
                 join s in Context.Submissions on j.SubmissionId equals s.Id
                 where (j.Status == Verdict.Accepted && j2.Status != Verdict.Accepted) || (j.Status != Verdict.Accepted && j2.Status == Verdict.Accepted)
@@ -115,17 +115,17 @@ namespace Polygon.Storages
 
         async Task IRejudgingStore.CancelAsync(Rejudging rejudge, int uid)
         {
-            int rid = rejudge.Id;
+            int rejid = rejudge.Id;
 
             var cancelJudgings = await Context.Judgings
-                .Where(j => j.RejudgingId == rid && j.Status == Verdict.Pending)
+                .Where(j => j.RejudgingId == rejid && j.Status == Verdict.Pending)
                 .BatchDeleteAsync();
             var resetSubmits = await Context.Submissions
-                .Where(s => s.RejudgingId == rid)
+                .Where(s => s.RejudgingId == rejid)
                 .BatchUpdateAsync(s => new Submission { RejudgingId = null });
 
             await Context.Rejudgings
-                .Where(r => r.Id == rid)
+                .Where(r => r.Id == rejid)
                 .BatchUpdateAsync(r => new Rejudging
                 {
                     EndTime = DateTimeOffset.Now,
