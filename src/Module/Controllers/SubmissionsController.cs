@@ -41,11 +41,11 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet("{sid}")]
-        public async Task<IActionResult> Detail(int pid, int sid, int? jid)
+        public async Task<IActionResult> Detail(int pid, int sid, int? judgingid)
         {
             var s = await Facade.Submissions.FindAsync(sid, true);
             if (s == null || s.ProblemId != pid) return NotFound();
-            var j = s.Judgings.SingleOrDefault(jj => jid.HasValue ? jj.Id == jid : jj.Active);
+            var j = s.Judgings.SingleOrDefault(jj => judgingid.HasValue ? jj.Id == judgingid : jj.Active);
             if (j == null) return NotFound();
             var l = await Facade.Languages.FindAsync(s.Language);
             var det = await Facade.Judgings.GetDetailsAsync(pid, j.Id);
@@ -131,37 +131,37 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpGet("{sid}/[action]/{jid}/{rid}")]
-        public async Task<IActionResult> RunDetails(int pid, int sid, int jid, int rid)
+        [HttpGet("{sid}/[action]/{judgingid}/{rid}")]
+        public async Task<IActionResult> RunDetails(int pid, int sid, int judgingid, int rid)
         {
-            var run = await Facade.Judgings.GetDetailAsync(pid, sid, jid, rid);
+            var run = await Facade.Judgings.GetDetailAsync(pid, sid, judgingid, rid);
             if (run == null) return NotFound();
             ViewBag.CombinedRunCompare = Problem.CombinedRunCompare;
             return Window(run);
         }
 
 
-        [HttpGet("{sid}/[action]/{jid}/{rid}/{type}")]
-        public async Task<IActionResult> RunDetails(int pid, int sid, int jid, int rid, string type)
+        [HttpGet("{sid}/[action]/{judgingid}/{rid}/{type}")]
+        public async Task<IActionResult> RunDetails(int pid, int sid, int judgingid, int rid, string type)
         {
             if (type == "meta")
             {
-                var run = await Facade.Judgings.GetDetailAsync(pid, sid, jid, rid);
+                var run = await Facade.Judgings.GetDetailAsync(pid, sid, judgingid, rid);
                 if (run == null) return NotFound();
                 return File(
                     fileContents: Convert.FromBase64String(run.MetaData),
                     contentType: "text/plain",
-                    fileDownloadName: $"j{jid}.r{rid}.{type}");
+                    fileDownloadName: $"j{judgingid}.r{rid}.{type}");
             }
             else
             {
-                var fileInfo = await Facade.Judgings.GetRunFileAsync(jid, rid, type, sid, pid);
+                var fileInfo = await Facade.Judgings.GetRunFileAsync(judgingid, rid, type, sid, pid);
                 if (!fileInfo.Exists) return NotFound();
 
                 return File(
                     fileStream: fileInfo.CreateReadStream(),
                     contentType: "application/octet-stream",
-                    fileDownloadName: $"j{jid}.r{rid}.{type}");
+                    fileDownloadName: $"j{judgingid}.r{rid}.{type}");
             }
         }
 

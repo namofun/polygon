@@ -75,22 +75,22 @@ namespace SatelliteSite.PolygonModule.Dashboards
         }
 
 
-        [HttpGet("/[area]/submissions/[action]/{jid}")]
-        public async Task<IActionResult> ByJudgingId(int jid)
+        [HttpGet("/[area]/submissions/[action]/{judgingid}")]
+        public async Task<IActionResult> ByJudgingId(int judgingid)
         {
-            var item = await Facade.Submissions.FindByJudgingAsync(jid);
+            var item = await Facade.Submissions.FindByJudgingAsync(judgingid);
             if (item == null) return NotFound();
 
             if (item.ContestId == 0)
                 return RedirectToAction(
                     actionName: "Detail",
                     controllerName: "Submissions",
-                    new { area = "Polygon", sid = item.Id, jid, pid = item.ProblemId });
+                    new { area = "Polygon", sid = item.Id, judgingid, pid = item.ProblemId });
             else
                 return RedirectToAction(
                     actionName: "Detail",
                     controllerName: "JurySubmissions",
-                    new { area = "Contest", cid = item.ContestId, submitid = item.Id, judgingid = jid });
+                    new { area = "Contest", cid = item.ContestId, submitid = item.Id, judgingid });
         }
 
 

@@ -32,7 +32,7 @@
     <tbody>
         @foreach (var g in judgings)
         {
-            <tr asp-controller="Problems" asp-action="ByJudgingId" asp-route-jid="@g.Id" class="@(g.Active ? "" : "disabled")" role="row">
+            <tr asp-controller="Problems" asp-action="ByJudgingId" asp-route-judgingid="@g.Id" class="@(g.Active ? "" : "disabled")" role="row">
                 <td use-a style="padding-right:1em">j@(g.Id) s@(g.SubmissionId)</td>
                 <td use-a>@Html.CstTime(g.StartTime)</td>
                 <td use-a>@Html.MinSecTimespan(g.StopTime - g.StartTime)</td>

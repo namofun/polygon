@@ -29,7 +29,7 @@
         <tbody>
             @foreach (var stat in Model)
             {
-                <tr asp-action="ByJudgingId" asp-route-jid="@stat.JudgingId" role="row" data-toggle="gotoUrl">
+                <tr asp-action="ByJudgingId" asp-route-judgingid="@stat.JudgingId" role="row" data-toggle="gotoUrl">
                     <td use-a>s@(stat.SubmissionId)</td>
                     <td use-a>@Html.CstTime(stat.Time)</td>
                     <td use-a><verdict skipped="@stat.Skipped" value="@stat.Verdict" /></td>

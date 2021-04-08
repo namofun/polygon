@@ -52,7 +52,7 @@
         @foreach (var judging in Model.AllJudgings)
         {
             var subTime = judging.StartTime;
-            <tr asp-route-jid="@judging.Id" data-toggle="gotoUrl" class="@(judging.Active ? "" : "disabled")">
+            <tr asp-route-judgingid="@judging.Id" data-toggle="gotoUrl" class="@(judging.Active ? "" : "disabled")">
                 <td use-a><i asp-show-if="judging.Id == Model.JudgingId" class="fas fa-long-arrow-alt-right"></i></td>
                 <td use-a>j@(judging.Id)</td>
                 <td use-a>@subTime?.ToString("HH:mm")</td>

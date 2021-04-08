@@ -36,7 +36,7 @@ namespace SatelliteSite.PolygonModule.Models
                     area = "Polygon",
                     pid = ProblemId,
                     sid = SubmissionId,
-                    jid = JudgingId,
+                    judgingid = JudgingId,
                     rid = runid,
                 });
         }
@@ -51,7 +51,7 @@ namespace SatelliteSite.PolygonModule.Models
                     area = "Polygon",
                     pid = ProblemId,
                     sid = SubmissionId,
-                    jid = JudgingId,
+                    judgingid = JudgingId,
                     rid = runid,
                     type = file,
                 });
