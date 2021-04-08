@@ -18,7 +18,7 @@ namespace Polygon.Judgement
             if (host is null) return false; // Unknown or inactive judgehost requested
             await Facade.Judgehosts.NotifyPollAsync(host);
 
-            var (judging, pid, cid, uid, time) = await Facade.Judgings.FindAsync(request.JudgingId);
+            var (judging, probid, cid, uid, time) = await Facade.Judgings.FindAsync(request.JudgingId);
             if (judging == null) throw new InvalidOperationException("Unknown judging occurred.");
             var runList = new List<JudgingRun>();
 
@@ -44,10 +44,10 @@ namespace Polygon.Judgement
             }
 
             // Check for the final status
-            var countTc = await Facade.Testcases.CountAsync(pid);
+            var countTc = await Facade.Testcases.CountAsync(probid);
             var verdict = await Facade.Judgings.SummarizeAsync(judging.Id);
 
-            await Mediator.Publish(new JudgingRunEmittedEvent(runList, judging, cid, pid, uid, time, verdict.Testcases - runList.Count + 1));
+            await Mediator.Publish(new JudgingRunEmittedEvent(runList, judging, cid, probid, uid, time, verdict.Testcases - runList.Count + 1));
 
             bool anyRejected = !judging.FullTest && verdict.FinalVerdict != Verdict.Accepted;
             bool fullTested = verdict.Testcases >= countTc && countTc > 0;
@@ -59,7 +59,7 @@ namespace Polygon.Judgement
                 judging.Status = verdict.FinalVerdict;
                 judging.StopTime = host.PollTime;
                 judging.TotalScore = verdict.TotalScore;
-                await FinalizeJudging(new JudgingFinishedEvent(judging, cid, pid, uid, time));
+                await FinalizeJudging(new JudgingFinishedEvent(judging, cid, probid, uid, time));
             }
 
             return true;

@@ -31,10 +31,10 @@ namespace Polygon.Storages
             await Mediator.Publish(new ProblemModifiedEvent(problem));
         }
 
-        Task<Problem> IProblemStore.FindAsync(int pid)
+        Task<Problem> IProblemStore.FindAsync(int probid)
         {
             return Context.Problems
-                .Where(p => p.Id == pid)
+                .Where(p => p.Id == probid)
                 .SingleOrDefaultAsync();
         }
 
@@ -58,9 +58,9 @@ namespace Polygon.Storages
                     .ToPagedListAsync(page, perCount);
         }
 
-        Task<IEnumerable<(int UserId, string UserName, AuthorLevel Level)>> IProblemStore.ListPermittedUserAsync(int pid)
+        Task<IEnumerable<(int UserId, string UserName, AuthorLevel Level)>> IProblemStore.ListPermittedUserAsync(int probid)
         {
-            return QueryCache.FetchPermittedUserAsync(Context, pid);
+            return QueryCache.FetchPermittedUserAsync(Context, probid);
         }
 
         Task IProblemStore.RebuildStatisticsAsync()
@@ -97,17 +97,17 @@ namespace Polygon.Storages
                 });
         }
 
-        Task IProblemStore.ToggleJudgeAsync(int pid, bool tobe)
+        Task IProblemStore.ToggleJudgeAsync(int probid, bool tobe)
         {
             return Context.Problems
-                .Where(p => p.Id == pid)
+                .Where(p => p.Id == probid)
                 .BatchUpdateAsync(p => new Problem { AllowJudge = tobe });
         }
 
-        Task IProblemStore.ToggleSubmitAsync(int pid, bool tobe)
+        Task IProblemStore.ToggleSubmitAsync(int probid, bool tobe)
         {
             return Context.Problems
-                .Where(p => p.Id == pid)
+                .Where(p => p.Id == probid)
                 .BatchUpdateAsync(p => new Problem { AllowSubmit = tobe });
         }
 

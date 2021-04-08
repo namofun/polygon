@@ -12,10 +12,10 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : ITestcaseStore
     {
-        Task<int> ITestcaseStore.BatchScoreAsync(int pid, int lower, int upper, int score)
+        Task<int> ITestcaseStore.BatchScoreAsync(int probid, int lower, int upper, int score)
         {
             return Context.Testcases
-                .Where(t => t.ProblemId == pid && t.Rank >= lower && t.Rank <= upper)
+                .Where(t => t.ProblemId == probid && t.Rank >= lower && t.Rank <= upper)
                 .BatchUpdateAsync(t => new Testcase { Point = score });
         }
 
@@ -50,16 +50,16 @@ namespace Polygon.Storages
             return dts;
         }
 
-        async Task ITestcaseStore.ChangeRankAsync(int pid, int tid, bool up)
+        async Task ITestcaseStore.ChangeRankAsync(int probid, int tid, bool up)
         {
             var tc = await Context.Testcases
-                .Where(t => t.ProblemId == pid && t.Id == tid)
+                .Where(t => t.ProblemId == probid && t.Id == tid)
                 .FirstOrDefaultAsync();
             if (tc == null) return;
 
             int rk2 = tc.Rank + (up ? -1 : 1);
             var tc2 = await Context.Testcases
-                .Where(t => t.ProblemId == pid && t.Rank == rk2)
+                .Where(t => t.ProblemId == probid && t.Rank == rk2)
                 .FirstOrDefaultAsync();
 
             if (tc2 != null)
@@ -83,17 +83,17 @@ namespace Polygon.Storages
             }
         }
 
-        Task<int> ITestcaseStore.CountAsync(int pid)
+        Task<int> ITestcaseStore.CountAsync(int probid)
         {
             return Context.Testcases
-                .Where(p => p.ProblemId == pid)
+                .Where(p => p.ProblemId == probid)
                 .CountAsync();
         }
 
-        async Task<(int, int)> ITestcaseStore.CountAndScoreAsync(int pid)
+        async Task<(int, int)> ITestcaseStore.CountAndScoreAsync(int probid)
         {
             var q = await Context.Testcases
-                .Where(t => t.ProblemId == pid)
+                .Where(t => t.ProblemId == probid)
                 .GroupBy(t => 1)
                 .Select(g => new { Count = g.Count(), Score = g.Sum(t => t.Point) })
                 .FirstOrDefaultAsync();
@@ -102,10 +102,10 @@ namespace Polygon.Storages
 
         Task<Testcase> ITestcaseStore.CreateAsync(Testcase entity) => CreateEntityAsync(entity);
 
-        Task<Testcase> ITestcaseStore.FindAsync(int tid, int? pid)
+        Task<Testcase> ITestcaseStore.FindAsync(int tid, int? probid)
         {
             return Context.Testcases
-                .WhereIf(pid.HasValue, t => t.ProblemId == pid)
+                .WhereIf(probid.HasValue, t => t.ProblemId == probid)
                 .Where(t => t.Id == tid)
                 .SingleOrDefaultAsync();
         }

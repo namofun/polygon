@@ -34,7 +34,7 @@ namespace SatelliteSite.PolygonModule.Models
                 values: new
                 {
                     area = "Polygon",
-                    pid = ProblemId,
+                    probid = ProblemId,
                     sid = SubmissionId,
                     judgingid = JudgingId,
                     rid = runid,
@@ -49,7 +49,7 @@ namespace SatelliteSite.PolygonModule.Models
                 values: new
                 {
                     area = "Polygon",
-                    pid = ProblemId,
+                    probid = ProblemId,
                     sid = SubmissionId,
                     judgingid = JudgingId,
                     rid = runid,
@@ -65,7 +65,7 @@ namespace SatelliteSite.PolygonModule.Models
                 values: new
                 {
                     area = "Polygon",
-                    pid = ProblemId,
+                    probid = ProblemId,
                     tid = tcid,
                     filetype = file
                 });

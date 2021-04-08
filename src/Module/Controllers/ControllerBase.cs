@@ -42,12 +42,12 @@ namespace SatelliteSite.PolygonModule.Controllers
             var feature = HttpContext.Features.Get<IPolygonFeature>();
             if (feature == null)
             {
-                if (!RouteData.Values.TryGetValue("pid", out var _pid) ||
-                    !int.TryParse(_pid as string, out int pid) ||
+                if (!RouteData.Values.TryGetValue("probid", out var _probid) ||
+                    !int.TryParse(_probid as string, out int probid) ||
                     !User.IsSignedIn())
                     return NotFound();
 
-                var results = await Facade.Problems.FindAsync(pid, User);
+                var results = await Facade.Problems.FindAsync(probid, User);
                 if (results.Item1 == null || results.Item2 == null) return NotFound();
                 feature = new PolygonFeature(results.Item1, results.Item2.Value);
                 HttpContext.Features.Set<IPolygonFeature>(feature);

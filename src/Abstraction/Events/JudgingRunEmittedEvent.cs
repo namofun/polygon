@@ -21,13 +21,13 @@ namespace Polygon.Events
 
         public int RankOfFirst { get; }
 
-        public JudgingRunEmittedEvent(IReadOnlyList<JudgingRun> r, Judging j, int? cid, int pid, int uid, DateTimeOffset subtime, int rank0)
+        public JudgingRunEmittedEvent(IReadOnlyList<JudgingRun> r, Judging j, int? cid, int probid, int uid, DateTimeOffset subtime, int rank0)
         {
             if (cid == 0) cid = null;
             Runs = r;
             Judging = j;
             ContestId = cid;
-            ProblemId = pid;
+            ProblemId = probid;
             TeamId = uid;
             SubmitTime = subtime;
             RankOfFirst = rank0;

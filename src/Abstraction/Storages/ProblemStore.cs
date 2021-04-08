@@ -49,18 +49,18 @@ namespace Polygon.Storages
         /// <summary>
         /// Toggle the allow judge flag for problem.
         /// </summary>
-        /// <param name="pid">The problem ID.</param>
+        /// <param name="probid">The problem ID.</param>
         /// <param name="tobe">The toggle result.</param>
         /// <returns>The toggle task.</returns>
-        Task ToggleSubmitAsync(int pid, bool tobe);
+        Task ToggleSubmitAsync(int probid, bool tobe);
 
         /// <summary>
         /// Toggle the allow judge flag for problem.
         /// </summary>
-        /// <param name="pid">The problem ID.</param>
+        /// <param name="probid">The problem ID.</param>
         /// <param name="tobe">The toggle result.</param>
         /// <returns>The toggle task.</returns>
-        Task ToggleJudgeAsync(int pid, bool tobe);
+        Task ToggleJudgeAsync(int probid, bool tobe);
 
         /// <summary>
         /// Find the problem via ID.
@@ -129,9 +129,9 @@ namespace Polygon.Storages
         /// <summary>
         /// List permitted users.
         /// </summary>
-        /// <param name="pid">The problem ID.</param>
+        /// <param name="probid">The problem ID.</param>
         /// <returns>The list of permitted users.</returns>
-        Task<IEnumerable<(int UserId, string UserName, AuthorLevel Level)>> ListPermittedUserAsync(int pid);
+        Task<IEnumerable<(int UserId, string UserName, AuthorLevel Level)>> ListPermittedUserAsync(int probid);
 
         /// <summary>
         /// Write file to problem repository.

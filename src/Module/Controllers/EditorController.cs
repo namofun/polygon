@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 namespace SatelliteSite.PolygonModule.Controllers
 {
     [Area("Polygon")]
-    [Route("[area]/{pid}/[action]")]
+    [Route("[area]/{probid}/[action]")]
     [SupportStatusCodePage]
     public class EditorController : PolygonControllerBase
     {
         private IProblemStore Store => Facade.Problems;
 
 
-        [HttpGet("/[area]/{pid}")]
+        [HttpGet("/[area]/{probid}")]
         public async Task<IActionResult> Overview()
         {
             var (count, score) = await Facade.Testcases.CountAndScoreAsync(Problem.Id);
@@ -163,7 +163,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 message: $"You're about to delete problem {Problem.Id} \"{Problem.Title}\". " +
                     "Warning, this will cascade to testcases and submissions. Are you sure?",
                 area: "Polygon", controller: "Editor", action: "Delete",
-                routeValues: new { pid = Problem.Id },
+                routeValues: new { probid = Problem.Id },
                 type: BootstrapColor.danger);
         }
 
@@ -282,7 +282,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         [ValidateAntiForgeryToken]
         [AtLeastLevel(AuthorLevel.Creator)]
         [AuditPoint(AuditlogType.Problem)]
-        public async Task<IActionResult> Delete(int pid)
+        public async Task<IActionResult> Delete(bool _ = true)
         {
             try
             {

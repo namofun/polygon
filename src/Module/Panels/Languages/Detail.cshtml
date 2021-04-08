@@ -60,7 +60,7 @@
     <tbody>
         @foreach (var md in subs)
         {
-            <tr asp-area="Polygon" asp-controller="Submissions" asp-action="Detail" asp-route-pid="@md.ProblemId" asp-route-sid="@md.SubmissionId" role="row">
+            <tr asp-area="Polygon" asp-controller="Submissions" asp-action="Detail" asp-route-probid="@md.ProblemId" asp-route-sid="@md.SubmissionId" role="row">
                 <td use-a>s@(md.SubmissionId)</td>
                 <td use-a>@authors.GetValueOrDefault(md.SubmissionId)</td>
                 <td use-a>p@(md.ProblemId) - @problems.GetValueOrDefault(md.ProblemId)</td>

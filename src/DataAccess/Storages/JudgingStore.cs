@@ -108,20 +108,20 @@ namespace Polygon.Storages
             return Context.Judgings.Where(predicate).OrderBy(j => j.Id).Take(topCount).ToListAsync();
         }
 
-        async Task<IFileInfo> IJudgingStore.GetRunFileAsync(int jid, int rid, string type, int? sid, int? pid)
+        async Task<IFileInfo> IJudgingStore.GetRunFileAsync(int jid, int rid, string type, int? sid, int? probid)
         {
             var notfound = new NotFoundFileInfo($"j{jid}/r{rid}.{type}");
             var fileInfo = await JudgingFiles.GetFileInfoAsync($"j{jid}/r{rid}.{type}");
             if (!fileInfo.Exists) return notfound;
 
-            if (sid.HasValue || pid.HasValue)
+            if (sid.HasValue || probid.HasValue)
             {
                 var validation = await Context.JudgingRuns
                     .Where(r => r.JudgingId == jid && r.Id == rid)
                     .Select(r => new { SubmissionId = r.j.s.Id, r.j.s.ProblemId })
                     .SingleOrDefaultAsync();
                 if (sid.HasValue && validation.SubmissionId != sid.Value) return notfound;
-                if (pid.HasValue && validation.ProblemId != pid.Value) return notfound;
+                if (probid.HasValue && validation.ProblemId != probid.Value) return notfound;
             }
 
             return fileInfo;

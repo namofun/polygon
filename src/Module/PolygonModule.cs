@@ -40,8 +40,8 @@ namespace SatelliteSite.PolygonModule
                 version: "v7.2.0");
 
             endpoints.WithErrorHandler("Polygon", "Editor")
-                .MapFallbackNotFound("/polygon/{pid}/{**slug}")
-                .MapStatusCode("/polygon/{pid:problem}/{**slug}");
+                .MapFallbackNotFound("/polygon/{probid}/{**slug}")
+                .MapStatusCode("/polygon/{probid:problem}/{**slug}");
         }
 
         public override void RegisterServices(IServiceCollection services)

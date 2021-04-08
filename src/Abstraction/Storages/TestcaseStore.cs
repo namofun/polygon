@@ -47,19 +47,19 @@ namespace Polygon.Storages
         /// Find the testcase.
         /// </summary>
         /// <param name="tid">The testcase ID.</param>
-        /// <param name="pid">The problem ID.</param>
+        /// <param name="probid">The problem ID.</param>
         /// <returns>The find task.</returns>
-        Task<Testcase> FindAsync(int tid, int? pid = null);
+        Task<Testcase> FindAsync(int tid, int? probid = null);
 
         /// <summary>
         /// Batch set the score of testcases.
         /// </summary>
-        /// <param name="pid">The problem ID.</param>
+        /// <param name="probid">The problem ID.</param>
         /// <param name="lower">The lowest rank of testcase.</param>
         /// <param name="upper">The highest rank of testcase.</param>
         /// <param name="score">The score for each testcase.</param>
         /// <returns>The task for updated testcases.</returns>
-        Task<int> BatchScoreAsync(int pid, int lower, int upper, int score);
+        Task<int> BatchScoreAsync(int probid, int lower, int upper, int score);
 
         /// <summary>
         /// Cascade delete the testcase with details.

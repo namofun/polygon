@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace SatelliteSite.PolygonModule.Controllers
 {
     [Area("Polygon")]
-    [Route("[area]/{pid}/[controller]/[action]")]
+    [Route("[area]/{probid}/[controller]/[action]")]
     public class DescriptionController : PolygonControllerBase
     {
         [HttpGet]

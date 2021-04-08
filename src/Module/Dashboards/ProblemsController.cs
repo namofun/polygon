@@ -71,7 +71,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
             return RedirectToAction(
                 actionName: "Overview",
                 controllerName: "Editor",
-                routeValues: new { area = "Polygon", pid = p.Id });
+                routeValues: new { area = "Polygon", probid = p.Id });
         }
 
 
@@ -85,7 +85,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
                 return RedirectToAction(
                     actionName: "Detail",
                     controllerName: "Submissions",
-                    new { area = "Polygon", sid = item.Id, judgingid, pid = item.ProblemId });
+                    new { area = "Polygon", sid = item.Id, judgingid, probid = item.ProblemId });
             else
                 return RedirectToAction(
                     actionName: "Detail",
@@ -132,7 +132,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
                 return RedirectToAction(
                     actionName: "Overview",
                     controllerName: "Editor",
-                    routeValues: new { area = "Polygon", pid = probs[0].Id });
+                    routeValues: new { area = "Polygon", probid = probs[0].Id });
             }
             catch (Exception ex)
             {

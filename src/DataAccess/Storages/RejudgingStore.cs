@@ -205,16 +205,16 @@ namespace Polygon.Storages
                 await Context.SaveChangesAsync();
             }
 
-            var (cid, tid, pid, acc) = (
+            var (cid, teamid, probid, accepted) = (
                 sub.ContestId, sub.TeamId, sub.ProblemId,
                 currentJudging.Status == Verdict.Accepted ? 1 : 0);
 
             await Context.SubmissionStatistics
-                .Where(s => s.TeamId == tid && s.ContestId == cid && s.ProblemId == pid)
+                .Where(s => s.TeamId == teamid && s.ContestId == cid && s.ProblemId == probid)
                 .BatchUpdateAsync(s => new SubmissionStatistics
                 {
                     TotalSubmission = s.TotalSubmission - 1,
-                    AcceptedSubmission = s.AcceptedSubmission - acc,
+                    AcceptedSubmission = s.AcceptedSubmission - accepted,
                 });
         }
 

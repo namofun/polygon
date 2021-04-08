@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace SatelliteSite.PolygonModule.Controllers
 {
     [Area("Polygon")]
-    [Route("[area]/{pid}/[controller]")]
+    [Route("[area]/{probid}/[controller]")]
     [AuditPoint(AuditlogType.Testcase)]
     public class TestcasesController : PolygonControllerBase
     {
@@ -18,9 +18,9 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Testcases(int pid)
+        public async Task<IActionResult> Testcases()
         {
-            ViewBag.Testcases = await Store.ListAsync(pid);
+            ViewBag.Testcases = await Store.ListAsync(Problem.Id);
             return View(Problem);
         }
 
@@ -178,7 +178,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 message: "You're about to delete testcase t" + tid + ". Are you sure? " +
                     "This operation is irreversible, and will make heavy load and data loss.",
                 area: "Polygon", controller: "Testcases", action: "Delete",
-                routeValues: new { pid = Problem.Id, tid },
+                routeValues: new { probid = Problem.Id, tid },
                 type: BootstrapColor.danger);
         }
 
@@ -186,13 +186,14 @@ namespace SatelliteSite.PolygonModule.Controllers
         [HttpPost("{tid}/[action]")]
         [ValidateAntiForgeryToken]
         [AtLeastLevel(AuthorLevel.Writer)]
-        public async Task<IActionResult> Delete(int pid, int tid)
+        public async Task<IActionResult> Delete(int tid, bool _ = true)
         {
-            var tc = await Store.FindAsync(tid, pid);
+            var tc = await Store.FindAsync(tid, Problem.Id);
             if (tc == null) return NotFound();
 
             int dts = await Store.CascadeDeleteAsync(tc);
-            await HttpContext.AuditAsync("deleted", $"p{pid}t{tid}");
+            await HttpContext.AuditAsync("deleted", $"p{Problem.Id}t{tid}");
+
             StatusMessage = dts < 0
                 ? "Error occurred during the deletion."
                 : $"Testcase {tid} with {dts} runs deleted.";

@@ -16,12 +16,12 @@ namespace Polygon.Events
 
         public DateTimeOffset SubmitTime { get; }
 
-        public JudgingFinishedEvent(Judging j, int? cid, int pid, int uid, DateTimeOffset subtime)
+        public JudgingFinishedEvent(Judging j, int? cid, int probid, int uid, DateTimeOffset subtime)
         {
             if (cid == 0) cid = null;
             Judging = j;
             ContestId = cid;
-            ProblemId = pid;
+            ProblemId = probid;
             TeamId = uid;
             SubmitTime = subtime;
         }

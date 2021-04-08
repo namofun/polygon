@@ -10,7 +10,7 @@ namespace SatelliteSite.PolygonModule
 {
     public class ProblemAuthorOfAddition : IAdditionalRole
     {
-        private readonly int probId;
+        private readonly int probid;
 
         public string Category => "Author of";
 
@@ -21,13 +21,13 @@ namespace SatelliteSite.PolygonModule
         public string GetUrl(object urlHelper)
         {
             var url = urlHelper as IUrlHelper;
-            return url.Action("Overview", "Editor", new { area = "Polygon", pid = probId });
+            return url.Action("Overview", "Editor", new { area = "Polygon", probid });
         }
 
         public ProblemAuthorOfAddition((int, string) item)
         {
             Title = item.Item2;
-            probId = item.Item1;
+            probid = item.Item1;
             Text = "p" + item.Item1;
         }
     }
