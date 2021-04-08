@@ -97,9 +97,11 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="page">The page.</param>
         /// <param name="perCount">The count per page.</param>
+        /// <param name="ascending">Whether to pagination as ascending.</param>
         /// <param name="uid">The user id.</param>
+        /// <param name="leastLevel">The least problem level to show.</param>
         /// <returns>The task for paginated list of problems.</returns>
-        Task<IPagedList<Problem>> ListAsync(int page, int perCount, int? uid = null);
+        Task<IPagedList<Problem>> ListAsync(int page, int perCount, bool ascending = true, int? uid = null, AuthorLevel? leastLevel = null);
 
         /// <summary>
         /// List problem names.

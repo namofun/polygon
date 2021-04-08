@@ -43,17 +43,18 @@ namespace Polygon.Storages
             return ProblemFiles.GetFileInfoAsync($"p{problemId}/{fileName}");
         }
 
-        Task<IPagedList<Problem>> IProblemStore.ListAsync(int page, int perCount, int? uid)
+        Task<IPagedList<Problem>> IProblemStore.ListAsync(int page, int perCount, bool ascending, int? uid, AuthorLevel? leastLevel)
         {
             if (uid.HasValue)
                 return Context.ProblemAuthors
                     .Where(pa => pa.UserId == uid)
-                    .OrderBy(pa => pa.ProblemId)
+                    .WhereIf(leastLevel.HasValue, pa => pa.Level >= leastLevel)
+                    .OrderByBoolean(pa => pa.ProblemId, ascending)
                     .Join(Context.Problems, pa => pa.ProblemId, p => p.Id, (pa, p) => p)
                     .ToPagedListAsync(page, perCount);
             else
                 return Context.Problems
-                    .OrderBy(p => p.Id)
+                    .OrderByBoolean(p => p.Id, ascending)
                     .ToPagedListAsync(page, perCount);
         }
 

@@ -256,13 +256,16 @@ namespace Polygon.Storages
         /// <param name="page">The page.</param>
         /// <param name="perCount">The count per page.</param>
         /// <param name="user">The user claims principal.</param>
+        /// <param name="ascending">Whether to pagination as ascending.</param>
+        /// <param name="leastLevel">The least problem level to show.</param>
         /// <returns>The task for paginated list of problems.</returns>
-        public static Task<IPagedList<Problem>> ListAsync(this IProblemStore store, int page, int perCount, ClaimsPrincipal user)
+        public static Task<IPagedList<Problem>> ListAsync(this IProblemStore store, int page, int perCount, ClaimsPrincipal user, bool ascending = true, AuthorLevel? leastLevel = null)
         {
             var uid = user.IsInRole("Administrator")
                 ? default(int?)
                 : int.Parse(user.GetUserId());
-            return store.ListAsync(page, perCount, uid);
+
+            return store.ListAsync(page, perCount, ascending, uid, leastLevel);
         }
 
         /// <summary>
