@@ -27,5 +27,9 @@ namespace Polygon.Models
         public string ServerName { get; }
 
         public string GetRunDetailsUrl(IUrlHelper urlHelper, int rid);
+
+        public string GetTestcaseUrl(IUrlHelper urlHelper, int rid, string file);
+
+        public string GetRunFileUrl(IUrlHelper urlHelper, int rid, string file);
     }
 }

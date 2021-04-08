@@ -26,7 +26,7 @@ namespace SatelliteSite.PolygonModule.Models
 
         public double RealTimeLimit => TimeLimit * TimeFactor / 1000;
 
-        public string GetRunDetailsUrl(IUrlHelper urlHelper, int runid)
+        public virtual string GetRunDetailsUrl(IUrlHelper urlHelper, int runid)
         {
             return urlHelper.Action(
                 action: "RunDetails",
@@ -38,6 +38,36 @@ namespace SatelliteSite.PolygonModule.Models
                     sid = SubmissionId,
                     jid = JudgingId,
                     rid = runid,
+                });
+        }
+
+        public virtual string GetRunFileUrl(IUrlHelper urlHelper, int runid, string file)
+        {
+            return urlHelper.Action(
+                action: "RunDetails",
+                controller: "Submissions",
+                values: new
+                {
+                    area = "Polygon",
+                    pid = ProblemId,
+                    sid = SubmissionId,
+                    jid = JudgingId,
+                    rid = runid,
+                    type = file,
+                });
+        }
+
+        public virtual string GetTestcaseUrl(IUrlHelper urlHelper, int tcid, string file)
+        {
+            return urlHelper.Action(
+                action: "Fetch",
+                controller: "Testcases",
+                values: new
+                {
+                    area = "Polygon",
+                    pid = ProblemId,
+                    tid = tcid,
+                    filetype = file
                 });
         }
     }

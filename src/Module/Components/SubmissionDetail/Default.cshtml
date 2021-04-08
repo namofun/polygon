@@ -153,11 +153,11 @@
         <tr>
             <th>Download</th>
             <td>
-                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Testcases" asp-action="Fetch" asp-route-tid="@detail.TestcaseId" asp-route-filetype="input">Input</a>
+                <a href="@Model.GetTestcaseUrl(Url, detail.TestcaseId, "input")">Input</a>
                 /
-                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Testcases" asp-action="Fetch" asp-route-tid="@detail.TestcaseId" asp-route-filetype="output">Reference Output</a>
+                <a href="@Model.GetTestcaseUrl(Url, detail.TestcaseId, "output")">Reference Output</a>
                 /
-                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Submissions" asp-route-sid="@Model.SubmissionId" asp-action="RunDetails" asp-route-jid="@detail.JudgingId" asp-route-rid="@detail.Id" asp-route-type="out">Team Output</a>
+                <a href="@Model.GetRunFileUrl(Url, detail.Id, "out")">Team Output</a>
             </td>
         </tr>
         <tr>
@@ -165,8 +165,8 @@
             <td>
                 @(detail.ExecuteTime)ms,
                 @(detail.ExecuteMemory)kb,
-                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Submissions" asp-route-sid="@Model.SubmissionId" asp-action="RunDetails" asp-route-jid="@detail.JudgingId" asp-route-rid="@detail.Id" asp-route-type="err">stderr</a>,
-                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Submissions" asp-route-sid="@Model.SubmissionId" asp-action="RunDetails" asp-route-jid="@detail.JudgingId" asp-route-rid="@detail.Id" asp-route-type="meta">metadata</a>.
+                <a href="@Model.GetRunFileUrl(Url, detail.Id, "err")">stderr</a>,
+                <a href="@Model.GetRunFileUrl(Url, detail.Id, "meta")">metadata</a>.
             </td>
         </tr>
         <tr>
