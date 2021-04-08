@@ -98,8 +98,8 @@ namespace Polygon.Storages
                     .Where(s => s.RejudgingId == rejid)
                     .Join(
                         inner: Context.Judgings,
-                        outerKeySelector: s => s.Id,
-                        innerKeySelector: j => j.SubmissionId,
+                        outerKeySelector: s => new { s.Id, Active = true },
+                        innerKeySelector: j => new { Id = j.SubmissionId, j.Active },
                         resultSelector: (s, j) => new Judging
                         {
                             Active = false,
