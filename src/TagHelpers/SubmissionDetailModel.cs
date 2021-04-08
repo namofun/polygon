@@ -1,4 +1,5 @@
-﻿using Polygon.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using Polygon.Entities;
 using System.Collections.Generic;
 
 namespace Polygon.Models
@@ -24,5 +25,7 @@ namespace Polygon.Models
         public Judging Judging { get; }
 
         public string ServerName { get; }
+
+        public string GetRunDetailsUrl(IUrlHelper urlHelper, int rid);
     }
 }

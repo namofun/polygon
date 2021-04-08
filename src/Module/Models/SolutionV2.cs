@@ -1,4 +1,5 @@
-﻿using Polygon.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using Polygon.Entities;
 using Polygon.Models;
 using System.Collections.Generic;
 
@@ -24,5 +25,20 @@ namespace SatelliteSite.PolygonModule.Models
         public IEnumerable<(JudgingRun, Testcase)> DetailsV2 { get; set; }
 
         public double RealTimeLimit => TimeLimit * TimeFactor / 1000;
+
+        public string GetRunDetailsUrl(IUrlHelper urlHelper, int runid)
+        {
+            return urlHelper.Action(
+                action: "RunDetails",
+                controller: "Submissions",
+                values: new
+                {
+                    area = "Polygon",
+                    pid = ProblemId,
+                    sid = SubmissionId,
+                    jid = JudgingId,
+                    rid = runid,
+                });
+        }
     }
 }

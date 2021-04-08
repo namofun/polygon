@@ -131,16 +131,38 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
+        [HttpGet("{sid}/[action]/{jid}/{rid}")]
+        public async Task<IActionResult> RunDetails(int pid, int sid, int jid, int rid)
+        {
+            var run = await Facade.Judgings.GetDetailAsync(pid, sid, jid, rid);
+            if (run == null) return NotFound();
+            ViewBag.CombinedRunCompare = Problem.CombinedRunCompare;
+            return Window(run);
+        }
+
+
         [HttpGet("{sid}/[action]/{jid}/{rid}/{type}")]
         public async Task<IActionResult> RunDetails(int pid, int sid, int jid, int rid, string type)
         {
-            var fileInfo = await Facade.Judgings.GetRunFileAsync(jid, rid, type, sid, pid);
-            if (!fileInfo.Exists) return NotFound();
+            if (type == "meta")
+            {
+                var run = await Facade.Judgings.GetDetailAsync(pid, sid, jid, rid);
+                if (run == null) return NotFound();
+                return File(
+                    fileContents: Convert.FromBase64String(run.MetaData),
+                    contentType: "text/plain",
+                    fileDownloadName: $"j{jid}.r{rid}.{type}");
+            }
+            else
+            {
+                var fileInfo = await Facade.Judgings.GetRunFileAsync(jid, rid, type, sid, pid);
+                if (!fileInfo.Exists) return NotFound();
 
-            return File(
-                fileStream: fileInfo.CreateReadStream(),
-                contentType: "application/octet-stream",
-                fileDownloadName: $"j{jid}.r{rid}.{type}");
+                return File(
+                    fileStream: fileInfo.CreateReadStream(),
+                    contentType: "application/octet-stream",
+                    fileDownloadName: $"j{jid}.r{rid}.{type}");
+            }
         }
 
 

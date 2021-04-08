@@ -151,5 +151,13 @@ namespace Polygon.Storages
 
             return query.FirstOrDefaultAsync();
         }
+
+        Task<JudgingRun?> IJudgingStore.GetDetailAsync(int problemId, int submitId, int judgingId, int runId)
+        {
+            return Context.JudgingRuns
+                .Where(jr => jr.Id == runId && jr.j.Id == judgingId)
+                .Where(jr => jr.j.s.Id == submitId && jr.j.s.ProblemId == problemId)
+                .FirstOrDefaultAsync()!;
+        }
     }
 }

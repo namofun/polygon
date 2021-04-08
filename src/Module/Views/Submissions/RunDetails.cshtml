@@ -1,0 +1,15 @@
+﻿@model JudgingRun
+@{
+    ViewData["Title"] = $"Run r{Model.Id}";
+    bool interactive = ViewBag.CombinedRunCompare;
+    ViewData["MaxWidth"] = "700px";
+    ViewData["CancelText"] = "OK";
+    Layout = "_WindowLayout";
+}
+
+<snippet h5-title="Metadata" class="mb-4" base64="@Model.MetaData" nodata="Metadata is not collected." />
+<snippet h5-title="Diff output" class="mb-4" base64="@Model.OutputDiff" nodata="There was no diff output." />
+<interactive h5-title="Validator/Submission interaction" class="mb-4" asp-show-if="interactive" filename="@(Model.JudgingId)/@(Model.Id)/out" />
+<snippet h5-title="Program output" class="mb-4" asp-show-if="!interactive" filename="@(Model.JudgingId)/@(Model.Id)/out" nodata="There was no stdout output." />
+<snippet h5-title="Program error output" class="mb-4" filename="@(Model.JudgingId)/@(Model.Id)/err" nodata="There was no stderr output." />
+<snippet h5-title="Judging system output (info/debug/errors)" class="mb-4" base64="@Model.OutputSystem" />

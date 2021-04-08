@@ -144,7 +144,7 @@
     <p class="nodata">Testcase not used.</p>
 </div>
 <div class="run @(detail?.Status == Verdict.Accepted ? "run_correct" : "")" asp-show-if="detail != null">
-    <h4 id="run-@testcase.Rank">Run @testcase.Rank</h4>
+    <h4 id="run-@testcase.Rank">Run @testcase.Rank <small class="ml-1"><a href="@Model.GetRunDetailsUrl(Url, detail.Id)" data-toggle="ajaxWindow"><i class="fas fa-external-link-alt"></i></a></small></h4>
     <table><tr><td><table class="table table-sm table-striped table-bordered table-hover">
         <tr>
             <th>Description</th>
@@ -162,7 +162,12 @@
         </tr>
         <tr>
             <th>Status</th>
-            <td>@(detail.ExecuteTime)ms, @(detail.ExecuteMemory)kb.</td>
+            <td>
+                @(detail.ExecuteTime)ms,
+                @(detail.ExecuteMemory)kb,
+                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Submissions" asp-route-sid="@Model.SubmissionId" asp-action="RunDetails" asp-route-jid="@detail.JudgingId" asp-route-rid="@detail.Id" asp-route-type="err">stderr</a>,
+                <a asp-area="Polygon" asp-route-pid="@testcase.ProblemId" asp-controller="Submissions" asp-route-sid="@Model.SubmissionId" asp-action="RunDetails" asp-route-jid="@detail.JudgingId" asp-route-rid="@detail.Id" asp-route-type="meta">metadata</a>.
+            </td>
         </tr>
         <tr>
             <th>Result</th>
@@ -170,11 +175,7 @@
         </tr>
     </table></td><td></td></tr></table>
 
-    <snippet h5-title="Metadata" class="mb-3" base64="@detail.MetaData" nodata="Metadata is not collected." />
     <snippet h5-title="Diff output" class="mb-3" base64="@detail.OutputDiff" nodata="There was no diff output." />
-    <interactive h5-title="Validator/Submission interaction" class="mb-3" asp-show-if="Model.CombinedRunCompare" filename="@(detail.JudgingId)/@(detail.Id)/out" />
-    <snippet h5-title="Program output" class="mb-3" asp-show-if="!Model.CombinedRunCompare" filename="@(detail.JudgingId)/@(detail.Id)/out" nodata="There was no stdout output." />
-    <snippet h5-title="Program error output" class="mb-3" filename="@(detail.JudgingId)/@(detail.Id)/err" nodata="There was no stderr output." />
     <snippet h5-title="Judging system output (info/debug/errors)" class="mb-4" base64="@detail.OutputSystem" />
 </div>
 

@@ -111,6 +111,16 @@ namespace Polygon.Storages
         Task<List<Judging>> ListAsync(Expression<Func<Judging, bool>> predicate, int topCount);
 
         /// <summary>
+        /// Fetch the detail DTO.
+        /// </summary>
+        /// <param name="problemId">The problem ID.</param>
+        /// <param name="submitId">The submission ID.</param>
+        /// <param name="judgingId">The judging ID.</param>
+        /// <param name="runId">The judging run ID.</param>
+        /// <returns>The task for fetching judging run.</returns>
+        Task<JudgingRun?> GetDetailAsync(int problemId, int submitId, int judgingId, int runId);
+
+        /// <summary>
         /// Fetch the details DTO.
         /// </summary>
         /// <remarks>Use left join so the judging run may be null.</remarks>
