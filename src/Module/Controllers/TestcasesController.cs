@@ -54,14 +54,14 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpGet("{tid}/[action]")]
+        [HttpGet("{testid}/[action]")]
         [AtLeastLevel(AuthorLevel.Writer)]
-        public async Task<IActionResult> Edit(int tid)
+        public async Task<IActionResult> Edit(int testid)
         {
-            var tc = await Store.FindAsync(tid, Problem.Id);
+            var tc = await Store.FindAsync(testid, Problem.Id);
             if (tc == null) return NotFound();
 
-            ViewData["Title"] = $"Edit testcase t{tid}";
+            ViewData["Title"] = $"Edit testcase t{testid}";
             return Window(new TestcaseUploadModel
             {
                 ProblemId = Problem.Id,
@@ -74,16 +74,16 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpPost("{tid}/[action]")]
+        [HttpPost("{testid}/[action]")]
         [ValidateAntiForgeryToken]
         [AtLeastLevel(AuthorLevel.Writer)]
         [RequestSizeLimit(1 << 30)]
         [RequestFormLimits2(1 << 30)]
-        public async Task<IActionResult> Edit(int tid, TestcaseUploadModel model)
+        public async Task<IActionResult> Edit(int testid, TestcaseUploadModel model)
         {
             try
             {
-                var last = await Store.FindAsync(tid, Problem.Id);
+                var last = await Store.FindAsync(testid, Problem.Id);
                 if (last == null) return NotFound();
 
                 (Func<Stream>, long)? inputf = null, outputf = null;
@@ -100,7 +100,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 await Store.UpdateAsync(last, inputf, outputf);
 
                 await HttpContext.AuditAsync("modified", $"p{last.ProblemId}t{last.Id}");
-                StatusMessage = $"Testcase t{tid} updated successfully.";
+                StatusMessage = $"Testcase t{testid} updated successfully.";
                 return RedirectToAction(nameof(Testcases));
             }
             catch (Exception ex)
@@ -169,67 +169,67 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpGet("{tid}/[action]")]
+        [HttpGet("{testid}/[action]")]
         [AtLeastLevel(AuthorLevel.Writer)]
-        public IActionResult Delete(int tid)
+        public IActionResult Delete(int testid)
         {
             return AskPost(
-                title: "Delete testcase t" + tid,
-                message: "You're about to delete testcase t" + tid + ". Are you sure? " +
+                title: "Delete testcase t" + testid,
+                message: "You're about to delete testcase t" + testid + ". Are you sure? " +
                     "This operation is irreversible, and will make heavy load and data loss.",
                 area: "Polygon", controller: "Testcases", action: "Delete",
-                routeValues: new { probid = Problem.Id, tid },
+                routeValues: new { probid = Problem.Id, testid },
                 type: BootstrapColor.danger);
         }
 
 
-        [HttpPost("{tid}/[action]")]
+        [HttpPost("{testid}/[action]")]
         [ValidateAntiForgeryToken]
         [AtLeastLevel(AuthorLevel.Writer)]
-        public async Task<IActionResult> Delete(int tid, bool _ = true)
+        public async Task<IActionResult> Delete(int testid, bool _ = true)
         {
-            var tc = await Store.FindAsync(tid, Problem.Id);
+            var tc = await Store.FindAsync(testid, Problem.Id);
             if (tc == null) return NotFound();
 
             int dts = await Store.CascadeDeleteAsync(tc);
-            await HttpContext.AuditAsync("deleted", $"p{Problem.Id}t{tid}");
+            await HttpContext.AuditAsync("deleted", $"p{Problem.Id}t{testid}");
 
             StatusMessage = dts < 0
                 ? "Error occurred during the deletion."
-                : $"Testcase {tid} with {dts} runs deleted.";
+                : $"Testcase {testid} with {dts} runs deleted.";
             return RedirectToAction(nameof(Testcases));
         }
 
 
-        [HttpGet("{tid}/[action]/{direction}")]
+        [HttpGet("{testid}/[action]/{direction}")]
         [AtLeastLevel(AuthorLevel.Writer)]
-        public async Task<IActionResult> Move(int tid, string direction)
+        public async Task<IActionResult> Move(int testid, string direction)
         {
             bool up = false;
             if (direction == "up") up = true;
             else if (direction != "down") return NotFound();
 
-            await Store.ChangeRankAsync(Problem.Id, tid, up);
-            await HttpContext.AuditAsync("moved", $"p{Problem.Id}t{tid}");
+            await Store.ChangeRankAsync(Problem.Id, testid, up);
+            await HttpContext.AuditAsync("moved", $"p{Problem.Id}t{testid}");
             return RedirectToAction(nameof(Testcases));
         }
 
 
-        [HttpGet("{tid}/[action]/{filetype}")]
-        public async Task<IActionResult> Fetch(int tid, string filetype)
+        [HttpGet("{testid}/[action]/{filetype}")]
+        public async Task<IActionResult> Fetch(int testid, string filetype)
         {
             if (filetype == "input") filetype = "in";
             else if (filetype == "output") filetype = "out";
             else return NotFound();
 
-            var tc = await Store.FindAsync(tid, Problem.Id);
+            var tc = await Store.FindAsync(testid, Problem.Id);
             var fileInfo = await Store.GetFileAsync(tc, filetype);
             if (!fileInfo.Exists) return NotFound();
 
             return File(
                 fileStream: fileInfo.CreateReadStream(),
                 contentType: "application/octet-stream",
-                fileDownloadName: $"p{Problem.Id}.t{tid}.{filetype}");
+                fileDownloadName: $"p{Problem.Id}.t{testid}.{filetype}");
         }
     }
 }

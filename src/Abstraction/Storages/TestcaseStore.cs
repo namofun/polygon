@@ -46,10 +46,10 @@ namespace Polygon.Storages
         /// <summary>
         /// Find the testcase.
         /// </summary>
-        /// <param name="tid">The testcase ID.</param>
+        /// <param name="testid">The testcase ID.</param>
         /// <param name="probid">The problem ID.</param>
         /// <returns>The find task.</returns>
-        Task<Testcase> FindAsync(int tid, int? probid = null);
+        Task<Testcase> FindAsync(int testid, int? probid = null);
 
         /// <summary>
         /// Batch set the score of testcases.

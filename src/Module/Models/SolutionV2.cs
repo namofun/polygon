@@ -57,7 +57,7 @@ namespace SatelliteSite.PolygonModule.Models
                 });
         }
 
-        public virtual string GetTestcaseUrl(IUrlHelper urlHelper, int tcid, string file)
+        public virtual string GetTestcaseUrl(IUrlHelper urlHelper, int testid, string filetype)
         {
             return urlHelper.Action(
                 action: "Fetch",
@@ -66,8 +66,8 @@ namespace SatelliteSite.PolygonModule.Models
                 {
                     area = "Polygon",
                     probid = ProblemId,
-                    tid = tcid,
-                    filetype = file
+                    testid,
+                    filetype
                 });
         }
     }

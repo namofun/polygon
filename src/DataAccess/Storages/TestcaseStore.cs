@@ -50,10 +50,10 @@ namespace Polygon.Storages
             return dts;
         }
 
-        async Task ITestcaseStore.ChangeRankAsync(int probid, int tid, bool up)
+        async Task ITestcaseStore.ChangeRankAsync(int probid, int testid, bool up)
         {
             var tc = await Context.Testcases
-                .Where(t => t.ProblemId == probid && t.Id == tid)
+                .Where(t => t.ProblemId == probid && t.Id == testid)
                 .FirstOrDefaultAsync();
             if (tc == null) return;
 
@@ -102,11 +102,11 @@ namespace Polygon.Storages
 
         Task<Testcase> ITestcaseStore.CreateAsync(Testcase entity) => CreateEntityAsync(entity);
 
-        Task<Testcase> ITestcaseStore.FindAsync(int tid, int? probid)
+        Task<Testcase> ITestcaseStore.FindAsync(int testid, int? probid)
         {
             return Context.Testcases
                 .WhereIf(probid.HasValue, t => t.ProblemId == probid)
-                .Where(t => t.Id == tid)
+                .Where(t => t.Id == testid)
                 .SingleOrDefaultAsync();
         }
 
