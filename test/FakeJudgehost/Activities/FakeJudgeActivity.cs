@@ -41,9 +41,9 @@ namespace Polygon.FakeJudgehost
             return bytes;
         }
 
-        private async Task<string> FetchSubmission(JudgeDaemon service, int cid, int sid)
+        private async Task<string> FetchSubmission(JudgeDaemon service, int cid, int submitid)
         {
-            using var resp = await service.HttpClient.GetAsync($"contests/{cid}/submissions/{sid}/source-code");
+            using var resp = await service.HttpClient.GetAsync($"contests/{cid}/submissions/{submitid}/source-code");
             using var stream = await resp.Content.ReadAsStreamAsync();
             var entity = await JsonSerializer.DeserializeAsync<Models.SubmissionFile[]>(stream);
             return entity[0].SourceCode.UnBase64();

@@ -67,9 +67,9 @@ namespace Polygon.Storages
         /// <summary>
         /// Batch get the author name of submissions.
         /// </summary>
-        /// <param name="sids">The submission ID filter.</param>
+        /// <param name="submitids">The submission ID filter.</param>
         /// <returns>The dictionary for author names.</returns>
-        Task<Dictionary<int, string>> GetAuthorNamesAsync(Expression<Func<Submission, bool>> sids);
+        Task<Dictionary<int, string>> GetAuthorNamesAsync(Expression<Func<Submission, bool>> submitids);
 
         /// <summary>
         /// List the submissions.

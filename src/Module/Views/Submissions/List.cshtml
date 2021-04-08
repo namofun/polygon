@@ -28,7 +28,7 @@
         <tbody>
             @foreach (var sub in Model)
             {
-                <tr asp-action="Detail" asp-route-sid="@sub.SubmissionId" data-toggle="gotoUrl">
+                <tr asp-action="Detail" asp-route-submitid="@sub.SubmissionId" data-toggle="gotoUrl">
                     <td data-sort="@(sub.SubmissionId)" use-a>s@(sub.SubmissionId)</td>
                     <td use-a>@Html.CstTime(sub.Time)</td>
                     <td use-a><verdict value="@(sub.ExpectedVerdict ?? Verdict.Unknown)" too-late="@(!sub.ExpectedVerdict.HasValue)" /></td>

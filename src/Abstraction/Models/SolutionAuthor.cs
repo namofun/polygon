@@ -41,16 +41,16 @@
         /// <summary>
         /// Create an instance of solution author.
         /// </summary>
-        /// <param name="sid">The submission ID.</param>
+        /// <param name="submitid">The submission ID.</param>
         /// <param name="cid">The contest ID.</param>
-        /// <param name="tid">The team ID.</param>
+        /// <param name="teamid">The team ID.</param>
         /// <param name="userName">The user name.</param>
         /// <param name="teamName">The team name.</param>
-        public SolutionAuthor(int sid, int cid, int tid, string? userName, string? teamName)
+        public SolutionAuthor(int submitid, int cid, int teamid, string? userName, string? teamName)
         {
-            SubmissionId = sid;
+            SubmissionId = submitid;
             ContestId = cid;
-            TeamId = tid;
+            TeamId = teamid;
             UserName = userName;
             TeamName = teamName;
         }

@@ -39,7 +39,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
             var maxSub = subs.Select(s => s.SubmissionId).Append(-1).Max();
             var minSub = subs.Select(s => s.SubmissionId).Append(-1).Min();
             ViewBag.Authors = await Facade.Submissions.GetAuthorNamesAsync(
-                sids: s => s.Language == langid && s.Id >= minSub && s.Id <= maxSub);
+                s => s.Language == langid && s.Id >= minSub && s.Id <= maxSub);
 
             ViewBag.Problems = await Facade.Problems.ListNameAsync(
                 s => s.Language == langid && s.Id >= minSub && s.Id <= maxSub);

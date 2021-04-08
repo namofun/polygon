@@ -85,7 +85,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
                 return RedirectToAction(
                     actionName: "Detail",
                     controllerName: "Submissions",
-                    new { area = "Polygon", sid = item.Id, judgingid, probid = item.ProblemId });
+                    new { area = "Polygon", submitid = item.Id, judgingid, probid = item.ProblemId });
             else
                 return RedirectToAction(
                     actionName: "Detail",
@@ -155,7 +155,7 @@ namespace SatelliteSite.PolygonModule.Dashboards
             var maxSub = model.Select(s => s.SubmissionId).Append(-1).Max();
             var minSub = model.Select(s => s.SubmissionId).Append(-1).Min();
             ViewBag.Authors = await Facade.Submissions.GetAuthorNamesAsync(
-                sids: s => s.Id >= minSub && s.Id <= maxSub);
+                s => s.Id >= minSub && s.Id <= maxSub);
 
             ViewBag.Problems = await Store.ListNameAsync(
                 (Submission s) => s.Id >= minSub && s.Id <= maxSub);

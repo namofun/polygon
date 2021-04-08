@@ -40,16 +40,16 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpGet("{sid}")]
-        public async Task<IActionResult> Detail(int sid, int? judgingid)
+        [HttpGet("{submitid}")]
+        public async Task<IActionResult> Detail(int submitid, int? judgingid)
         {
-            var s = await Facade.Submissions.FindAsync(sid, true);
+            var s = await Facade.Submissions.FindAsync(submitid, true);
             if (s == null || s.ProblemId != Problem.Id) return NotFound();
             var j = s.Judgings.SingleOrDefault(jj => judgingid.HasValue ? jj.Id == judgingid : jj.Active);
             if (j == null) return NotFound();
             var l = await Facade.Languages.FindAsync(s.Language);
             var det = await Facade.Judgings.GetDetailsAsync(Problem.Id, j.Id);
-            var uname = await Facade.Submissions.GetAuthorNameAsync(sid);
+            var uname = await Facade.Submissions.GetAuthorNameAsync(submitid);
 
             return View(new SolutionV2
             {
@@ -112,14 +112,14 @@ namespace SatelliteSite.PolygonModule.Controllers
                 username: User.GetUserName(),
                 expected: Verdict.Unknown);
 
-            return RedirectToAction(nameof(Detail), new { sid = sub.Id });
+            return RedirectToAction(nameof(Detail), new { submitid = sub.Id });
         }
 
 
-        [HttpGet("{sid}/[action]")]
-        public async Task<IActionResult> RejudgeOne(int sid)
+        [HttpGet("{submitid}/rejudge")]
+        public async Task<IActionResult> RejudgeOne(int submitid)
         {
-            var sub = await Facade.Submissions.FindAsync(sid);
+            var sub = await Facade.Submissions.FindAsync(submitid);
             if (sub == null || sub.ProblemId != Problem.Id)
                 return NotFound();
 
@@ -131,22 +131,22 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpGet("{sid}/[action]/{judgingid}/{rid}")]
-        public async Task<IActionResult> RunDetails(int sid, int judgingid, int rid)
+        [HttpGet("{submitid}/[action]/{judgingid}/{rid}")]
+        public async Task<IActionResult> RunDetails(int submitid, int judgingid, int rid)
         {
-            var run = await Facade.Judgings.GetDetailAsync(Problem.Id, sid, judgingid, rid);
+            var run = await Facade.Judgings.GetDetailAsync(Problem.Id, submitid, judgingid, rid);
             if (run == null) return NotFound();
             ViewBag.CombinedRunCompare = Problem.CombinedRunCompare;
             return Window(run);
         }
 
 
-        [HttpGet("{sid}/[action]/{judgingid}/{rid}/{type}")]
-        public async Task<IActionResult> RunDetails(int sid, int judgingid, int rid, string type)
+        [HttpGet("{submitid}/[action]/{judgingid}/{rid}/{type}")]
+        public async Task<IActionResult> RunDetails(int submitid, int judgingid, int rid, string type)
         {
             if (type == "meta")
             {
-                var run = await Facade.Judgings.GetDetailAsync(Problem.Id, sid, judgingid, rid);
+                var run = await Facade.Judgings.GetDetailAsync(Problem.Id, submitid, judgingid, rid);
                 if (run == null) return NotFound();
                 return File(
                     fileContents: Convert.FromBase64String(run.MetaData),
@@ -155,7 +155,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             }
             else
             {
-                var fileInfo = await Facade.Judgings.GetRunFileAsync(judgingid, rid, type, sid, Problem.Id);
+                var fileInfo = await Facade.Judgings.GetRunFileAsync(judgingid, rid, type, submitid, Problem.Id);
                 if (!fileInfo.Exists) return NotFound();
 
                 return File(
@@ -196,11 +196,11 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpGet("{sid}/[action]")]
+        [HttpGet("{submitid}/[action]")]
         [ValidateAjaxWindow]
-        public async Task<IActionResult> ChangeExpected(int sid)
+        public async Task<IActionResult> ChangeExpected(int submitid)
         {
-            var sub = await Facade.Submissions.FindAsync(sid);
+            var sub = await Facade.Submissions.FindAsync(submitid);
             if (sub == null || sub.ProblemId != Problem.Id) return NotFound();
             ViewBag.Languages = await Facade.Languages.ListAsync();
 
@@ -212,11 +212,11 @@ namespace SatelliteSite.PolygonModule.Controllers
         }
 
 
-        [HttpPost("{sid}/[action]")]
+        [HttpPost("{submitid}/[action]")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangeExpected(int sid, ChangeExpectedModel model)
+        public async Task<IActionResult> ChangeExpected(int submitid, ChangeExpectedModel model)
         {
-            var it = await Facade.Submissions.FindAsync(sid);
+            var it = await Facade.Submissions.FindAsync(submitid);
             if (it == null || it.ProblemId != Problem.Id) return NotFound();
 
             var expected = model.Verdict == -1 ? default(Verdict?) : (Verdict)model.Verdict;
