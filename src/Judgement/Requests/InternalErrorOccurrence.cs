@@ -16,13 +16,13 @@ namespace Polygon.Judgement
 
         public int? JudgingId { get; }
 
-        public InternalErrorOccurrence(string desc, string log, string disabled, int? cid, int? jid)
+        public InternalErrorOccurrence(string description, string log, string disabled, int? cid, int? judgingid)
         {
-            Description = desc;
+            Description = description;
             JudgehostLog = log;
             Disabled = disabled;
             ContestId = cid;
-            JudgingId = jid;
+            JudgingId = judgingid;
         }
     }
 }

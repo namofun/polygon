@@ -83,14 +83,14 @@ namespace SatelliteSite.PolygonModule.Models
             };
         }
 
-        public (JudgingRun, string, string) ParseInfo(int jid, DateTimeOffset time2)
+        public (JudgingRun, string, string) ParseInfo(int judgingid, DateTimeOffset time2)
         {
-            int time, mem, exitcode, tcid;
+            int time, mem, exitcode, testid;
             if (!double.TryParse(RunTime, out var dtime)) dtime = 0;
             time = (int)(dtime * 1000);
             if (!Mapping.TryGetValue(RunResult, out var verdict))
                 verdict = Verdict.UndefinedError;
-            if (!int.TryParse(TestcaseId, out tcid)) tcid = 0;
+            if (!int.TryParse(TestcaseId, out testid)) testid = 0;
 
             try
             {
@@ -111,10 +111,10 @@ namespace SatelliteSite.PolygonModule.Models
                 Status = verdict,
                 ExecuteMemory = mem,
                 ExecuteTime = time,
-                TestcaseId = tcid,
+                TestcaseId = testid,
                 OutputDiff = OutputDiff,
                 OutputSystem = OutputSystem,
-                JudgingId = jid,
+                JudgingId = judgingid,
                 CompleteTime = time2,
                 MetaData = MetaData,
             };

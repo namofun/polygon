@@ -145,10 +145,10 @@ namespace Polygon.Storages
 
         Task IRejudgingStore.DeleteAsync(Rejudging entity) => DeleteEntityAsync(entity);
 
-        Task<Rejudging> IRejudgingStore.FindAsync(int cid, int rjid)
+        Task<Rejudging> IRejudgingStore.FindAsync(int cid, int rejid)
         {
             return Context.Rejudgings
-                .Where(r => r.ContestId == cid && r.Id == rjid)
+                .Where(r => r.ContestId == cid && r.Id == rejid)
                 .SingleOrDefaultAsync();
         }
 

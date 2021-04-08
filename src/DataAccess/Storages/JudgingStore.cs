@@ -108,28 +108,28 @@ namespace Polygon.Storages
             return Context.Judgings.Where(predicate).OrderBy(j => j.Id).Take(topCount).ToListAsync();
         }
 
-        async Task<IFileInfo> IJudgingStore.GetRunFileAsync(int jid, int rid, string type, int? sid, int? probid)
+        async Task<IFileInfo> IJudgingStore.GetRunFileAsync(int judgingid, int runid, string type, int? submitid, int? probid)
         {
-            var notfound = new NotFoundFileInfo($"j{jid}/r{rid}.{type}");
-            var fileInfo = await JudgingFiles.GetFileInfoAsync($"j{jid}/r{rid}.{type}");
+            var notfound = new NotFoundFileInfo($"j{judgingid}/r{runid}.{type}");
+            var fileInfo = await JudgingFiles.GetFileInfoAsync($"j{judgingid}/r{runid}.{type}");
             if (!fileInfo.Exists) return notfound;
 
-            if (sid.HasValue || probid.HasValue)
+            if (submitid.HasValue || probid.HasValue)
             {
                 var validation = await Context.JudgingRuns
-                    .Where(r => r.JudgingId == jid && r.Id == rid)
+                    .Where(r => r.JudgingId == judgingid && r.Id == runid)
                     .Select(r => new { SubmissionId = r.j.s.Id, r.j.s.ProblemId })
                     .SingleOrDefaultAsync();
-                if (sid.HasValue && validation.SubmissionId != sid.Value) return notfound;
+                if (submitid.HasValue && validation.SubmissionId != submitid.Value) return notfound;
                 if (probid.HasValue && validation.ProblemId != probid.Value) return notfound;
             }
 
             return fileInfo;
         }
 
-        Task<IFileInfo> IJudgingStore.SetRunFileAsync(int jid, int rid, string type, byte[] content)
+        Task<IFileInfo> IJudgingStore.SetRunFileAsync(int judgingid, int runid, string type, byte[] content)
         {
-            return JudgingFiles.WriteBinaryAsync($"j{jid}/r{rid}.{type}", content);
+            return JudgingFiles.WriteBinaryAsync($"j{judgingid}/r{runid}.{type}", content);
         }
 
         Task<RunSummary> IJudgingStore.SummarizeAsync(int judgingId)

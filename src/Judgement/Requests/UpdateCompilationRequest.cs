@@ -13,12 +13,12 @@ namespace Polygon.Judgement
 
         public int JudgingId { get; }
 
-        public UpdateCompilationRequest(int succ, string outp, int jid, string host)
+        public UpdateCompilationRequest(int succ, string outp, int judgingid, string host)
         {
             Success = succ;
             CompilerOutput = outp;
             Judgehost = host;
-            JudgingId = jid;
+            JudgingId = judgingid;
         }
     }
 }

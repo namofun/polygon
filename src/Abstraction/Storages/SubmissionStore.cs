@@ -60,9 +60,9 @@ namespace Polygon.Storages
         /// <summary>
         /// Find the submission by judging ID.
         /// </summary>
-        /// <param name="jid">The judging ID.</param>
+        /// <param name="judgingid">The judging ID.</param>
         /// <returns>The submission entity.</returns>
-        Task<Submission> FindByJudgingAsync(int jid);
+        Task<Submission> FindByJudgingAsync(int judgingid);
 
         /// <summary>
         /// Batch get the author name of submissions.

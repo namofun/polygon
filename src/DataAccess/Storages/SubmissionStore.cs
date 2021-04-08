@@ -50,10 +50,10 @@ namespace Polygon.Storages
                 .SingleOrDefaultAsync();
         }
 
-        Task<Submission> ISubmissionStore.FindByJudgingAsync(int jid)
+        Task<Submission> ISubmissionStore.FindByJudgingAsync(int judgingid)
         {
             return Context.Judgings
-                .Where(j => j.Id == jid)
+                .Where(j => j.Id == judgingid)
                 .Select(j => j.s)
                 .SingleOrDefaultAsync();
         }

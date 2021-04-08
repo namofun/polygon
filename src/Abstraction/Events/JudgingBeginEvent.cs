@@ -17,14 +17,14 @@ namespace Polygon.Events
 
         public int? RejudgingId { get; set; }
 
-        public JudgingBeginEvent(Judging j, Problem p, Language l, int cid, int uid, int? rjid)
+        public JudgingBeginEvent(Judging j, Problem p, Language l, int cid, int uid, int? rejid)
         {
             Judging = j;
             Problem = p;
             Language = l;
             ContestId = cid;
             TeamId = uid;
-            RejudgingId = rjid;
+            RejudgingId = rejid;
         }
     }
 }
