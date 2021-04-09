@@ -135,13 +135,20 @@ namespace Polygon.Packaging
             }
         }
 
-        private static Dictionary<string, Verdict> Verd =
+        private static readonly IReadOnlyDictionary<string, Verdict> Verd =
             new Dictionary<string, Verdict>
             {
                 ["accepted"] = Verdict.Accepted,
                 ["wrong_answer"] = Verdict.WrongAnswer,
                 ["time_limit_exceeded"] = Verdict.TimeLimitExceeded,
                 ["run_time_error"] = Verdict.RuntimeError,
+            };
+
+        private static readonly IReadOnlyList<string> TexStmt =
+            new[]
+            {
+                "problem.en.tex",
+                "problem.zh.tex"
             };
 
         #endregion
@@ -235,7 +242,7 @@ namespace Polygon.Packaging
                 if (lang == null)
                 {
                     Log($"No language found for jury solution '{file.FullName}' Fallback to default.");
-                    lang = langs.First();
+                    lang = langs.FirstOrDefault(l => l.Id == "py3") ?? langs.First();
                 }
 
                 var expected = Verd.GetValueOrDefault(file.FullName.Split('/')[1]);
@@ -294,11 +301,13 @@ namespace Polygon.Packaging
             }
 
             // Load statements
+            bool hasMarkdownStatement = false;
             foreach (var mdfile in ResourceDictionary.MarkdownFiles)
             {
                 var entry = zipArchive.GetEntry("problem_statement/" + mdfile + ".md");
                 if (entry == null) continue;
 
+                if (mdfile == "description") hasMarkdownStatement = true;
                 string mdcontent = await entry.ReadAsStringAsync();
 
                 var tags = $"p{ctx.Id}";
@@ -306,6 +315,21 @@ namespace Polygon.Packaging
                 await ctx.WriteAsync($"{mdfile}.md", content);
 
                 Log($"Adding statement section 'problem_statement/{mdfile}.md'.");
+            }
+
+            if (!hasMarkdownStatement)
+            {
+                foreach (var texfile in TexStmt)
+                {
+                    var entry = zipArchive.GetEntry("problem_statement/" + texfile);
+                    if (entry == null) continue;
+
+                    string texcontent = await entry.ReadAsStringAsync();
+                    await ctx.WriteAsync("description.md", texcontent);
+
+                    Log($"Adding statement section 'problem_statement/{texfile}'.");
+                    break;
+                }
             }
 
             // Load testcases
