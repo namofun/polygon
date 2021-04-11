@@ -236,13 +236,14 @@ namespace Polygon.Packaging
                     continue;
                 }
 
-                var lang = langs.FirstOrDefault(l =>
-                    "." + l.FileExtension == Path.GetExtension(file.FullName));
+                var fileExt = Path.GetExtension(file.FullName);
+                if (fileExt == ".cc") fileExt = ".cpp";
+                var lang = langs.FirstOrDefault(l => "." + l.FileExtension == fileExt);
 
                 if (lang == null)
                 {
-                    Log($"No language found for jury solution '{file.FullName}' Fallback to default.");
-                    lang = langs.FirstOrDefault(l => l.Id == "py3") ?? langs.First();
+                    Log($"No language found for jury solution '{file.FullName}'.");
+                    continue;
                 }
 
                 var expected = Verd.GetValueOrDefault(file.FullName.Split('/')[1]);

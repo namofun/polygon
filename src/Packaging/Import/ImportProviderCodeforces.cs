@@ -148,8 +148,9 @@ namespace Polygon.Packaging
                 var file = zip.GetEntry(fileName);
                 var tag = sol.Attribute("tag").Value;
 
-                var lang = langs.FirstOrDefault(l =>
-                    "." + l.FileExtension == Path.GetExtension(file.FullName));
+                var fileExt = Path.GetExtension(file.FullName);
+                if (fileExt == ".cc") fileExt = ".cpp";
+                var lang = langs.FirstOrDefault(l => "." + l.FileExtension == fileExt);
 
                 if (lang == null)
                 {
