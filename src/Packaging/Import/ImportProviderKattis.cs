@@ -253,6 +253,11 @@ namespace Polygon.Packaging
             }
         }
 
+        private IReadOnlyList<(string, string)> GetTexContent(string content)
+        {
+            return new[] { ("description.md", content) };
+        }
+
         public override async Task<List<Problem>> ImportAsync(Stream stream, string uploadFileName, string username)
         {
             using var zipArchive = new ZipArchive(stream);
@@ -326,7 +331,8 @@ namespace Polygon.Packaging
                     if (entry == null) continue;
 
                     string texcontent = await entry.ReadAsStringAsync();
-                    await ctx.WriteAsync("description.md", texcontent);
+                    var contents = GetTexContent(texcontent);
+                    foreach (var (fn, ct) in contents) await ctx.WriteAsync(fn, ct);
 
                     Log($"Adding statement section 'problem_statement/{texfile}'.");
                     break;
