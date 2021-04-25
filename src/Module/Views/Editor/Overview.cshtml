@@ -143,9 +143,9 @@
             <tbody>
                 @foreach (var (uid, uname, level) in urs)
                 {
-                    <tr asp-action="Show" asp-route-username="@uname" asp-controller="Profile" asp-area="Account">
+                    <tr asp-route="AccountProfile" asp-route-username="@uname">
                         <td use-a>u@(uid)</td>
-                        <td use-a>@uname</td>
+                        <td><user uid="uid" username="@uname" /></td>
                         <td use-a>@level</td>
                         <td><a asp-show-if="@(Feature.AuthorLevel >= AuthorLevel.Creator && (User.IsInRole("Administrator") || uname != User.GetUserName()))" asp-action="Unauthorize" asp-route-uid="@uid" data-toggle="ajaxWindow" data-target="unauthProb"><i class="fas fa-trash-alt"></i></a></td>
                     </tr>
