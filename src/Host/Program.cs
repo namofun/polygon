@@ -19,6 +19,7 @@ namespace SatelliteSite
         {
             Current = CreateHostBuilder(args).Build();
             Current.AutoMigrate<DefaultContext>();
+            Current.MigratePolygonV1();
             Current.Run();
         }
 
@@ -54,7 +55,7 @@ namespace SatelliteSite
                                     BaseAddress = new System.Uri("https://localhost:41359/api/")
                                 };
                             });
-                        */
+                        //*/
                     });
                 });
     }
