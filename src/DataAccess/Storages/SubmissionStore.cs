@@ -94,6 +94,24 @@ namespace Polygon.Storages
                 .ToPagedListAsync(pagination.Page, pagination.PageCount);
         }
 
+        Task<IPagedList<T>> ISubmissionStore.ListWithJudgingAsync<T>((int Page, int PageCount) pagination, Expression<Func<Submission, Judging, T>> selector, Expression<Func<Submission, Judging, bool>>? predicate)
+        {
+            var template = new { s = (Submission)null!, j = (Judging)null! };
+            var selector2 = selector.Combine(template, t => t.s, t => t.j)!;
+            var predicate2 = predicate?.Combine(template, t => t.s, t => t.j);
+
+            return Context.Submissions
+                .OrderByDescending(s => s.Time)
+                .Join(
+                    inner: Context.Judgings,
+                    outerKeySelector: s => new { s.Id, Active = true },
+                    innerKeySelector: j => new { Id = j.SubmissionId, j.Active },
+                    resultSelector: (s, j) => new { s, j })
+                .WhereIf(predicate2 != null, predicate2)
+                .Select(selector2)
+                .ToPagedListAsync(pagination.Page, pagination.PageCount);
+        }
+
         Task<List<T>> ISubmissionStore.ListWithJudgingAsync<T>(Expression<Func<Submission, Judging, T>> selector, Expression<Func<Submission, bool>>? predicate, int? limits)
         {
             return Context.Submissions

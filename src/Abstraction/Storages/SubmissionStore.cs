@@ -98,6 +98,19 @@ namespace Polygon.Storages
             Expression<Func<Submission, bool>>? predicate = null);
 
         /// <summary>
+        /// List the paginated solutions satisfying some conditions.
+        /// </summary>
+        /// <typeparam name="T">The DTO entity.</typeparam>
+        /// <param name="pagination">The pagination parameter.</param>
+        /// <param name="selector">The entity shaper.</param>
+        /// <param name="predicate">The conditions.</param>
+        /// <returns>The task for fetching solutions.</returns>
+        Task<IPagedList<T>> ListWithJudgingAsync<T>(
+            (int Page, int PageCount) pagination,
+            Expression<Func<Submission, Judging, T>> selector,
+            Expression<Func<Submission, Judging, bool>>? predicate = null);
+
+        /// <summary>
         /// List the solutions satisfying some conditions.
         /// </summary>
         /// <typeparam name="T">The DTO entity.</typeparam>

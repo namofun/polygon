@@ -164,6 +164,23 @@ namespace Polygon.Storages
         }
 
         /// <summary>
+        /// List the paginated solutions satisfying some conditions.
+        /// </summary>
+        /// <param name="that">The store.</param>
+        /// <param name="pagination">The pagination parameter.</param>
+        /// <param name="predicate">The conditions.</param>
+        /// <param name="includeDetails">Whether to include judging runs.</param>
+        /// <returns>The task for fetching solutions.</returns>
+        public static Task<IPagedList<Models.Solution>> ListWithJudgingAsync(
+            this ISubmissionStore that,
+            (int Page, int PageCount) pagination,
+            Expression<Func<Submission, Judging, bool>> predicate,
+            bool includeDetails = false)
+        {
+            return that.ListWithJudgingAsync(pagination, CreateSelector(includeDetails), predicate);
+        }
+
+        /// <summary>
         /// List the solutions satisfying some conditions.
         /// </summary>
         /// <param name="that">The store.</param>
