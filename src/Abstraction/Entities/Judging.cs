@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Polygon.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Polygon.Entities
@@ -6,7 +7,7 @@ namespace Polygon.Entities
     /// <summary>
     /// The entity class for judgings.
     /// </summary>
-    public class Judging
+    public class Judging : IJudgementDetail
     {
         /// <summary>
         /// The judging ID
