@@ -84,9 +84,14 @@ namespace Polygon.Entities
         public int? TotalScore { get; set; }
 
         /// <summary>
-        /// The navigation to judging runs
+        /// The version of polygon entity
         /// </summary>
-        public ICollection<JudgingRun> Details { get; set; }
+        public int PolygonVersion { get; set; }
+
+        /// <summary>
+        /// The verdicts in one string
+        /// </summary>
+        public string? RunVerdicts { get; set; }
 
         /// <summary>
         /// The navigation to submission

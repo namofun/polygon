@@ -132,7 +132,7 @@ namespace Polygon.Storages
                 .HasColumnName("RunId");
 
             entity.HasOne<Judging>(e => e.j)
-                .WithMany(e => e.Details)
+                .WithMany()
                 .HasForeignKey(e => e.JudgingId)
                 .OnDelete(DeleteBehavior.Cascade);
 

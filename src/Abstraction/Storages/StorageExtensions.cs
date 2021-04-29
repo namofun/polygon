@@ -105,6 +105,7 @@ namespace Polygon.Storages
         /// <returns>The expression for query.</returns>
         private static Expression<Func<Submission, Judging, Models.Solution>> CreateSelector(bool includeDetails)
         {
+#warning Details was removed
             if (includeDetails)
                 return (s, j) => new Models.Solution
                 {
@@ -122,7 +123,7 @@ namespace Polygon.Storages
                     Verdict = j.Status,
                     ExecutionTime = j.ExecuteTime,
                     ExecutionMemory = j.ExecuteMemory,
-                    Details = j.Details,
+                    // Details = j.Details,
                     TotalScore = j.TotalScore,
                 };
             else

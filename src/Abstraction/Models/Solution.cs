@@ -75,9 +75,10 @@ namespace Polygon.Models
         public Verdict Verdict { get; set; }
 
         /// <summary>
-        /// The running details
+        /// The judging run verdicts
         /// </summary>
-        public ICollection<JudgingRun> Details { get; set; }
+        /// <remarks>Ordered by the emitted ID. When not included, this field may be null.</remarks>
+        public IEnumerable<Verdict>? Verdicts { get; set; }
 
         /// <summary>
         /// The name of author
