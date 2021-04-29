@@ -19,19 +19,23 @@ namespace SatelliteSite.PolygonModule.Controllers
         {
             if (page < 0) return NotFound();
 
-            Expression<Func<Submission, bool>> cond = s => s.ProblemId == Problem.Id;
-            if (!all) cond = cond.Combine(s => s.ExpectedResult != null);
+            var cond = Expr.Of<Submission>(s => s.ProblemId == Problem.Id)
+                .CombineIf(!all, s => s.ExpectedResult != null);
+            var result = await Facade.Submissions.ListWithJudgingAsync((page, 30), cond);
 
-            var result = await Facade.Submissions.ListWithJudgingAsync((page, 30), cond, true);
-
-            if (result.Any())
+            if (result.Count > 0)
             {
-                var (id1, id2) = (result[0].SubmissionId, result[^1].SubmissionId);
-                if (id1 > id2) (id1, id2) = (id2, id1);
-                var cond2 = cond.Combine(s => s.Id >= id1 && s.Id <= id2);
-                var names = await Facade.Submissions.GetAuthorNamesAsync(cond2);
+                var sids = result.Select(s => s.SubmissionId);
+                var names = await Facade.Submissions.GetAuthorNamesAsync(s => sids.Contains(s.Id));
                 foreach (var item in result)
                     item.AuthorName = names.GetValueOrDefault(item.SubmissionId, "SYSTEM");
+
+                var jids = result.Select(s => s.JudgingId);
+                ViewBag.JudgingRuns = await Facade.Judgings.GetJudgingRunsAsync(jids);
+            }
+            else
+            {
+                ViewBag.JudgingRuns = new NullLookup<int, JudgingRun>();
             }
 
             ViewBag.All = all;

@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Submissions";
     List<Testcase> tc = ViewBag.Testcase;
+    ILookup<int, JudgingRun> jr = ViewBag.JudgingRuns;
     bool showAll = ViewBag.All;
 }
 
@@ -40,10 +41,11 @@
                         @{
                             int t = 0;
                             bool jp = sub.Verdict == Verdict.Pending || sub.Verdict == Verdict.Running;
+                            var jri = jr[sub.JudgingId].ToDictionary(r => r.TestcaseId);
                             foreach (var item in tc)
                             {
                                 t++;
-                                var de = sub.Details.SingleOrDefault(d => d.TestcaseId == item.Id);
+                                var de = jri.GetValueOrDefault(item.Id);
                                 if (de != null) {<verdict-badge value="@de.Status" tooltip="#@item.Rank, desc: @item.Description, runtime: @(de.ExecuteTime)ms." />}
                                 else {<verdict-badge value="Pending" judging-pending="jp" tooltip="#@item.Rank, desc: @item.Description, not used." />}
                             }

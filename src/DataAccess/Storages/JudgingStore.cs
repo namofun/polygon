@@ -159,5 +159,13 @@ namespace Polygon.Storages
                 .Where(jr => jr.j.s.Id == submitId && jr.j.s.ProblemId == problemId)
                 .FirstOrDefaultAsync()!;
         }
+
+        Task<ILookup<int, JudgingRun>> IJudgingStore.GetJudgingRunsAsync(IEnumerable<int> judgingIds)
+        {
+            return Context.JudgingRuns
+                .Where(jr => judgingIds.Contains(jr.JudgingId))
+                .AsNoTracking()
+                .ToLookupAsync(jr => jr.JudgingId, jr => jr);
+        }
     }
 }

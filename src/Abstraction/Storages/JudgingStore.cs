@@ -3,6 +3,7 @@ using Polygon.Entities;
 using Polygon.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -119,6 +120,13 @@ namespace Polygon.Storages
         /// <param name="runId">The judging run ID.</param>
         /// <returns>The task for fetching judging run.</returns>
         Task<JudgingRun?> GetDetailAsync(int problemId, int submitId, int judgingId, int runId);
+
+        /// <summary>
+        /// Fetches the judging run entities.
+        /// </summary>
+        /// <param name="judgingIds">The judging IDs that judging runs belongs to.</param>
+        /// <returns>The task for getting the lookup.</returns>
+        Task<ILookup<int, JudgingRun>> GetJudgingRunsAsync(IEnumerable<int> judgingIds);
 
         /// <summary>
         /// Fetch the details DTO.
