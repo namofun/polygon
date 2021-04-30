@@ -14,6 +14,7 @@ namespace Polygon.Storages
         Task<Judgehost> IJudgehostStore.FindAsync(string name)
         {
             return Context.Judgehosts
+                .AsNoTracking()
                 .Where(h => h.ServerName == name)
                 .SingleOrDefaultAsync();
         }
@@ -41,7 +42,9 @@ namespace Polygon.Storages
         Task IJudgehostStore.NotifyPollAsync(Judgehost host)
         {
             host.PollTime = DateTimeOffset.Now;
-            return UpdateEntityAsync(host);
+            return Context.Judgehosts
+                .Where(h => h.ServerName == host.ServerName)
+                .BatchUpdateAsync(h => new Judgehost { PollTime = host.PollTime });
         }
 
         Task<int> IJudgehostStore.ToggleAsync(string? hostname, bool active)

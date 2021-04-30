@@ -20,21 +20,6 @@ namespace Polygon.Storages
         Task<Rejudging> CreateAsync(Rejudging entity);
 
         /// <summary>
-        /// Update the instance of entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <returns>The update task.</returns>
-        Task UpdateAsync(Rejudging entity);
-
-        /// <summary>
-        /// Update the instance of entity.
-        /// </summary>
-        /// <param name="id">The entity id.</param>
-        /// <param name="expression">The update expression.</param>
-        /// <returns>The update task.</returns>
-        Task UpdateAsync(int id, Expression<Func<Rejudging, Rejudging>> expression);
-
-        /// <summary>
         /// Delete the instance of entity.
         /// </summary>
         /// <param name="entity">The entity.</param>

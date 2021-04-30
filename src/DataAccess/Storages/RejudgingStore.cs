@@ -220,13 +220,6 @@ namespace Polygon.Storages
                 });
         }
 
-        Task IRejudgingStore.UpdateAsync(Rejudging entity) => UpdateEntityAsync(entity);
-
-        Task IRejudgingStore.UpdateAsync(int id, Expression<Func<Rejudging, Rejudging>> expression)
-        {
-            return Context.Rejudgings.Where(r => r.Id == id).BatchUpdateAsync(expression);
-        }
-
         async Task<IEnumerable<RejudgingDifference>> IRejudgingStore.ViewAsync(Rejudging rejudge, Expression<Func<Judging, Judging, Submission, bool>>? filter)
         {
             var query =
