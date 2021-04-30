@@ -14,8 +14,6 @@ namespace Polygon.Storages
     {
         Task<Judging> IJudgingStore.CreateAsync(Judging entity) => CreateEntityAsync(entity);
 
-        Task IJudgingStore.UpdateAsync(Judging entity) => UpdateEntityAsync(entity);
-
         Task IJudgingStore.UpdateAsync(int id, Expression<Func<Judging, Judging>> expression)
         {
             return Context.Judgings.Where(j => j.Id == id).BatchUpdateAsync(expression);

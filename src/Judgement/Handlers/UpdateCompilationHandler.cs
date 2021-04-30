@@ -28,12 +28,27 @@ namespace Polygon.Judgement
                 judging.Status = Verdict.CompileError;
                 judging.StopTime = DateTimeOffset.Now;
 
-                await Facade.Judgings.UpdateAsync(judging);
+                await Facade.Judgings.UpdateAsync(
+                    id: judging.Id,
+                    j => new Judging
+                    {
+                        CompileError = judging.CompileError,
+                        StopTime = judging.StopTime,
+                        Status = Verdict.CompileError,
+                        RunVerdicts = "",
+                    });
+
                 await FinalizeJudging(new Events.JudgingFinishedEvent(judging, contestId, problemId, teamId, time));
             }
             else
             {
-                await Facade.Judgings.UpdateAsync(judging);
+                await Facade.Judgings.UpdateAsync(
+                    id: judging.Id,
+                    j => new Judging
+                    {
+                        CompileError = judging.CompileError,
+                        RunVerdicts = "",
+                    });
             }
 
             return judging;

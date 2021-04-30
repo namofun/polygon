@@ -63,7 +63,18 @@ namespace Polygon.Judgement
                 judging.TotalScore = verdict.TotalScore;
                 judging.RunVerdicts += addition;
 
-                await Facade.Judgings.UpdateAsync(judging);
+                await Facade.Judgings.UpdateAsync(
+                    id: judging.Id,
+                    j => new Judging
+                    {
+                        ExecuteMemory = judging.ExecuteMemory,
+                        ExecuteTime = judging.ExecuteTime,
+                        Status = judging.Status,
+                        StopTime = judging.StopTime,
+                        TotalScore = judging.TotalScore,
+                        RunVerdicts = judging.RunVerdicts,
+                    });
+
                 await FinalizeJudging(new JudgingFinishedEvent(judging, cid, probid, uid, time));
             }
             else

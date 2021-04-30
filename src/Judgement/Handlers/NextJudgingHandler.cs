@@ -36,7 +36,15 @@ namespace Polygon.Judgement
                 judging.Status = Verdict.Running;
                 judging.Server = host.ServerName;
                 judging.StartTime = DateTimeOffset.Now;
-                await Facade.Judgings.UpdateAsync(judging);
+
+                await Facade.Judgings.UpdateAsync(
+                    id: judging.Id,
+                    j => new Judging
+                    {
+                        Status = Verdict.Running,
+                        Server = judging.Server,
+                        StartTime = judging.StartTime,
+                    });
             }
 
             await Mediator.Publish(r);

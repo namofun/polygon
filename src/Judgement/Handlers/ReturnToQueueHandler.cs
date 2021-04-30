@@ -31,7 +31,17 @@ namespace Polygon.Judgement
             if (!j.StopTime.HasValue)
                 j.StopTime = DateTimeOffset.Now;
 
-            await Facade.Judgings.UpdateAsync(j);
+            await Facade.Judgings.UpdateAsync(
+                id: j.Id,
+                j => new Judging
+                {
+                    Active = false,
+                    Status = Verdict.UndefinedError,
+                    RejudgingId = null,
+                    PreviousJudgingId = null,
+                    StopTime = j.StopTime,
+                });
+
             await FinalizeJudging(request.ToEvent());
             return Unit.Value;
         }
