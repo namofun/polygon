@@ -1,8 +1,6 @@
 ﻿using Polygon.Entities;
 using Polygon.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Polygon.Storages
@@ -18,21 +16,6 @@ namespace Polygon.Storages
         /// <param name="entity">The entity.</param>
         /// <returns>The created entity.</returns>
         Task<InternalError> CreateAsync(InternalError entity);
-
-        /// <summary>
-        /// Update the instance of entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <returns>The update task.</returns>
-        Task UpdateAsync(InternalError entity);
-
-        /// <summary>
-        /// Update the instance of entity.
-        /// </summary>
-        /// <param name="id">The entity id.</param>
-        /// <param name="expression">The update expression.</param>
-        /// <returns>The update task.</returns>
-        Task UpdateAsync(int id, Expression<Func<InternalError, InternalError>> expression);
 
         /// <summary>
         /// Find the entity.

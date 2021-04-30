@@ -4,7 +4,6 @@ using Polygon.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Polygon.Storages
@@ -12,15 +11,6 @@ namespace Polygon.Storages
     public partial class PolygonFacade<TContext, TQueryCache> : IInternalErrorStore
     {
         Task<InternalError> IInternalErrorStore.CreateAsync(InternalError entity) => CreateEntityAsync(entity);
-
-        Task IInternalErrorStore.UpdateAsync(InternalError entity) => UpdateEntityAsync(entity);
-
-        Task IInternalErrorStore.UpdateAsync(int id, Expression<Func<InternalError, InternalError>> expression)
-        {
-            return Context.InternalErrors
-                .Where(e => e.Id == id)
-                .BatchUpdateAsync(expression);
-        }
 
         Task<int> IInternalErrorStore.CountOpenAsync()
         {
@@ -33,6 +23,7 @@ namespace Polygon.Storages
         {
             return Context.InternalErrors
                 .Where(e => e.Id == id)
+                .AsNoTracking()
                 .SingleOrDefaultAsync();
         }
 
@@ -48,8 +39,11 @@ namespace Polygon.Storages
         {
             if (error.Status != InternalErrorStatus.Open || status == InternalErrorStatus.Open)
                 throw new InvalidOperationException();
+
             error.Status = status;
-            await UpdateEntityAsync(error);
+            await Context.InternalErrors
+                .Where(e => e.Id == error.Id)
+                .BatchUpdateAsync(e => new InternalError { Status = status });
 
             if (status != InternalErrorStatus.Resolved) return null;
             return error.Disabled.AsJson<InternalErrorDisable>();
