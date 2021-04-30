@@ -55,7 +55,7 @@ namespace SatelliteSite
                         .Reverse()
                         .SkipWhile(a => !a.Verdict.HasValue)
                         .Reverse()
-                        .Select(a => Convert(a.Verdict))
+                        .Select(a => Polygon.ResourceDictionary.ConvertToChar(a.Verdict))
                         .ToArray());
 
                     await facade.Judgings.UpdateAsync(
@@ -64,21 +64,6 @@ namespace SatelliteSite
                 }
             }
             while (true);
-
-            static char Convert(Verdict? verdict)
-            {
-                return verdict switch
-                {
-                    Verdict.Accepted => 'a',
-                    Verdict.MemoryLimitExceeded => 'm',
-                    Verdict.OutputLimitExceeded => 'o',
-                    Verdict.RuntimeError => 'r',
-                    Verdict.TimeLimitExceeded => 't',
-                    Verdict.UndefinedError => 'u',
-                    Verdict.WrongAnswer => 'w',
-                    _ => '?',
-                };
-            }
         }
 
         public static IHost MigratePolygonV1(this IHost host)

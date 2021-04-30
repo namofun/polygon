@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Polygon.Entities;
 using Polygon.Packaging;
 
 namespace Polygon
@@ -44,6 +45,46 @@ namespace Polygon
             services.AddScoped<T>();
             services.Configure<PolygonOptions>(o => o.AddImportProvider<T>(id, name));
             return services;
+        }
+
+        /// <summary>
+        /// Converts the verdict to single char.
+        /// </summary>
+        /// <param name="verdict">The raw verdict.</param>
+        /// <returns>The char to represent.</returns>
+        public static char ConvertToChar(Verdict? verdict)
+        {
+            return verdict switch
+            {
+                Verdict.Accepted => 'a',
+                Verdict.MemoryLimitExceeded => 'm',
+                Verdict.OutputLimitExceeded => 'o',
+                Verdict.RuntimeError => 'r',
+                Verdict.TimeLimitExceeded => 't',
+                Verdict.UndefinedError => 'u',
+                Verdict.WrongAnswer => 'w',
+                _ => '?',
+            };
+        }
+
+        /// <summary>
+        /// Converts the single char to verdict.
+        /// </summary>
+        /// <param name="ch">The single char.</param>
+        /// <returns>The char to represent.</returns>
+        public static Verdict ConvertToVerdict(char ch)
+        {
+            return ch switch
+            {
+                'a' => Verdict.Accepted,
+                'm' => Verdict.MemoryLimitExceeded,
+                'o' => Verdict.OutputLimitExceeded,
+                'r' => Verdict.RuntimeError,
+                't' => Verdict.TimeLimitExceeded,
+                'u' => Verdict.UndefinedError,
+                'w' => Verdict.WrongAnswer,
+                _ => Verdict.Unknown,
+            };
         }
     }
 }

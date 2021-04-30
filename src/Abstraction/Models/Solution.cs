@@ -1,5 +1,6 @@
 ﻿using Polygon.Entities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Polygon.Models
@@ -78,7 +79,7 @@ namespace Polygon.Models
         /// The judging run verdicts
         /// </summary>
         /// <remarks>Ordered by the emitted ID. When not included, this field may be null.</remarks>
-        public IEnumerable<Verdict>? Verdicts { get; set; }
+        public virtual IEnumerable<Verdict>? RunVerdicts { get; set; }
 
         /// <summary>
         /// The name of author
@@ -103,5 +104,36 @@ namespace Polygon.Models
         {
         }
 #pragma warning restore CS8618
+    }
+
+    /// <summary>
+    /// The model class for solutions with verdicts.
+    /// </summary>
+    internal class SolutionV1 : Solution, IEnumerable<Verdict>
+    {
+        /// <inheritdoc />
+        public override IEnumerable<Verdict>? RunVerdicts
+        {
+            get => this;
+            set => throw new InvalidOperationException("The run verdicts has been set.");
+        }
+
+        /// <inheritdoc cref="RunVerdicts" />
+        public string? RunVerdictsRaw { get; set; }
+
+        /// <inheritdoc />
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc />
+        public IEnumerator<Verdict> GetEnumerator()
+        {
+            if (RunVerdictsRaw != null)
+            {
+                for (int i = 0; i < RunVerdictsRaw.Length; i++)
+                {
+                    yield return ResourceDictionary.ConvertToVerdict(RunVerdictsRaw[i]);
+                }
+            }
+        }
     }
 }

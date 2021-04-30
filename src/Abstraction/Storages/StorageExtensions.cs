@@ -98,54 +98,46 @@ namespace Polygon.Storages
             return result.Select(a => ((JudgingRun?)a.d, a.t));
         }
 
-        /// <summary>
-        /// Create an expression for fetching with <see cref="Submission"/> and <see cref="Judging"/>.
-        /// </summary>
-        /// <param name="includeDetails">Whether to include judging runs.</param>
-        /// <returns>The expression for query.</returns>
-        private static Expression<Func<Submission, Judging, Models.Solution>> CreateSelector(bool includeDetails)
-        {
-#warning Details was removed
-            if (includeDetails)
-                return (s, j) => new Models.Solution
-                {
-                    SubmissionId = s.Id,
-                    JudgingId = j.Id,
-                    ProblemId = s.ProblemId,
-                    ContestId = s.ContestId,
-                    TeamId = s.TeamId,
-                    Skipped = s.Ignored,
-                    Language = s.Language,
-                    CodeLength = s.CodeLength,
-                    ExpectedVerdict = s.ExpectedResult,
-                    Time = s.Time,
-                    Ip = s.Ip,
-                    Verdict = j.Status,
-                    ExecutionTime = j.ExecuteTime,
-                    ExecutionMemory = j.ExecuteMemory,
-                    // Details = j.Details,
-                    TotalScore = j.TotalScore,
-                };
-            else
-                return (s, j) => new Models.Solution
-                {
-                    SubmissionId = s.Id,
-                    JudgingId = j.Id,
-                    ProblemId = s.ProblemId,
-                    ContestId = s.ContestId,
-                    TeamId = s.TeamId,
-                    Skipped = s.Ignored,
-                    Language = s.Language,
-                    CodeLength = s.CodeLength,
-                    ExpectedVerdict = s.ExpectedResult,
-                    Time = s.Time,
-                    Ip = s.Ip,
-                    Verdict = j.Status,
-                    ExecutionTime = j.ExecuteTime,
-                    ExecutionMemory = j.ExecuteMemory,
-                    TotalScore = j.TotalScore,
-                };
-        }
+        private static readonly Expression<Func<Submission, Judging, Models.Solution>> SelectorWithDetails
+            = (s, j) => new Models.SolutionV1
+            {
+                SubmissionId = s.Id,
+                JudgingId = j.Id,
+                ProblemId = s.ProblemId,
+                ContestId = s.ContestId,
+                TeamId = s.TeamId,
+                Skipped = s.Ignored,
+                Language = s.Language,
+                CodeLength = s.CodeLength,
+                ExpectedVerdict = s.ExpectedResult,
+                Time = s.Time,
+                Ip = s.Ip,
+                Verdict = j.Status,
+                ExecutionTime = j.ExecuteTime,
+                ExecutionMemory = j.ExecuteMemory,
+                RunVerdictsRaw = j.RunVerdicts,
+                TotalScore = j.TotalScore,
+            };
+
+        private static readonly Expression<Func<Submission, Judging, Models.Solution>> SelectorWithoutDetails
+            = (s, j) => new Models.Solution
+            {
+                SubmissionId = s.Id,
+                JudgingId = j.Id,
+                ProblemId = s.ProblemId,
+                ContestId = s.ContestId,
+                TeamId = s.TeamId,
+                Skipped = s.Ignored,
+                Language = s.Language,
+                CodeLength = s.CodeLength,
+                ExpectedVerdict = s.ExpectedResult,
+                Time = s.Time,
+                Ip = s.Ip,
+                Verdict = j.Status,
+                ExecutionTime = j.ExecuteTime,
+                ExecutionMemory = j.ExecuteMemory,
+                TotalScore = j.TotalScore,
+            };
 
         /// <summary>
         /// List the paginated solutions satisfying some conditions.
@@ -161,7 +153,7 @@ namespace Polygon.Storages
             Expression<Func<Submission, bool>>? predicate = null,
             bool includeDetails = false)
         {
-            return that.ListWithJudgingAsync(pagination, CreateSelector(includeDetails), predicate);
+            return that.ListWithJudgingAsync(pagination, includeDetails ? SelectorWithDetails : SelectorWithoutDetails, predicate);
         }
 
         /// <summary>
@@ -178,7 +170,7 @@ namespace Polygon.Storages
             Expression<Func<Submission, Judging, bool>> predicate,
             bool includeDetails = false)
         {
-            return that.ListWithJudgingAsync(pagination, CreateSelector(includeDetails), predicate);
+            return that.ListWithJudgingAsync(pagination, includeDetails ? SelectorWithDetails : SelectorWithoutDetails, predicate);
         }
 
         /// <summary>
@@ -195,7 +187,7 @@ namespace Polygon.Storages
             bool includeDetails = false,
             int? limits = null)
         {
-            return that.ListWithJudgingAsync(CreateSelector(includeDetails), predicate, limits);
+            return that.ListWithJudgingAsync(includeDetails ? SelectorWithDetails : SelectorWithoutDetails, predicate, limits);
         }
 
         /// <summary>
