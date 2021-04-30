@@ -5,6 +5,7 @@ using Polygon.Events;
 using Polygon.Storages;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,6 +45,7 @@ namespace Polygon.Judgement
             }
 
             // Check for the final status
+            var addition = new string(runList.Select(r => ResourceDictionary.ConvertToChar(r.Status)).ToArray());
             var countTc = await Facade.Testcases.CountAsync(probid);
             var verdict = await Facade.Judgings.SummarizeAsync(judging.Id);
 
@@ -59,7 +61,16 @@ namespace Polygon.Judgement
                 judging.Status = verdict.FinalVerdict;
                 judging.StopTime = host.PollTime;
                 judging.TotalScore = verdict.TotalScore;
+                judging.RunVerdicts += addition;
+
+                await Facade.Judgings.UpdateAsync(judging);
                 await FinalizeJudging(new JudgingFinishedEvent(judging, cid, probid, uid, time));
+            }
+            else
+            {
+                await Facade.Judgings.UpdateAsync(
+                    id: judging.Id,
+                    j => new Judging { RunVerdicts = j.RunVerdicts + addition });
             }
 
             return true;

@@ -108,6 +108,7 @@ namespace Polygon.Storages
                             Status = Verdict.Pending,
                             RejudgingId = rejid,
                             PreviousJudgingId = j.Id,
+                            PolygonVersion = 1,
                         })
                     .BatchInsertIntoAsync(Context.Judgings);
             }
@@ -200,6 +201,7 @@ namespace Polygon.Storages
                     Active = true,
                     Status = Verdict.Pending,
                     PreviousJudgingId = currentJudging.Id,
+                    PolygonVersion = 1,
                 });
 
                 await Context.SaveChangesAsync();

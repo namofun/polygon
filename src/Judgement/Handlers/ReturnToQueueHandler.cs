@@ -21,6 +21,7 @@ namespace Polygon.Judgement
                     RejudgingId = j.RejudgingId,
                     PreviousJudgingId = j.PreviousJudgingId,
                     SubmissionId = j.SubmissionId,
+                    PolygonVersion = 1,
                 });
 
             j.Active = false;
@@ -30,6 +31,7 @@ namespace Polygon.Judgement
             if (!j.StopTime.HasValue)
                 j.StopTime = DateTimeOffset.Now;
 
+            await Facade.Judgings.UpdateAsync(j);
             await FinalizeJudging(request.ToEvent());
             return Unit.Value;
         }

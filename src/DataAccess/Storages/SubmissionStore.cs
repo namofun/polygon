@@ -33,6 +33,7 @@ namespace Polygon.Storages
                         FullTest = fullJudge || expected.HasValue,
                         Active = true,
                         Status = Verdict.Pending,
+                        PolygonVersion = 1,
                     }
                 },
             });

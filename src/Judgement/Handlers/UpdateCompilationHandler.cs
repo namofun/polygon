@@ -21,11 +21,14 @@ namespace Polygon.Judgement
             if (judging == null) return null;
 
             judging.CompileError = request.CompilerOutput ?? "";
+            judging.RunVerdicts = "";
 
             if (request.Success != 1)
             {
                 judging.Status = Verdict.CompileError;
                 judging.StopTime = DateTimeOffset.Now;
+
+                await Facade.Judgings.UpdateAsync(judging);
                 await FinalizeJudging(new Events.JudgingFinishedEvent(judging, contestId, problemId, teamId, time));
             }
             else

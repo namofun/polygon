@@ -13,8 +13,6 @@ namespace Polygon.Judgement
         /// </summary>
         private async Task FinalizeJudging(JudgingFinishedEvent e)
         {
-            await Facade.Judgings.UpdateAsync(e.Judging);
-
             Telemetry.TrackDependency(
                 dependencyTypeName: "JudgeHost",
                 dependencyName: e.Judging.Server!,
