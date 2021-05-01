@@ -118,12 +118,12 @@ namespace Polygon.Storages
             return Context.Submissions
                 .WhereIf(predicate != null, predicate!)
                 .OrderByDescending(s => s.Time)
-                .TakeIf(limits)
                 .Join(
                     inner: Context.Judgings,
                     outerKeySelector: s => new { s.Id, Active = true },
                     innerKeySelector: j => new { Id = j.SubmissionId, j.Active },
                     resultSelector: selector)
+                .TakeIf(limits)
                 .ToListAsync();
         }
 
