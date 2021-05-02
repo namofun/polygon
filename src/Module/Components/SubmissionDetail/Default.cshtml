@@ -84,7 +84,7 @@
 <div class="mb-2">
     <div>
         Result: <verdict value="@Model.Judging.Status" class="@(Model.Judging.Active ? "" : "disabled")" />,
-        Judgehost: <span class="hostname">@(Model.Judging.Server ?? "-")</span>,
+        Judgehost: <a class="hostname" href="@(Model.Judging.Server != null && User.IsInRole("Administrator") ? Url.Action("Detail", "Judgehosts", new { area = "Dashboard", hostname = Model.Judging.Server }) : null)">@(Model.Judging.Server ?? "n/a")</a>,
         <span class="judgetime">
             <razor asp-show-if="Model.Judging.StartTime.HasValue">
                 Judging started: @Model.Judging.StartTime?.ToString("HH:mm:ss"),

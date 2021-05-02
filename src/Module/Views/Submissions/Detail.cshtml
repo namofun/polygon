@@ -18,11 +18,11 @@
 <div class="submission-summary mb-2">
     <span>
         <i class="fas fa-user" title="Author:"></i>
-        <a>@(Model.AuthorName ?? "SYSTEM")</a>
+        <a href="@(Model.ContestId == 0 ? Url.Action("Detail", "Users", new { area = "Dashboard", uid = Model.TeamId }) : Url.Action("Detail", "JuryTeams", new { area = "Contest", cid = Model.ContestId, teamid = Model.TeamId }))">@(Model.AuthorName ?? "SYSTEM")</a>
     </span>
     <span>
         <i class="fas fa-comments" title="Language:"></i>
-        @Model.LanguageName
+        <a asp-area="Dashboard" asp-controller="Languages" asp-action="Detail" asp-route-langid="@Model.Language">@Model.LanguageName</a>
     </span>
     <span>
         <i class="fas fa-clock" title="Submittime:"></i>
