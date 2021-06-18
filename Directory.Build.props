@@ -4,6 +4,6 @@
     <SubstrateVersion>1.0.38</SubstrateVersion>
     <PreviewBuild>18</PreviewBuild>
     <AspNetCoreVersion>3.1.13</AspNetCoreVersion>
-    <EFCoreBulkVersion>3.1.25</EFCoreBulkVersion>
+    <EFCoreBulkVersion>3.1.26</EFCoreBulkVersion>
   </PropertyGroup>
 </Project>

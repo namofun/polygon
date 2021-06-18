@@ -42,6 +42,7 @@ namespace SatelliteSite.PolygonModule.Apis
         /// <param name="testcases"></param>
         /// <response code="200">Information about the file of the given testcase</response>
         [HttpGet("{id}/[action]/{type}")]
+        [Produces("application/json", "application/octet-stream")]
         public async Task<ActionResult<string>> File(
             [FromRoute] int id,
             [FromRoute] string type,
@@ -56,7 +57,7 @@ namespace SatelliteSite.PolygonModule.Apis
 
             var fileInfo = await testcases.GetFileAsync(tc, type);
             if (!fileInfo.Exists) return NotFound();
-            return new Base64StreamResult(fileInfo);
+            return this.Output(fileInfo);
         }
     }
 }

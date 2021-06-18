@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Polygon.Models;
 using Polygon.Packaging;
 using System;
@@ -64,6 +65,37 @@ namespace Microsoft.AspNetCore.Mvc
             var sb = new StringBuilder();
             writer.BuildHtml(sb, statement);
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Outputs the file as action result.
+        /// </summary>
+        /// <param name="controller">The controller.</param>
+        /// <param name="fileInfo">The file information.</param>
+        /// <returns>The decided action result.</returns>
+        public static ActionResult Output(this ControllerBase controller, IFileInfo fileInfo)
+        {
+            controller.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            var accepts = controller.Request.Headers.GetCommaSeparatedValues("accept");
+            var decidedOutput = accepts.Length == 0 ? "application/json" : null;
+
+            for (int i = 0; i < accepts.Length; i++)
+            {
+                switch (accepts[i])
+                {
+                    case "application/json":
+                    case "application/octet-stream":
+                    case "text/plain":
+                        decidedOutput ??= accepts[i];
+                        break;
+                }
+            }
+
+            return decidedOutput == null
+                ? new StatusCodeResult(StatusCodes.Status406NotAcceptable)
+                : decidedOutput == "application/json"
+                ? (ActionResult)new Base64StreamResult(fileInfo)
+                : new FileStreamResult(fileInfo.CreateReadStream(), decidedOutput);
         }
     }
 }
