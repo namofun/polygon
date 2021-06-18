@@ -4,6 +4,8 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading;
@@ -29,7 +31,11 @@ namespace Polygon.FakeJudgehost
             if (Files.TryGetValue(requestUrl, out var exec) && md5 == exec.Item1)
                 return exec.Item2;
 
-            var result = await service.HttpClient.GetStringAsync(requestUrl);
+            using var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            using var response = await service.HttpClient.SendAsync(request);
+            var result = await response.Content.ReadAsStringAsync();
+
             result = result.Trim('"');
             var bytes = Convert.FromBase64String(result);
             var md5_new = bytes.ToMD5().ToHexDigest(true);
