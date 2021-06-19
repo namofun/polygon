@@ -88,6 +88,11 @@ namespace Microsoft.AspNetCore.Mvc
                     case "text/plain":
                         decidedOutput ??= accepts[i];
                         break;
+
+                    case "*/*":
+                    case "application/*":
+                        decidedOutput ??= "application/json";
+                        break;
                 }
             }
 
