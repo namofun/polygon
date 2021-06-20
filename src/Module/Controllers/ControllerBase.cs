@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,11 +18,17 @@ namespace SatelliteSite.PolygonModule.Controllers
     public abstract class PolygonControllerBase : ViewControllerBase
     {
         private IPolygonFacade _facade;
+        private IMediator _mediator;
 
         /// <summary>
         /// The facade
         /// </summary>
         protected IPolygonFacade Facade => _facade;
+
+        /// <summary>
+        /// The messaging center
+        /// </summary>
+        protected IMediator Mediator => _mediator;
 
         /// <summary>
         /// The context problem
@@ -82,6 +89,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             ActionExecutionDelegate next)
         {
             _facade = context.GetService<IPolygonFacade>();
+            _mediator = context.GetService<IMediator>();
             context.Result = await ValidateAsync();
             await base.OnActionExecutionAsync(context, next);
         }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Polygon.Entities;
+using Polygon.Events;
 using Polygon.Packaging;
 using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
@@ -149,6 +150,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 Shared = model.Shared,
             });
 
+            await Mediator.Publish(new ProblemModifiedEvent(Problem));
             await HttpContext.AuditAsync("edit", $"{Problem.Id}");
             return RedirectToAction(nameof(Overview));
         }

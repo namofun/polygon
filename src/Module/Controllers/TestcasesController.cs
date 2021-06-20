@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Polygon.Entities;
+using Polygon.Events;
 using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
@@ -48,6 +49,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         public async Task<IActionResult> Score(TestcaseScoreModel model)
         {
             int cnt = await Store.BatchScoreAsync(Problem.Id, model.Lower, model.Upper, model.Score);
+            await Mediator.Publish(new ProblemModifiedEvent(Problem));
             await HttpContext.AuditAsync("scored", $"{model.Lower} ~ {model.Upper}");
             StatusMessage = $"Score set, {cnt} testcases affected.";
             return RedirectToAction(nameof(Testcases));
@@ -99,6 +101,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 last.CustomOutput = string.IsNullOrWhiteSpace(model.CustomOutput) ? null : model.CustomOutput;
                 await Store.UpdateAsync(last, inputf, outputf);
 
+                await Mediator.Publish(new ProblemModifiedEvent(Problem));
                 await HttpContext.AuditAsync("modified", $"p{last.ProblemId}t{last.Id}");
                 StatusMessage = $"Testcase t{testid} updated successfully.";
                 return RedirectToAction(nameof(Testcases));
@@ -155,6 +158,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                         CustomOutput = model.CustomOutput,
                     });
 
+                await Mediator.Publish(new ProblemModifiedEvent(Problem));
                 await HttpContext.AuditAsync("created", $"p{Problem.Id}t{e.Id}");
                 StatusMessage = $"Testcase t{e.Id} created successfully.";
                 return RedirectToAction(nameof(Testcases));
@@ -192,6 +196,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             if (tc == null) return NotFound();
 
             int dts = await Store.CascadeDeleteAsync(tc);
+            await Mediator.Publish(new ProblemModifiedEvent(Problem));
             await HttpContext.AuditAsync("deleted", $"p{Problem.Id}t{testid}");
 
             StatusMessage = dts < 0
@@ -210,6 +215,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             else if (direction != "down") return NotFound();
 
             await Store.ChangeRankAsync(Problem.Id, testid, up);
+            await Mediator.Publish(new ProblemModifiedEvent(Problem));
             await HttpContext.AuditAsync("moved", $"p{Problem.Id}t{testid}");
             return RedirectToAction(nameof(Testcases));
         }

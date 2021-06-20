@@ -28,7 +28,6 @@ namespace Polygon.Storages
                 .BatchUpdateAsync(expression);
 
             await Context.Entry(problem).ReloadAsync();
-            await Mediator.Publish(new ProblemModifiedEvent(problem));
         }
 
         Task<Problem> IProblemStore.FindAsync(int probid)
@@ -111,11 +110,9 @@ namespace Polygon.Storages
                 .BatchUpdateAsync(p => new Problem { AllowSubmit = tobe });
         }
 
-        async Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, string content)
+        Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, string content)
         {
-            var result = await ProblemFiles.WriteStringAsync($"p{problem.Id}/{fileName}", content);
-            if (fileName == "view.html") await Mediator.Publish(new ProblemModifiedEvent(problem));
-            return result;
+            return ProblemFiles.WriteStringAsync($"p{problem.Id}/{fileName}", content);
         }
 
         Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, byte[] content)

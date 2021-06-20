@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Polygon;
+using Polygon.Events;
 using Polygon.Packaging;
 using SatelliteSite.PolygonModule.Models;
 using System;
@@ -71,6 +72,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         {
             var content = writer.BuildHtml(await StatementAsync());
             await Facade.Problems.WriteFileAsync(Problem, "view.html", content);
+            await Mediator.Publish(new ProblemModifiedEvent(Problem));
             StatusMessage = "Problem description saved successfully.";
             return RedirectToAction(nameof(Preview), new { @new = false });
         }
