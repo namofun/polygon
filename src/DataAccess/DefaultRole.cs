@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Polygon.Storages;
 using Polygon.Storages.Handlers;
 using System.IO;
@@ -28,12 +29,28 @@ namespace Polygon
             services.AddOptions<PolygonPhysicalOptions>()
                 .PostConfigure(options =>
                 {
-                    EnsureDirectoryExists(options.JudgingDirectory);
-                    EnsureDirectoryExists(options.ProblemDirectory);
+                    if (options.JudgingFileProvider == null)
+                    {
+                        EnsureDirectoryExists(options.JudgingDirectory);
+                    }
+
+                    if (options.ProblemFileProvider == null)
+                    {
+                        EnsureDirectoryExists(options.ProblemDirectory);
+                    }
                 });
 
-            services.AddSingleton<IJudgingFileProvider, ByOptionJudgingFileProvider>();
-            services.AddSingleton<IProblemFileProvider, ByOptionProblemFileProvider>();
+            services.AddSingleton<IJudgingFileProvider>(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<PolygonPhysicalOptions>>();
+                return options.Value.JudgingFileProvider ?? new PhysicalPolygonFileProvider(options.Value.JudgingDirectory);
+            });
+
+            services.AddSingleton<IProblemFileProvider>(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<PolygonPhysicalOptions>>();
+                return options.Value.ProblemFileProvider ?? new PhysicalPolygonFileProvider(options.Value.ProblemDirectory);
+            });
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
 
 namespace Polygon.Storages
 {
@@ -11,16 +10,9 @@ namespace Polygon.Storages
     {
     }
 
-    public class ByOptionJudgingFileProvider : PhysicalMutableFileProvider, IJudgingFileProvider
+    public class PhysicalPolygonFileProvider : PhysicalMutableFileProvider, IJudgingFileProvider, IProblemFileProvider
     {
-        public ByOptionJudgingFileProvider(IOptions<PolygonPhysicalOptions> options) : base(options.Value.JudgingDirectory)
-        {
-        }
-    }
-
-    public class ByOptionProblemFileProvider : PhysicalMutableFileProvider, IProblemFileProvider
-    {
-        public ByOptionProblemFileProvider(IOptions<PolygonPhysicalOptions> options) : base(options.Value.ProblemDirectory)
+        public PhysicalPolygonFileProvider(string path) : base(path)
         {
         }
     }
