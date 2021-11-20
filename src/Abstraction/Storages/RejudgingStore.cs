@@ -32,7 +32,7 @@ namespace Polygon.Storages
         /// <param name="contestId">The contest ID.</param>
         /// <param name="rejudgingId">The rejudging ID.</param>
         /// <returns>The task for fetching rejudging entity.</returns>
-        Task<Rejudging> FindAsync(int contestId, int rejudgingId);
+        Task<Rejudging?> FindAsync(int contestId, int rejudgingId);
 
         /// <summary>
         /// List the rejudging for certain contest.

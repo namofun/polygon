@@ -30,7 +30,7 @@ namespace Polygon.Storages
             await Context.Entry(problem).ReloadAsync();
         }
 
-        Task<Problem> IProblemStore.FindAsync(int probid)
+        Task<Problem?> IProblemStore.FindAsync(int probid)
         {
             return Context.Problems
                 .Where(p => p.Id == probid)
@@ -168,7 +168,7 @@ namespace Polygon.Storages
             }
         }
 
-        async Task<(Problem, AuthorLevel?)> IProblemStore.FindAsync(int problemId, int userId)
+        async Task<(Problem?, AuthorLevel?)> IProblemStore.FindAsync(int problemId, int userId)
         {
             var res = await Context.ProblemAuthors
                 .Where(pa => pa.ProblemId == problemId && pa.UserId == userId)

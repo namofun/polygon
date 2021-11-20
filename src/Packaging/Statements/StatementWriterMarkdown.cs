@@ -27,7 +27,7 @@ namespace Polygon.Packaging
         }
 
         public static readonly Dictionary<string, string> MarkdownReplacements
-            = new Dictionary<string, string>
+            = new()
             {
                 [" -- "] = " — ",
                 [" --- "] = " — ",
@@ -36,13 +36,16 @@ namespace Polygon.Packaging
 
         public void BuildHtml(StringBuilder htmlBuilder, Statement statement)
         {
-            string RenderMarkdown(string source, Action<MarkdownDocument>? options = null)
+            string RenderMarkdown(string source, Action<MarkdownDocument> options = null)
             {
                 var document = Markdown.Parse(source);
                 options?.Invoke(document);
                 var result = Markdown.RenderAsHtml(document);
                 foreach (var (key, value) in MarkdownReplacements)
+                {
                     result = result.Replace(key, value);
+                }
+
                 return result;
             }
 
@@ -124,7 +127,7 @@ namespace Polygon.Packaging
                     IFileInfo file = Files.GetFileInfoAsync(url.TrimStart('/')).Result;
                     if (!file.Exists) return url;
                     var ext = Path.GetExtension(file.PhysicalPath).TrimStart('.');
-                    var guid = Guid.NewGuid().ToString("N").Substring(0, 16);
+                    var guid = Guid.NewGuid().ToString("N")[..16];
                     var fileName = $"{guid}.{ext}";
                     zip.CreateEntryFromFile(file.PhysicalPath, filePrefix + fileName);
                     return Path.GetFileNameWithoutExtension(fileName) + Path.GetExtension(fileName);
@@ -134,7 +137,7 @@ namespace Polygon.Packaging
                     var index = url.IndexOf(";base64,");
                     if (index == -1) return url;
                     string ext = url[11..index];
-                    var guid = Guid.NewGuid().ToString("N").Substring(0, 16);
+                    var guid = Guid.NewGuid().ToString("N")[..16];
                     var fileName = $"{guid}.{ext}";
 
                     try

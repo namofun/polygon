@@ -23,7 +23,7 @@ namespace Polygon.Storages
         /// <param name="problemId">The problem ID.</param>
         /// <param name="user">The user claims principal.</param>
         /// <returns>The task for fetching the problem and author level.</returns>
-        public static async Task<(Problem, AuthorLevel?)> FindAsync(this IProblemStore store, int problemId, ClaimsPrincipal user)
+        public static async Task<(Problem?, AuthorLevel?)> FindAsync(this IProblemStore store, int problemId, ClaimsPrincipal user)
         {
             if (user.IsInRole("Administrator"))
             {
@@ -65,7 +65,7 @@ namespace Polygon.Storages
         /// <param name="judgingId">The judging ID.</param>
         /// <param name="selector">The result selector.</param>
         /// <returns>The task for fetching corresponding DTO.</returns>
-        public static Task<T> FindAsync<T>(this IJudgingStore that, int judgingId, Expression<Func<Judging, T>> selector)
+        public static Task<T?> FindAsync<T>(this IJudgingStore that, int judgingId, Expression<Func<Judging, T>> selector) where T : class
         {
             return that.FindAsync(j => j.Id == judgingId, selector);
         }
@@ -273,7 +273,7 @@ namespace Polygon.Storages
         {
             var uid = user.IsInRole("Administrator")
                 ? default(int?)
-                : int.Parse(user.GetUserId());
+                : int.Parse(user.GetUserId() ?? "-100");
 
             return store.ListAsync(page, perCount, ascending, uid, leastLevel);
         }

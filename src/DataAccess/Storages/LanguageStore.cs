@@ -27,7 +27,7 @@ namespace Polygon.Storages
             await Mediator.Publish(new LanguageModifiedEvent(entity));
         }
 
-        Task<Language> ILanguageStore.FindAsync(string langid)
+        Task<Language?> ILanguageStore.FindAsync(string langid)
         {
             return Context.Languages
                 .Where(l => l.Id == langid)

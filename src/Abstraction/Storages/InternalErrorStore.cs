@@ -22,7 +22,7 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="id">The entity id.</param>
         /// <returns>The find task.</returns>
-        Task<InternalError> FindAsync(int id);
+        Task<InternalError?> FindAsync(int id);
 
         /// <summary>
         /// Mark the internal error as resolved status.

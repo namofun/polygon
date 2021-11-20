@@ -11,7 +11,7 @@ namespace Polygon.Storages
     {
         Task<Judgehost> IJudgehostStore.CreateAsync(Judgehost entity) => CreateEntityAsync(entity);
 
-        Task<Judgehost> IJudgehostStore.FindAsync(string name)
+        Task<Judgehost?> IJudgehostStore.FindAsync(string name)
         {
             return Context.Judgehosts
                 .AsNoTracking()

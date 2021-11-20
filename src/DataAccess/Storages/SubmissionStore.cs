@@ -43,7 +43,7 @@ namespace Polygon.Storages
             return s.Entity;
         }
 
-        Task<Submission> ISubmissionStore.FindAsync(int submissionId, bool includeJudgings)
+        Task<Submission?> ISubmissionStore.FindAsync(int submissionId, bool includeJudgings)
         {
             return Context.Submissions
                 .Where(s => s.Id == submissionId)
@@ -51,7 +51,7 @@ namespace Polygon.Storages
                 .SingleOrDefaultAsync();
         }
 
-        Task<Submission> ISubmissionStore.FindByJudgingAsync(int judgingid)
+        Task<Submission?> ISubmissionStore.FindByJudgingAsync(int judgingid)
         {
             return Context.Judgings
                 .Where(j => j.Id == judgingid)
@@ -65,7 +65,7 @@ namespace Polygon.Storages
             return result.ToDictionary(s => s.SubmissionId, s => s.ToString());
         }
 
-        Task<SubmissionFile> ISubmissionStore.GetFileAsync(int submissionId)
+        Task<SubmissionFile?> ISubmissionStore.GetFileAsync(int submissionId)
         {
             return Context.Submissions
                 .Where(s => s.Id == submissionId)

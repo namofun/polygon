@@ -24,12 +24,12 @@ namespace Polygon.Storages
             return Context.Judgings.Where(predicate).CountAsync();
         }
 
-        Task<T> IJudgingStore.FindAsync<T>(Expression<Func<Judging, bool>> predicate, Expression<Func<Judging, T>> selector)
+        Task<T?> IJudgingStore.FindAsync<T>(Expression<Func<Judging, bool>> predicate, Expression<Func<Judging, T>> selector) where T : class
         {
             return Context.Judgings.Where(predicate).OrderBy(j => j.Id).Select(selector).FirstOrDefaultAsync();
         }
 
-        async Task<IEnumerable<T>> IJudgingStore.GetDetailsAsync<T>(int problemId, int judgingId, Expression<Func<Testcase, JudgingRun?, T>> selector)
+        async Task<IEnumerable<T>> IJudgingStore.GetDetailsAsync<T>(int problemId, int judgingId, Expression<Func<Testcase, JudgingRun?, T>> selector) where T : class
         {
             var _selector = selector.Combine(
                 objectTemplate1: new { t = default(Testcase)!, dd = default(IEnumerable<JudgingRun?>)! },
@@ -40,13 +40,13 @@ namespace Polygon.Storages
                 .Where(t => t.ProblemId == problemId)
                 .OrderBy(t => t.Rank)
                 .GroupJoin(
-                    inner: (DbSet<JudgingRun?>)Context.JudgingRuns!,
+                    inner: (IQueryable<JudgingRun?>)Context.JudgingRuns!,
                     outerKeySelector: t => new { TestcaseId = t.Id, JudgingId = judgingId },
                     innerKeySelector: d => new { d!.TestcaseId, d!.JudgingId },
                     resultSelector: (t, dd) => new { t, dd })
                 .SelectMany(
                     collectionSelector: a => a.dd.DefaultIfEmpty(),
-                    resultSelector: _selector);
+                    resultSelector: _selector!);
 
             return await query.ToListAsync();
         }
@@ -64,7 +64,7 @@ namespace Polygon.Storages
                 .Join(Context.Testcases, d => d.TestcaseId, t => t.Id, (d, t) => new { t, d })
                 .WhereIf(_predicate != null, _predicate)
                 .OrderBy(a => a.d.Id)
-                .Select(_selector)
+                .Select(_selector!)
                 .TakeIf(limit)
                 .ToListAsync();
         }
@@ -118,8 +118,9 @@ namespace Polygon.Storages
                     .Where(r => r.JudgingId == judgingid && r.Id == runid)
                     .Select(r => new { SubmissionId = r.j.s.Id, r.j.s.ProblemId })
                     .SingleOrDefaultAsync();
-                if (submitid.HasValue && validation.SubmissionId != submitid.Value) return notfound;
-                if (probid.HasValue && validation.ProblemId != probid.Value) return notfound;
+
+                if (submitid.HasValue && validation?.SubmissionId != submitid.Value) return notfound;
+                if (probid.HasValue && validation?.ProblemId != probid.Value) return notfound;
             }
 
             return fileInfo;
@@ -147,7 +148,7 @@ namespace Polygon.Storages
                     TotalScore = g.Sum(a => a.Status == Verdict.Accepted ? a.Point : 0)
                 };
 
-            return query.FirstOrDefaultAsync();
+            return query.FirstAsync();
         }
 
         Task<JudgingRun?> IJudgingStore.GetDetailAsync(int problemId, int submitId, int judgingId, int runId)

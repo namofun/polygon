@@ -43,7 +43,7 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="name">The entity id.</param>
         /// <returns>The find task.</returns>
-        Task<Judgehost> FindAsync(string name);
+        Task<Judgehost?> FindAsync(string name);
 
         /// <summary>
         /// Notify the judgehost polled now.

@@ -19,7 +19,7 @@ namespace Polygon.Judgement
             if (!host.Active) return null;
             // Above: unknown or inactive judgehost requested
 
-            JudgingBeginEvent r;
+            JudgingBeginEvent? r;
 
             using (await Lock.LockAsync())
             {
@@ -47,7 +47,7 @@ namespace Polygon.Judgement
                     });
             }
 
-            await Mediator.Publish(r);
+            await Mediator.Publish(r, CancellationToken.None);
 
             var md5s = await Facade.Executables.ListMd5Async(
                 r.Problem.RunScript,

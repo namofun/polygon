@@ -12,7 +12,7 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : IRejudgingStore
     {
-        private static readonly ConcurrentAsyncLock _beingRejudged = new ConcurrentAsyncLock();
+        private static readonly ConcurrentAsyncLock _beingRejudged = new();
 
         async Task IRejudgingStore.ApplyAsync(Rejudging rejudge, int uid)
         {
@@ -75,7 +75,7 @@ namespace Polygon.Storages
             var _predicate = predicate.Combine(
                 objectTemplate: new { s = default(Submission)!, j = default(Judging)! },
                 place1: a => a.s, place2: a => a.j);
-            selectionQuery = selectionQuery.Where(_predicate);
+            selectionQuery = selectionQuery.Where(_predicate!);
 
             var sublist_0 = selectionQuery.Select(a => a.s.Id).Distinct();
             var sublist = Context.Submissions.Where(s => sublist_0.Contains(s.Id));
@@ -146,7 +146,7 @@ namespace Polygon.Storages
 
         Task IRejudgingStore.DeleteAsync(Rejudging entity) => DeleteEntityAsync(entity);
 
-        Task<Rejudging> IRejudgingStore.FindAsync(int cid, int rejid)
+        Task<Rejudging?> IRejudgingStore.FindAsync(int cid, int rejid)
         {
             return Context.Rejudgings
                 .Where(r => r.ContestId == cid && r.Id == rejid)

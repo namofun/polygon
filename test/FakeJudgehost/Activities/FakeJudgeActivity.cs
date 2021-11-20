@@ -52,7 +52,7 @@ namespace Polygon.FakeJudgehost
             using var resp = await service.HttpClient.GetAsync($"contests/{cid}/submissions/{submitid}/source-code");
             using var stream = await resp.Content.ReadAsStreamAsync();
             var entity = await JsonSerializer.DeserializeAsync<Models.SubmissionFile[]>(stream);
-            return entity[0].SourceCode.UnBase64();
+            return entity![0].SourceCode.UnBase64();
         }
 
         private static string Exec(string execid) => "executables/" + UrlEncoder.Default.Encode(execid);
@@ -169,7 +169,7 @@ namespace Polygon.FakeJudgehost
                     return "compare-error";
                 }
 
-                await Task.Delay(runtime);
+                await Task.Delay(runtime, CancellationToken.None);
 
                 var jr = new JudgingRun
                 {
@@ -218,11 +218,11 @@ namespace Polygon.FakeJudgehost
                 {
                     ttjs.Clear();
                     var url = $"testcases/next-to-judge/{row.JudgingId}";
-                    using var msg = await service.HttpClient.GetAsync(url);
+                    using var msg = await service.HttpClient.GetAsync(url, CancellationToken.None);
                     if (msg.Content.Headers.ContentLength > 2)
                     {
-                        using var stream = await msg.Content.ReadAsStreamAsync();
-                        var ttj = await JsonSerializer.DeserializeAsync<Judgement.TestcaseToJudge>(stream);
+                        using var stream = await msg.Content.ReadAsStreamAsync(CancellationToken.None);
+                        var ttj = await JsonSerializer.DeserializeAsync<Judgement.TestcaseToJudge>(stream, cancellationToken: CancellationToken.None);
                         if (ttj != null) ttjs.Enqueue(ttj);
                     }
                 }

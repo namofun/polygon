@@ -30,8 +30,8 @@ namespace Polygon.Packaging
                 ["wrong-answer"] = Verdict.WrongAnswer,
             };
 
-        private static readonly IReadOnlyDictionary<string, string?> Checkers =
-            new Dictionary<string, string?>
+        private static readonly IReadOnlyDictionary<string, string> Checkers =
+            new Dictionary<string, string>
             {
                 ["504168fb5f80beb55d90d453633b50ff"] = "case_sensitive space_change_sensitive",
                 ["c64791ffeb412ceb0602d51e86eb220d"] = "float_tolerance 1e-4",
@@ -77,16 +77,18 @@ namespace Polygon.Packaging
 
             stream.Position = 0;
             var content = new byte[stream.Length];
-            int pos = 0;
-            while (pos < stream.Length)
-                pos += await stream.ReadAsync(content, pos, (int)stream.Length - pos);
+            var memory = new Memory<byte>(content);
+            for (int pos = 0; pos < stream.Length;)
+            {
+                pos += await stream.ReadAsync(memory[pos..]);
+            }
 
             return await ctx.AddAsync(new Executable
             {
                 Description = $"output validator for p{ctx.Id}",
                 ZipFile = content,
                 Md5sum = content.ToMD5().ToHexDigest(true),
-                ZipSize = pos,
+                ZipSize = (int)stream.Length,
                 Id = execName,
                 Type = cmp ? "compare" : "run",
             });
@@ -99,13 +101,14 @@ namespace Polygon.Packaging
             using var stream = entry.Open();
 
             var content = new byte[entry.Length];
+            var memory = new Memory<byte>(content);
             for (int pos = 0; pos < entry.Length; )
             {
-                pos += await stream.ReadAsync(content, pos, (int)entry.Length - pos);
+                pos += await stream.ReadAsync(memory[pos..]);
             }
 
             var md5 = content.ToMD5().ToHexDigest(true);
-            string cmp = "compare"; string? args = null;
+            string cmp = "compare", args = null;
             if (Checkers.ContainsKey(md5))
             {
                 args = Checkers[md5];
@@ -128,9 +131,10 @@ namespace Polygon.Packaging
             using var stream = entry.Open();
 
             var content = new byte[entry.Length];
+            var memory = new Memory<byte>(content);
             for (int pos = 0; pos < entry.Length;)
             {
-                pos += await stream.ReadAsync(content, pos, (int)entry.Length - pos);
+                pos += await stream.ReadAsync(memory[pos..]);
             }
 
             var e = await CreateExecutableAsync(ctx, content, Path.GetExtension(fileName), false);

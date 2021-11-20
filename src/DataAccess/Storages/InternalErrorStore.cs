@@ -19,7 +19,7 @@ namespace Polygon.Storages
                 .CountAsync();
         }
 
-        Task<InternalError> IInternalErrorStore.FindAsync(int id)
+        Task<InternalError?> IInternalErrorStore.FindAsync(int id)
         {
             return Context.InternalErrors
                 .Where(e => e.Id == id)

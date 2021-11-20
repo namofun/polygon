@@ -97,12 +97,13 @@ namespace Polygon.Storages
                 .GroupBy(t => 1)
                 .Select(g => new { Count = g.Count(), Score = g.Sum(t => t.Point) })
                 .FirstOrDefaultAsync();
-            return (q.Count, q.Score);
+
+            return (q?.Count ?? 0, q?.Score ?? 0);
         }
 
         Task<Testcase> ITestcaseStore.CreateAsync(Testcase entity) => CreateEntityAsync(entity);
 
-        Task<Testcase> ITestcaseStore.FindAsync(int testid, int? probid)
+        Task<Testcase?> ITestcaseStore.FindAsync(int testid, int? probid)
         {
             return Context.Testcases
                 .WhereIf(probid.HasValue, t => t.ProblemId == probid)

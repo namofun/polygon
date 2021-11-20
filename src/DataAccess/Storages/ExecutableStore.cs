@@ -27,7 +27,7 @@ namespace Polygon.Storages
                 .BatchUpdateAsync(expression);
         }
 
-        Task<Executable> IExecutableStore.FindAsync(string execid)
+        Task<Executable?> IExecutableStore.FindAsync(string execid)
         {
             return Context.Executables
                 .Where(e => e.Id == execid)

@@ -85,7 +85,7 @@ namespace Polygon.Storages
         /// <param name="predicate">The predicate.</param>
         /// <param name="selector">The selector.</param>
         /// <returns>The task for fetching DTO.</returns>
-        Task<T> FindAsync<T>(Expression<Func<Judging, bool>> predicate, Expression<Func<Judging, T>> selector);
+        Task<T?> FindAsync<T>(Expression<Func<Judging, bool>> predicate, Expression<Func<Judging, T>> selector) where T : class;
 
         /// <summary>
         /// List the judgings with predicate and selector.
@@ -130,7 +130,7 @@ namespace Polygon.Storages
         /// <param name="judgingId">The judging ID.</param>
         /// <param name="selector">The result selector.</param>
         /// <returns>The task for fetching judging runs.</returns>
-        Task<IEnumerable<T>> GetDetailsAsync<T>(int problemId, int judgingId, Expression<Func<Testcase, JudgingRun?, T>> selector);
+        Task<IEnumerable<T>> GetDetailsAsync<T>(int problemId, int judgingId, Expression<Func<Testcase, JudgingRun?, T>> selector) where T : class;
 
         /// <summary>
         /// Fetch the details DTO.

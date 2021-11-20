@@ -61,7 +61,9 @@ namespace Polygon.Storages
 
         public CompositePolygonFacade(IServiceProvider serviceProvider)
         {
-            Lazy<T> Resolve<T>() => new Lazy<T>(serviceProvider.GetRequiredService<T>);
+            Lazy<T> Resolve<T>() where T : class
+                => new(serviceProvider.GetRequiredService<T>);
+
             _rejudgings = Resolve<IRejudgingStore>();
             _submissions = Resolve<ISubmissionStore>();
             _testcases = Resolve<ITestcaseStore>();

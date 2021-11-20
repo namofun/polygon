@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <DescriptionAttach>The import and export package definitions</DescriptionAttach>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

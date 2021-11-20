@@ -55,14 +55,14 @@ namespace Polygon.Storages
         /// <param name="submissionId">The submission ID.</param>
         /// <param name="includeJudgings">Whether to include judgings in results.</param>
         /// <returns>The task for fetching submission entity.</returns>
-        Task<Submission> FindAsync(int submissionId, bool includeJudgings = false);
+        Task<Submission?> FindAsync(int submissionId, bool includeJudgings = false);
 
         /// <summary>
         /// Find the submission by judging ID.
         /// </summary>
         /// <param name="judgingid">The judging ID.</param>
         /// <returns>The submission entity.</returns>
-        Task<Submission> FindByJudgingAsync(int judgingid);
+        Task<Submission?> FindByJudgingAsync(int judgingid);
 
         /// <summary>
         /// Batch get the author name of submissions.
@@ -138,7 +138,7 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="submissionId">The submission ID.</param>
         /// <returns>The task for fetching submission file.</returns>
-        Task<SubmissionFile> GetFileAsync(int submissionId);
+        Task<SubmissionFile?> GetFileAsync(int submissionId);
 
         /// <summary>
         /// Statistics the submission for participant.

@@ -67,7 +67,7 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="problemId">The problem ID.</param>
         /// <returns>The task for problem.</returns>
-        Task<Problem> FindAsync(int problemId);
+        Task<Problem?> FindAsync(int problemId);
 
         /// <summary>
         /// Find the problem via ID.
@@ -75,7 +75,7 @@ namespace Polygon.Storages
         /// <param name="problemId">The problem ID.</param>
         /// <param name="userId">The user ID.</param>
         /// <returns>The task for problem.</returns>
-        Task<(Problem, AuthorLevel?)> FindAsync(int problemId, int userId);
+        Task<(Problem?, AuthorLevel?)> FindAsync(int problemId, int userId);
 
         /// <summary>
         /// Check the problem permission via ID.

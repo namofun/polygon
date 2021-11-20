@@ -38,7 +38,7 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="langid">The entity id.</param>
         /// <returns>The find task.</returns>
-        Task<Language> FindAsync(string langid);
+        Task<Language?> FindAsync(string langid);
 
         /// <summary>
         /// Toggle the allow judge flag for language.

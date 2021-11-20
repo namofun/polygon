@@ -47,7 +47,7 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="execid">The entity id.</param>
         /// <returns>The find task.</returns>
-        Task<Executable> FindAsync(string execid);
+        Task<Executable?> FindAsync(string execid);
 
         /// <summary>
         /// List the executable by types.

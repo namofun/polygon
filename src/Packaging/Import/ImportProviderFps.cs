@@ -16,7 +16,7 @@ namespace Polygon.Packaging
         {
         }
 
-        static readonly Dictionary<string, string> nodes = new Dictionary<string, string>
+        static readonly Dictionary<string, string> nodes = new()
         {
             ["description"] = "description.md",
             ["input"] = "inputdesc.md",
@@ -72,7 +72,7 @@ namespace Polygon.Packaging
                 foreach (var (tcgName, isSecret, nextEleName) in testcaseGroups)
                 foreach (XElement inputNode in doc.Elements(tcgName))
                 {
-                    if (!(inputNode.NextNode is XElement outputNode) || outputNode.Name != nextEleName)
+                    if (inputNode.NextNode is not XElement outputNode || outputNode.Name != nextEleName)
                     {
                         Log($"Unknown node at {tot}.");
                         continue;

@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace System.IO
@@ -56,10 +57,12 @@ namespace System.IO
 
         public long Length => EnsureNotDisposed(() => _file!.Length);
 
-        public Task<string> Md5HashAsync() => EnsureNotDisposed(() =>
+        public Task<string> Md5HashAsync() => EnsureNotDisposed(async () =>
         {
             using var stream = OpenRead();
-            return Task.FromResult(stream.ToMD5().ToHexDigest(true));
+            using var md5 = MD5.Create();
+            var hash = await md5.ComputeHashAsync(stream);
+            return hash.ToHexDigest(true);
         });
 
         public Stream OpenRead() => EnsureNotDisposed(() => _file!.OpenRead());
@@ -104,8 +107,12 @@ namespace System.IO
         {
             int len = checked((int)length);
             var stream = new RentMemoryStream2(len);
+            Memory<byte> memory = new(stream._rentMemory);
             for (int i = 0; i < len;)
-                i += await source.ReadAsync(stream._rentMemory!, i, len - i);
+            {
+                i += await source.ReadAsync(memory[i..len]);
+            }
+
             return stream;
         }
 
@@ -129,7 +136,7 @@ namespace System.IO
         {
             if (!_disposed)
             {
-                if (disposing)
+                if (disposing && _rentMemory != null)
                 {
                     ArrayPool<byte>.Shared.Return(_rentMemory);
                     _rentMemory = null;
@@ -160,9 +167,13 @@ namespace System.IO
         {
             using var s = stream.Item1.Invoke();
             if (stream.Item2 > 10 * 1024 * 1024)
+            {
                 return await TemporaryFileStream2.CreateAsync(s);
+            }
             else
+            {
                 return await RentMemoryStream2.CreateAsync(s, stream.Item2);
+            }
         }
     }
 }

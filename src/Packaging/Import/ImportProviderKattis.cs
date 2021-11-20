@@ -126,12 +126,14 @@ namespace Polygon.Packaging
                 var line = await reader.ReadLineAsync();
                 if (line == null) break;
                 int cmt = line.IndexOf(comment);
-                if (cmt != -1) line = line.Substring(0, cmt);
+                if (cmt != -1) line = line[..cmt];
                 cmt = line.IndexOf(equal);
                 if (cmt == -1) continue;
-                var startToken = line.Substring(0, cmt).Trim();
+                var startToken = line[..cmt].Trim();
                 if (parser.TryGetValue(startToken, out var visitor))
+                {
                     visitor.Invoke(line[(cmt + 1)..].Trim(), context);
+                }
             }
         }
 
@@ -162,7 +164,7 @@ namespace Polygon.Packaging
             Files = files;
         }
 
-        private async Task<Executable?> GetOutputValidatorAsync(ImportContext ctx, ZipArchive zip)
+        private async Task<Executable> GetOutputValidatorAsync(ImportContext ctx, ZipArchive zip)
         {
             var list = zip.Entries
                 .Where(z => z.FullName.StartsWith("output_validators/") && !z.FullName.EndsWith('/'))
@@ -202,19 +204,21 @@ namespace Polygon.Packaging
                         f.ExternalAttributes = file.ExternalAttributes;
                 }
             }
-            
+
             stream.Position = 0;
             var content = new byte[stream.Length];
-            int pos = 0;
-            while (pos < stream.Length)
-                pos += await stream.ReadAsync(content, pos, (int)stream.Length - pos);
+            var memory = new Memory<byte>(content);
+            for (int pos = 0; pos < stream.Length;)
+            {
+                pos += await stream.ReadAsync(memory[pos..]);
+            }
 
             return await ctx.AddAsync(new Executable
             {
                 Description = $"output validator for p{ctx.Id}",
                 ZipFile = content,
                 Md5sum = content.ToMD5().ToHexDigest(true),
-                ZipSize = pos,
+                ZipSize = (int)stream.Length,
                 Id = $"p{ctx.Id}{(ctx.Flag == 1 ? "cmp" : "run")}",
                 Type = ctx.Flag == 1 ? "compare" : "run",
             });
