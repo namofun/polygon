@@ -29,11 +29,13 @@ namespace Polygon.Judgement
             j.RejudgingId = null;
             j.PreviousJudgingId = null;
             if (!j.StopTime.HasValue)
+            {
                 j.StopTime = DateTimeOffset.Now;
+            }
 
             await Facade.Judgings.UpdateAsync(
                 id: j.Id,
-                j => new Judging
+                _ => new Judging
                 {
                     Active = false,
                     Status = Verdict.UndefinedError,
