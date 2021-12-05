@@ -9,33 +9,31 @@ namespace System.IO.Compression
 
         public static ZipArchiveEntry CreateEntryFromByteArray(this ZipArchive zip, byte[] content, string entry)
         {
-            var f = zip.CreateEntry(entry);
-            using (var fs = f.Open())
-                fs.Write(content, 0, content.Length);
-            f.ExternalAttributes = LINUX644;
-            return f;
+            ZipArchiveEntry zipEntry = zip.CreateEntry(entry);
+            using (Stream stream = zipEntry.Open()) stream.Write(content, 0, content.Length);
+            zipEntry.ExternalAttributes = LINUX644;
+            return zipEntry;
         }
 
         public static ZipArchiveEntry CreateEntryFromString(this ZipArchive zip, string content, string entry)
         {
-            var ent = CreateEntryFromByteArray(zip, Encoding.UTF8.GetBytes(content), entry);
+            ZipArchiveEntry ent = CreateEntryFromByteArray(zip, Encoding.UTF8.GetBytes(content), entry);
             ent.ExternalAttributes = LINUX644;
             return ent;
         }
 
         public static async Task<ZipArchiveEntry> CreateEntryFromStream(this ZipArchive zip, Stream source, string entry)
         {
-            var f = zip.CreateEntry(entry);
-            using (var fs = f.Open())
-                await source.CopyToAsync(fs);
-            f.ExternalAttributes = LINUX644;
-            return f;
+            ZipArchiveEntry zipEntry = zip.CreateEntry(entry);
+            using (Stream stream = zipEntry.Open()) await source.CopyToAsync(stream);
+            zipEntry.ExternalAttributes = LINUX644;
+            return zipEntry;
         }
 
         public static async Task<string> ReadAsStringAsync(this ZipArchiveEntry entry)
         {
-            using var stream = entry.Open();
-            using var reader = new StreamReader(stream);
+            using Stream stream = entry.Open();
+            using StreamReader reader = new(stream);
             return await reader.ReadToEndAsync();
         }
     }

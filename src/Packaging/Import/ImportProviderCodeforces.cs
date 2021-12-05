@@ -28,6 +28,7 @@ namespace Polygon.Packaging
                 ["rejected"] = Verdict.RuntimeError,
                 ["failed"] = Verdict.RuntimeError,
                 ["wrong-answer"] = Verdict.WrongAnswer,
+                ["unknown"] = Verdict.Unknown,
             };
 
         private static readonly IReadOnlyDictionary<string, string> Checkers =
@@ -216,9 +217,14 @@ namespace Polygon.Packaging
 
                 var str = $"{i:D2}";
                 if (attr1 != null)
+                {
                     str += ": " + attr1.Value;
+                }
+
                 if (test.Attribute("method").Value == "generated")
+                {
                     str += "; " + test.Attribute("cmd").Value;
+                }
 
                 await ctx.AddAsync(
                     input: (() => inp.Open(), inp.Length),
@@ -229,11 +235,20 @@ namespace Polygon.Packaging
 
         public override async Task<List<Problem>> ImportAsync(Stream stream, string uploadFileName, string username)
         {
-            using var zipArchive = new ZipArchive(stream);
-            var infoXml = zipArchive.GetEntry("problem.xml");
-            var info = XDocument.Parse(await infoXml.ReadAsStringAsync()).Root;
+            using ZipArchive zipArchive = new(stream);
+            ZipArchiveEntry infoXml = zipArchive.GetEntry("problem.xml");
+            XElement info = XDocument.Parse(await infoXml.ReadAsStringAsync()).Root;
+            XElement assets = info.Element("assets");
+            XElement names = info.Element("names");
 
-            var ctx = await CreateAsync(new Problem
+            if (assets == null || names == null)
+            {
+                throw new InvalidDataException(
+                    "No <assets> node or <names> node in problem.xml. " +
+                    "This package is not a valid polygon package.");
+            }
+
+            ImportContext ctx = await CreateAsync(new Problem
             {
                 AllowJudge = false,
                 AllowSubmit = false,
@@ -246,24 +261,25 @@ namespace Polygon.Packaging
                 TimeLimit = 10000,
             });
 
-            var names = info.Element("names").Elements("name");
-            await LoadStatementAsync(ctx, names.FirstOrDefault(), zipArchive);
+            await LoadStatementAsync(ctx, names.Elements("name").FirstOrDefault(), zipArchive);
 
-            var tests = info.Element("judging").Elements("testset");
-            var testsCount = tests.Count();
+            IEnumerable<XElement> tests = info.Element("judging").Elements("testset");
+            int testsCount = tests.Count();
             if (testsCount != 1)
+            {
                 Log($"!!! Testset count is {testsCount}, using the first set...");
+            }
+
             await LoadTestsetAsync(ctx, tests.FirstOrDefault(), zipArchive);
             Log("All testcases has been added.");
 
-            var assets = info.Element("assets");
             await LoadSubmissionsAsync(ctx, assets.Element("solutions"), zipArchive);
             Log("All jury solutions has been added.");
 
             await GetCheckerAsync(ctx, assets.Element("checker"), zipArchive);
             await GetInteractorAsync(ctx, assets.Element("interactor"), zipArchive);
 
-            var problem = await ctx.FinalizeAsync();
+            Problem problem = await ctx.FinalizeAsync();
             return new List<Problem> { problem };
         }
     }

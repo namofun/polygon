@@ -139,20 +139,35 @@ namespace Polygon.Packaging
             var sb = new StringBuilder();
             sb.AppendLine("name: " + problem.Title);
             if (!string.IsNullOrEmpty(problem.Source))
+            {
                 sb.AppendLine("source: " + problem.Source);
+            }
+
             sb.AppendLine();
             sb.AppendLine("limits:");
             sb.AppendLine("    time: " + (problem.TimeLimit / 1000.0));
             sb.AppendLine("    memory: " + (problem.MemoryLimit / 1024));
             if (problem.OutputLimit != 4096)
+            {
                 sb.AppendLine("    output: " + (problem.OutputLimit / 1024));
+            }
+
             sb.AppendLine();
             if (!string.IsNullOrEmpty(problem.CompareArguments))
+            {
                 sb.AppendLine("validator_flags: " + problem.CompareArguments);
+            }
+
             if (problem.RunScript != "run")
+            {
                 sb.AppendLine("validation: custom interactive");
+            }
+
             else if (problem.CompareScript != "compare")
+            {
                 sb.AppendLine("validation: custom");
+            }
+
             zip.CreateEntryFromString(sb.ToString(), "problem.yaml");
 
             // Export domjudge-problem.ini.

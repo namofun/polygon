@@ -12,7 +12,10 @@ namespace Polygon.Packaging
 {
     public sealed class FpsImportProvider : ImportProviderBase
     {
-        public FpsImportProvider(IPolygonFacade facade, ILogger<FpsImportProvider> logger) : base(facade, logger)
+        public FpsImportProvider(
+            IPolygonFacade facade,
+            ILogger<FpsImportProvider> logger)
+            : base(facade, logger)
         {
         }
 
@@ -30,23 +33,26 @@ namespace Polygon.Packaging
             ("test_input", true, "test_output")
         };
 
-        public override async Task<List<Problem>> ImportAsync(Stream stream, string uploadFileName, string username)
+        public override async Task<List<Problem>> ImportAsync(
+            Stream stream,
+            string uploadFileName,
+            string username)
         {
             XDocument document;
 
-            using (var sr = new StreamReader(stream))
+            using (StreamReader sr = new(stream))
             {
-                var content = await sr.ReadToEndAsync();
+                string content = await sr.ReadToEndAsync();
                 document = XDocument.Parse(content);
             }
 
-            var doc2 = document.Root;
-            var probs = new List<Problem>();
-            var langs = await Facade.Languages.ListAsync();
+            XElement doc2 = document.Root;
+            List<Problem> probs = new();
+            List<Language> langs = await Facade.Languages.ListAsync();
 
-            foreach (var doc in doc2.Elements("item"))
+            foreach (XElement doc in doc2.Elements("item"))
             {
-                var ctx = await CreateAsync(new Problem
+                ImportContext ctx = await CreateAsync(new Problem
                 {
                     Title = ((string)doc.Element("title")) ?? uploadFileName,
                     MemoryLimit = int.Parse(((string)doc.Element("memory_limit")) ?? "128") * 1024,
@@ -62,7 +68,7 @@ namespace Polygon.Packaging
                 // Write all markdown files into folders.
                 foreach (var (nodeName, fileName) in nodes)
                 {
-                    var content = doc.Element(nodeName)?.Value;
+                    string content = doc.Element(nodeName)?.Value;
                     if (string.IsNullOrEmpty(content)) continue;
                     await ctx.WriteAsync(fileName, content);
                 }
@@ -84,14 +90,14 @@ namespace Polygon.Packaging
                 }
 
                 // Add solutions
-                foreach (var submission in doc.Elements("solution"))
+                foreach (XElement submission in doc.Elements("solution"))
                 {
-                    var langName = submission.Attribute("language").Value;
-                    var lang = langs.FirstOrDefault(l => l.Name == langName);
+                    string langName = submission.Attribute("language").Value;
+                    Language lang = langs.FirstOrDefault(l => l.Name == langName);
                     if (lang == null) lang = langs.FirstOrDefault();
 
-                    var content = submission.Value;
-                    var s = await ctx.SubmitAsync(content, lang.Id, Verdict.Unknown);
+                    string content = submission.Value;
+                    Submission s = await ctx.SubmitAsync(content, lang.Id, Verdict.Unknown);
 
                     Log($"Submission s{s.Id} created.");
                 }

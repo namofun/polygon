@@ -11,15 +11,21 @@ namespace Polygon.Packaging
 {
     public sealed class DataImportProvider : ImportProviderBase
     {
-        public DataImportProvider(IPolygonFacade facade, ILogger<DataImportProvider> logger) : base(facade, logger)
+        public DataImportProvider(
+            IPolygonFacade facade,
+            ILogger<DataImportProvider> logger)
+            : base(facade, logger)
         {
         }
 
-        public override async Task<List<Problem>> ImportAsync(Stream stream, string uploadFileName, string username)
+        public override async Task<List<Problem>> ImportAsync(
+            Stream stream,
+            string uploadFileName,
+            string username)
         {
-            using var zipArchive = new ZipArchive(stream);
+            using ZipArchive zipArchive = new(stream);
 
-            var ctx = await CreateAsync(new Problem
+            ImportContext ctx = await CreateAsync(new Problem
             {
                 AllowJudge = false,
                 AllowSubmit = false,
@@ -34,8 +40,14 @@ namespace Polygon.Packaging
 
             await ctx.KattisAsync(zipArchive, string.Empty, true);
 
-            foreach (var a in zipArchive.Entries.Where(a => !a.Name.EndsWith(".in") && !a.Name.EndsWith(".out") && !a.Name.EndsWith(".desc") && !a.Name.EndsWith(".point")))
+            foreach (var a in zipArchive.Entries.Where(
+                a => !a.Name.EndsWith(".in")
+                  && !a.Name.EndsWith(".out")
+                  && !a.Name.EndsWith(".desc")
+                  && !a.Name.EndsWith(".point")))
+            {
                 Log($"Has file {a.FullName}.");
+            }
 
             var problem = await ctx.FinalizeAsync();
             return new List<Problem> { problem };

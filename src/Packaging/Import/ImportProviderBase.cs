@@ -35,8 +35,7 @@ namespace Polygon.Packaging
         public static string TryGetPackageName(string orig)
         {
             var name = orig.ToUpper().EndsWith(".ZIP") ? orig[0..^4] : orig;
-            if (string.IsNullOrEmpty(name))
-                name = "UNTITLED";
+            if (string.IsNullOrEmpty(name)) name = "UNTITLED";
             return name;
         }
 

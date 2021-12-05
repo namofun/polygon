@@ -26,25 +26,33 @@ namespace Polygon.Packaging
 
         static readonly (string, bool)[] testcaseGroups = new[] { ("samples", false), ("test_cases", true) };
 
-        public XmlImportProvider(IPolygonFacade facade, ILogger<XmlImportProvider> logger, IMarkdownService markdown, IWwwrootFileProvider files) : base(facade, logger)
+        public XmlImportProvider(
+            IPolygonFacade facade,
+            ILogger<XmlImportProvider> logger,
+            IMarkdownService markdown,
+            IWwwrootFileProvider files)
+            : base(facade, logger)
         {
             Markdown = markdown;
             Files = files;
         }
 
-        public override async Task<List<Problem>> ImportAsync(Stream stream, string uploadFileName, string username)
+        public override async Task<List<Problem>> ImportAsync(
+            Stream stream,
+            string uploadFileName,
+            string username)
         {
             XDocument document;
 
-            using (var sr = new StreamReader(stream))
+            using (StreamReader sr = new(stream))
             {
-                var content = await sr.ReadToEndAsync();
+                string content = await sr.ReadToEndAsync();
                 document = XDocument.Parse(content);
             }
 
-            var doc = document.Root;
+            XElement doc = document.Root;
 
-            var ctx = await CreateAsync(new Problem
+            ImportContext ctx = await CreateAsync(new Problem
             {
                 Title = doc.Element("title").Value,
                 MemoryLimit = int.Parse(doc.Element("memory_limit").Value),
@@ -83,7 +91,7 @@ namespace Polygon.Packaging
                 }
             }
 
-            var problem = await ctx.FinalizeAsync();
+            Problem problem = await ctx.FinalizeAsync();
             return new List<Problem> { problem };
         }
     }

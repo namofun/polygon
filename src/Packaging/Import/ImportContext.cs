@@ -66,11 +66,16 @@ namespace Polygon.Packaging
                 var desc = zip.GetEntry(prefix + file + ".desc");
                 var point = zip.GetEntry(prefix + file + ".point");
 
-                string usedParts = "in,out";
+                string usedParts;
                 if (outp == null)
+                {
                     outp = zip.GetEntry(prefix + file + ".out");
+                    usedParts = "in,out";
+                }
                 else
+                {
                     usedParts = "in,ans";
+                }
 
                 if (inp == null || outp == null)
                 {
@@ -90,8 +95,10 @@ namespace Polygon.Packaging
                 if (point != null)
                 {
                     var content = await point.ReadAsStringAsync();
-                    int.TryParse(content.Trim(), out pnt);
-                    usedParts += ",point";
+                    if (int.TryParse(content.Trim(), out pnt))
+                    {
+                        usedParts += ",point";
+                    }
                 }
 
                 await AddAsync(

@@ -42,7 +42,10 @@ namespace Polygon.Packaging
                 var input = item.CustomInput ?? await (await Testcases.GetInputAsync(item)).ReadAsync();
                 var output = item.CustomOutput ?? await (await Testcases.GetOutputAsync(item)).ReadAsync();
                 if (input == null || output == null)
+                {
                     throw new InvalidOperationException($"Input or output invalid for testcase t{item.Id}.");
+                }
+
                 samples.Add(new MemoryTestcase(item.Description, input!, output!, item.Point));
             }
 

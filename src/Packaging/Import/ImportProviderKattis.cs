@@ -114,23 +114,27 @@ namespace Polygon.Packaging
             });
         }
 
-        private static async Task ReadLinesAsync(ZipArchiveEntry entry, ImportContext context,
-            Dictionary<string, Visitor> parser, char comment, char equal)
+        private static async Task ReadLinesAsync(
+            ZipArchiveEntry entry,
+            ImportContext context,
+            Dictionary<string, Visitor> parser,
+            char comment,
+            char equal)
         {
             if (entry == null) return;
 
-            using var stream = entry.Open();
-            using var reader = new StreamReader(stream);
+            using Stream stream = entry.Open();
+            using StreamReader reader = new(stream);
             while (!reader.EndOfStream)
             {
-                var line = await reader.ReadLineAsync();
+                string line = await reader.ReadLineAsync();
                 if (line == null) break;
                 int cmt = line.IndexOf(comment);
                 if (cmt != -1) line = line[..cmt];
                 cmt = line.IndexOf(equal);
                 if (cmt == -1) continue;
-                var startToken = line[..cmt].Trim();
-                if (parser.TryGetValue(startToken, out var visitor))
+                string startToken = line[..cmt].Trim();
+                if (parser.TryGetValue(startToken, out Visitor visitor))
                 {
                     visitor.Invoke(line[(cmt + 1)..].Trim(), context);
                 }
@@ -158,7 +162,12 @@ namespace Polygon.Packaging
         private IMarkdownService Markdown { get; }
         private IWwwrootFileProvider Files { get; }
 
-        public KattisImportProvider(IPolygonFacade facade, ILogger<KattisImportProvider> logger, IMarkdownService markdown, IWwwrootFileProvider files) : base(facade, logger)
+        public KattisImportProvider(
+            IPolygonFacade facade,
+            ILogger<KattisImportProvider> logger,
+            IMarkdownService markdown,
+            IWwwrootFileProvider files)
+            : base(facade, logger)
         {
             Markdown = markdown;
             Files = files;
@@ -166,7 +175,7 @@ namespace Polygon.Packaging
 
         private async Task<Executable> GetOutputValidatorAsync(ImportContext ctx, ZipArchive zip)
         {
-            var list = zip.Entries
+            List<ZipArchiveEntry> list = zip.Entries
                 .Where(z => z.FullName.StartsWith("output_validators/") && !z.FullName.EndsWith('/'))
                 .ToList();
 
@@ -176,35 +185,35 @@ namespace Polygon.Packaging
                 return null;
             }
 
-            var fileNames = list.FirstOrDefault().FullName.Split(new[] { '/' }, 3);
+            string[] fileNames = list.FirstOrDefault().FullName.Split(new[] { '/' }, 3);
             if (fileNames.Length != 3)
             {
                 Log($"Wrong file found: '{list[0].FullName}', ignoring output validator.");
                 return null;
             }
 
-            var prefix = fileNames[0] + '/' + fileNames[1] + '/';
+            string prefix = fileNames[0] + '/' + fileNames[1] + '/';
             if (list.Any(z => !z.FullName.StartsWith(prefix)))
             {
                 Log($"More than 1 output validator are found, ignoring.");
                 return null;
             }
 
-            var stream = new MemoryStream();
-            using (var newzip = new ZipArchive(stream, ZipArchiveMode.Create, true))
+            MemoryStream stream = new();
+            using (ZipArchive newzip = new(stream, ZipArchiveMode.Create, true))
             {
-                foreach (var file in list)
+                foreach (ZipArchiveEntry file in list)
                 {
-                    using var fs = file.Open();
-                    var fileName = file.FullName[prefix.Length..];
-                    var f = await newzip.CreateEntryFromStream(fs, fileName);
+                    using Stream fs = file.Open();
+                    string fileName = file.FullName[prefix.Length..];
+                    ZipArchiveEntry f = await newzip.CreateEntryFromStream(fs, fileName);
                     f.ExternalAttributes = fileName == "build" || fileName == "run" ? LINUX755 : LINUX644;
                 }
             }
 
             stream.Position = 0;
-            var content = new byte[stream.Length];
-            var memory = new Memory<byte>(content);
+            byte[] content = new byte[stream.Length];
+            Memory<byte> memory = new(content);
             for (int pos = 0; pos < stream.Length;)
             {
                 pos += await stream.ReadAsync(memory[pos..]);
@@ -223,13 +232,13 @@ namespace Polygon.Packaging
 
         private async Task LoadSubmissionsAsync(ImportContext ctx, ZipArchive zip)
         {
-            var prefix = "submissions/";
-            var files = zip.Entries
+            const string prefix = "submissions/";
+            List<ZipArchiveEntry> files = zip.Entries
                 .Where(z => z.FullName.StartsWith(prefix) && !z.FullName.EndsWith('/'))
                 .ToList();
-            var langs = await Facade.Languages.ListAsync();
+            List<Language> langs = await Facade.Languages.ListAsync();
 
-            foreach (var file in files)
+            foreach (ZipArchiveEntry file in files)
             {
                 if (file.Length > 65536)
                 {
@@ -237,9 +246,9 @@ namespace Polygon.Packaging
                     continue;
                 }
 
-                var fileExt = Path.GetExtension(file.FullName);
+                string fileExt = Path.GetExtension(file.FullName);
                 if (fileExt == ".cc") fileExt = ".cpp";
-                var lang = langs.FirstOrDefault(l => "." + l.FileExtension == fileExt);
+                Language lang = langs.FirstOrDefault(l => "." + l.FileExtension == fileExt);
 
                 if (lang == null)
                 {
@@ -247,9 +256,9 @@ namespace Polygon.Packaging
                     continue;
                 }
 
-                var expected = Verd.GetValueOrDefault(file.FullName.Split('/')[1]);
-                var code = await file.ReadAsStringAsync();
-                var sub = await ctx.SubmitAsync(code, lang.Id, expected);
+                Verdict expected = Verd.GetValueOrDefault(file.FullName.Split('/')[1]);
+                string code = await file.ReadAsStringAsync();
+                Submission sub = await ctx.SubmitAsync(code, lang.Id, expected);
                 Log($"Jury solution '{file.FullName}' saved s{sub.Id}.");
             }
         }
@@ -259,11 +268,14 @@ namespace Polygon.Packaging
             return new[] { ("description.md", content) };
         }
 
-        public override async Task<List<Problem>> ImportAsync(Stream stream, string uploadFileName, string username)
+        public override async Task<List<Problem>> ImportAsync(
+            Stream stream,
+            string uploadFileName,
+            string username)
         {
-            using var zipArchive = new ZipArchive(stream);
+            using ZipArchive zipArchive = new(stream);
 
-            var ctx = await CreateAsync(new Problem
+            ImportContext ctx = await CreateAsync(new Problem
             {
                 AllowJudge = false,
                 AllowSubmit = false,
@@ -292,7 +304,7 @@ namespace Polygon.Packaging
 
             if (ctx.Flag != 0)
             {
-                var exec = await GetOutputValidatorAsync(ctx, zipArchive);
+                Executable exec = await GetOutputValidatorAsync(ctx, zipArchive);
                 if (exec != null)
                 {
                     if (ctx.Flag == 1)
@@ -309,16 +321,16 @@ namespace Polygon.Packaging
 
             // Load statements
             bool hasMarkdownStatement = false;
-            foreach (var mdfile in ResourceDictionary.MarkdownFiles)
+            foreach (string mdfile in ResourceDictionary.MarkdownFiles)
             {
-                var entry = zipArchive.GetEntry("problem_statement/" + mdfile + ".md");
+                ZipArchiveEntry entry = zipArchive.GetEntry("problem_statement/" + mdfile + ".md");
                 if (entry == null) continue;
 
                 if (mdfile == "description") hasMarkdownStatement = true;
                 string mdcontent = await entry.ReadAsStringAsync();
 
-                var tags = $"p{ctx.Id}";
-                var content = await Files.ImportWithImagesAsync(Markdown, mdcontent, tags);
+                string tags = $"p{ctx.Id}";
+                string content = await Files.ImportWithImagesAsync(Markdown, mdcontent, tags);
                 await ctx.WriteAsync($"{mdfile}.md", content);
 
                 Log($"Adding statement section 'problem_statement/{mdfile}.md'.");
@@ -326,13 +338,13 @@ namespace Polygon.Packaging
 
             if (!hasMarkdownStatement)
             {
-                foreach (var texfile in TexStmt)
+                foreach (string texfile in TexStmt)
                 {
-                    var entry = zipArchive.GetEntry("problem_statement/" + texfile);
+                    ZipArchiveEntry entry = zipArchive.GetEntry("problem_statement/" + texfile);
                     if (entry == null) continue;
 
                     string texcontent = await entry.ReadAsStringAsync();
-                    var contents = GetTexContent(texcontent);
+                    IReadOnlyList<(string, string)> contents = GetTexContent(texcontent);
                     foreach (var (fn, ct) in contents) await ctx.WriteAsync(fn, ct);
 
                     Log($"Adding statement section 'problem_statement/{texfile}'.");
@@ -349,7 +361,7 @@ namespace Polygon.Packaging
             await LoadSubmissionsAsync(ctx, zipArchive);
             Log("All jury solutions has been added.");
 
-            var problem = await ctx.FinalizeAsync();
+            Problem problem = await ctx.FinalizeAsync();
             return new List<Problem> { problem };
         }
     }
