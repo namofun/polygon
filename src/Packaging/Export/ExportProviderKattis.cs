@@ -64,17 +64,25 @@ namespace Polygon.Packaging
 
                 var inputFile = await Facade.Testcases.GetInputAsync(tc);
                 using (var inputFile2 = inputFile.CreateReadStream())
+                {
                     await zip.CreateEntryFromStream(inputFile2, prefix + ".in");
+                }
 
                 var outputFile = await Facade.Testcases.GetOutputAsync(tc);
                 using (var outputFile2 = outputFile.CreateReadStream())
+                {
                     await zip.CreateEntryFromStream(outputFile2, prefix + ".ans");
+                }
 
                 if (tc.Description != $"{tc.Rank}")
+                {
                     zip.CreateEntryFromString(tc.Description, prefix + ".desc");
+                }
 
                 if (tc.Point != 0)
+                {
                     zip.CreateEntryFromString($"{tc.Point}", prefix + ".point");
+                }
             }
 
             // Export the submissions.
@@ -93,9 +101,14 @@ namespace Polygon.Packaging
             // Export the executables.
             var execs = new List<Executable>();
             if (problem.CompareScript != "compare")
+            {
                 execs.Add(await Facade.Executables.FindAsync(problem.CompareScript));
+            }
+
             if (problem.RunScript != "run")
+            {
                 execs.Add(await Facade.Executables.FindAsync(problem.RunScript));
+            }
 
             foreach (var exec in execs)
             {

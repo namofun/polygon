@@ -198,10 +198,7 @@ namespace Polygon.Packaging
                     using var fs = file.Open();
                     var fileName = file.FullName[prefix.Length..];
                     var f = await newzip.CreateEntryFromStream(fs, fileName);
-                    if (fileName == "build" || fileName == "run")
-                        f.ExternalAttributes = LINUX755;
-                    else
-                        f.ExternalAttributes = file.ExternalAttributes;
+                    f.ExternalAttributes = fileName == "build" || fileName == "run" ? LINUX755 : LINUX644;
                 }
             }
 
