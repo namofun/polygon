@@ -106,9 +106,9 @@ namespace Polygon.Storages
             return Context.Judgings.Where(predicate).OrderBy(j => j.Id).Take(topCount).ToListAsync();
         }
 
-        async Task<IFileInfo> IJudgingStore.GetRunFileAsync(int judgingid, int runid, string type, int? submitid, int? probid)
+        async Task<IBlobInfo> IJudgingStore.GetRunFileAsync(int judgingid, int runid, string type, int? submitid, int? probid)
         {
-            var notfound = new NotFoundFileInfo($"j{judgingid}/r{runid}.{type}");
+            var notfound = new NotFoundBlobInfo($"j{judgingid}/r{runid}.{type}");
             var fileInfo = await JudgingFiles.GetFileInfoAsync($"j{judgingid}/r{runid}.{type}");
             if (!fileInfo.Exists) return notfound;
 
@@ -126,7 +126,7 @@ namespace Polygon.Storages
             return fileInfo;
         }
 
-        Task<IFileInfo> IJudgingStore.SetRunFileAsync(int judgingid, int runid, string type, byte[] content)
+        Task<IBlobInfo> IJudgingStore.SetRunFileAsync(int judgingid, int runid, string type, byte[] content)
         {
             return JudgingFiles.WriteBinaryAsync($"j{judgingid}/r{runid}.{type}", content);
         }

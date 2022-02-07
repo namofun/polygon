@@ -161,7 +161,7 @@ namespace Polygon.Packaging
                 expected: expected);
         }
 
-        public Task<IFileInfo> WriteAsync(string fileName, string content)
+        public Task<IBlobInfo> WriteAsync(string fileName, string content)
         {
             return Facade.Problems.WriteFileAsync(Problem, fileName, content);
         }

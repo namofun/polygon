@@ -124,7 +124,7 @@ namespace Polygon.Packaging
             {
                 if (url.StartsWith("/images/problem/"))
                 {
-                    IFileInfo file = Files.GetFileInfoAsync(url.TrimStart('/')).Result;
+                    IFileInfo file = Files.GetFileInfo(url.TrimStart('/'));
                     if (!file.Exists) return url;
                     var ext = Path.GetExtension(file.PhysicalPath).TrimStart('.');
                     var guid = Guid.NewGuid().ToString("N")[..16];

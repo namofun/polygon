@@ -139,8 +139,8 @@ namespace Polygon.Storages
         /// <param name="problem">The problem.</param>
         /// <param name="fileName">The file name.</param>
         /// <param name="content">The content.</param>
-        /// <returns>The task for storing files, resulting in <see cref="IFileInfo"/>.</returns>
-        Task<IFileInfo> WriteFileAsync(Problem problem, string fileName, string content);
+        /// <returns>The task for storing files, resulting in <see cref="IBlobInfo"/>.</returns>
+        Task<IBlobInfo> WriteFileAsync(Problem problem, string fileName, string content);
 
         /// <summary>
         /// Write file to problem repository.
@@ -148,8 +148,8 @@ namespace Polygon.Storages
         /// <param name="problem">The problem.</param>
         /// <param name="fileName">The file name.</param>
         /// <param name="content">The content.</param>
-        /// <returns>The task for storing files, resulting in <see cref="IFileInfo"/>.</returns>
-        Task<IFileInfo> WriteFileAsync(Problem problem, string fileName, byte[] content);
+        /// <returns>The task for storing files, resulting in <see cref="IBlobInfo"/>.</returns>
+        Task<IBlobInfo> WriteFileAsync(Problem problem, string fileName, byte[] content);
 
         /// <summary>
         /// Write file to problem repository.
@@ -157,16 +157,16 @@ namespace Polygon.Storages
         /// <param name="problem">The problem.</param>
         /// <param name="fileName">The file name.</param>
         /// <param name="content">The content.</param>
-        /// <returns>The task for storing files, resulting in <see cref="IFileInfo"/>.</returns>
-        Task<IFileInfo> WriteFileAsync(Problem problem, string fileName, Stream content);
+        /// <returns>The task for storing files, resulting in <see cref="IBlobInfo"/>.</returns>
+        Task<IBlobInfo> WriteFileAsync(Problem problem, string fileName, Stream content);
 
         /// <summary>
         /// Get the problem file.
         /// </summary>
         /// <param name="problemId">The problem ID.</param>
         /// <param name="fileName">The file name.</param>
-        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
-        Task<IFileInfo> GetFileAsync(int problemId, string fileName);
+        /// <returns>The task for fetching the file, resulting in the <see cref="IBlobInfo"/>.</returns>
+        Task<IBlobInfo> GetFileAsync(int problemId, string fileName);
 
         /// <summary>
         /// Rebuild the submission statistics.

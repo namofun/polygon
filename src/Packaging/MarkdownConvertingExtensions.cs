@@ -13,7 +13,7 @@ namespace Polygon.Packaging
             return markdown.SolveImagesUrlAsync(content, async url =>
             {
                 if (!url.StartsWith("/images/problem/")) return url;
-                var file = await files.GetFileInfoAsync(url);
+                var file = files.GetFileInfo(url);
                 if (!file.Exists) return url;
                 var img = await file.ReadBinaryAsync();
                 var imgExt = Path.GetExtension(url).TrimStart('.');
@@ -37,12 +37,13 @@ namespace Polygon.Packaging
                     var guid = Guid.NewGuid().ToString("N").Substring(0, 16);
                     fileName = $"images/problem/{typeid}.{guid}.{ext}";
                 }
-                while ((await files.GetFileInfoAsync(fileName)).Exists);
+                while (files.GetFileInfo(fileName).Exists);
 
                 try
                 {
                     var fileIn = Convert.FromBase64String(url[(index + 8)..]);
-                    await files.WriteBinaryAsync(fileName, fileIn);
+                    using MemoryStream memoryStream = new(fileIn);
+                    await files.WriteStreamAsync(fileName, memoryStream);
                     return "/" + fileName;
                 }
                 catch

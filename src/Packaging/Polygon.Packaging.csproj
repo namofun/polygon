@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Markdig.Service" Version="0.25.0.3" />
+    <PackageReference Include="Markdig.Service" Version="0.25.0.4" />
   </ItemGroup>
 
   <ItemGroup>

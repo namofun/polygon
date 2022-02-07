@@ -37,7 +37,7 @@ namespace Polygon.Storages
                 .SingleOrDefaultAsync();
         }
 
-        Task<IFileInfo> IProblemStore.GetFileAsync(int problemId, string fileName)
+        Task<IBlobInfo> IProblemStore.GetFileAsync(int problemId, string fileName)
         {
             return ProblemFiles.GetFileInfoAsync($"p{problemId}/{fileName}");
         }
@@ -110,17 +110,17 @@ namespace Polygon.Storages
                 .BatchUpdateAsync(p => new Problem { AllowSubmit = tobe });
         }
 
-        Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, string content)
+        Task<IBlobInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, string content)
         {
             return ProblemFiles.WriteStringAsync($"p{problem.Id}/{fileName}", content);
         }
 
-        Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, byte[] content)
+        Task<IBlobInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, byte[] content)
         {
             return ProblemFiles.WriteBinaryAsync($"p{problem.Id}/{fileName}", content);
         }
 
-        Task<IFileInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, Stream content)
+        Task<IBlobInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, Stream content)
         {
             return ProblemFiles.WriteStreamAsync($"p{problem.Id}/{fileName}", content);
         }

@@ -96,8 +96,8 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="testcase">The testcase.</param>
         /// <param name="target">The target. (<c>in</c> or <c>out</c>)</param>
-        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
-        Task<IFileInfo> GetFileAsync(Testcase testcase, string target);
+        /// <returns>The task for fetching the file, resulting in the <see cref="IBlobInfo"/>.</returns>
+        Task<IBlobInfo> GetFileAsync(Testcase testcase, string target);
 
         /// <summary>
         /// Set the testcase file.
@@ -105,7 +105,7 @@ namespace Polygon.Storages
         /// <param name="testcase">The testcase.</param>
         /// <param name="target">The target. (<c>in</c> or <c>out</c>)</param>
         /// <param name="source">The source.</param>
-        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
-        Task<IFileInfo> SetFileAsync(Testcase testcase, string target, Stream source);
+        /// <returns>The task for fetching the file, resulting in the <see cref="IBlobInfo"/>.</returns>
+        Task<IBlobInfo> SetFileAsync(Testcase testcase, string target, Stream source);
     }
 }

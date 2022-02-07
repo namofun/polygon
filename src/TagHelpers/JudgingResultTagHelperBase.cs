@@ -50,12 +50,12 @@ namespace Polygon.TagHelpers
             }
         }
 
-        protected async ValueTask<(bool, string, bool)> ReadFileAsync(IFileInfo file)
+        protected async ValueTask<(bool, string, bool)> ReadFileAsync(IBlobInfo file)
         {
             if (!file.Exists) return (false, _deleted, false);
             string content;
 
-            using (var stream = file.CreateReadStream())
+            using (var stream = await file.CreateReadStreamAsync())
             using (var sr = new System.IO.StreamReader(stream))
             {
                 var arr = ArrayPool<char>.Shared.Rent(_readLength);

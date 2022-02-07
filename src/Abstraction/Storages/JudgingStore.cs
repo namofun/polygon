@@ -66,7 +66,7 @@ namespace Polygon.Storages
         /// <param name="submissionId">The submission ID. Just for validation.</param>
         /// <param name="problemId">The problem ID. Just for validation.</param>
         /// <returns>The fetched file info.</returns>
-        Task<IFileInfo> GetRunFileAsync(int judgingId, int runId, string type, int? submissionId = null, int? problemId = null);
+        Task<IBlobInfo> GetRunFileAsync(int judgingId, int runId, string type, int? submissionId = null, int? problemId = null);
 
         /// <summary>
         /// Save the run result file of judging run.
@@ -76,7 +76,7 @@ namespace Polygon.Storages
         /// <param name="type">The file type.</param>
         /// <param name="content">The file content.</param>
         /// <returns>The saved file info.</returns>
-        Task<IFileInfo> SetRunFileAsync(int judgingId, int runId, string type, byte[] content);
+        Task<IBlobInfo> SetRunFileAsync(int judgingId, int runId, string type, byte[] content);
 
         /// <summary>
         /// Find the judging with predicate.

@@ -54,8 +54,8 @@ namespace Polygon.Storages
         /// <param name="that">The store.</param>
         /// <param name="problem">The problem.</param>
         /// <param name="fileName">The file name.</param>
-        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
-        public static Task<IFileInfo> GetFileAsync(this IProblemStore that, Problem problem, string fileName) => that.GetFileAsync(problem.Id, fileName);
+        /// <returns>The task for fetching the file, resulting in the <see cref="IBlobInfo"/>.</returns>
+        public static Task<IBlobInfo> GetFileAsync(this IProblemStore that, Problem problem, string fileName) => that.GetFileAsync(problem.Id, fileName);
 
         /// <summary>
         /// Find the judging with judging ID.
@@ -242,8 +242,8 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="store">The store.</param>
         /// <param name="testcase">The testcase.</param>
-        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
-        public static Task<IFileInfo> GetInputAsync(this ITestcaseStore store, Testcase testcase)
+        /// <returns>The task for fetching the file, resulting in the <see cref="IBlobInfo"/>.</returns>
+        public static Task<IBlobInfo> GetInputAsync(this ITestcaseStore store, Testcase testcase)
         {
             return store.GetFileAsync(testcase, "in");
         }
@@ -253,8 +253,8 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="store">The store.</param>
         /// <param name="testcase">The testcase.</param>
-        /// <returns>The task for fetching the file, resulting in the <see cref="IFileInfo"/>.</returns>
-        public static Task<IFileInfo> GetOutputAsync(this ITestcaseStore store, Testcase testcase)
+        /// <returns>The task for fetching the file, resulting in the <see cref="IBlobInfo"/>.</returns>
+        public static Task<IBlobInfo> GetOutputAsync(this ITestcaseStore store, Testcase testcase)
         {
             return store.GetFileAsync(testcase, "out");
         }
