@@ -232,10 +232,18 @@ namespace SatelliteSite.PolygonModule.Controllers
             var fileInfo = await Store.GetFileAsync(tc, filetype);
             if (!fileInfo.Exists) return NotFound();
 
-            return File(
-                fileStream: fileInfo.CreateReadStream(),
-                contentType: "application/octet-stream",
-                fileDownloadName: $"p{Problem.Id}.t{testid}.{filetype}");
+            if (!tc.IsSecret && fileInfo.HasDirectLink)
+            {
+                Uri url = await fileInfo.CreateDirectLinkAsync(TimeSpan.FromMinutes(10));
+                return Redirect(url.AbsoluteUri);
+            }
+            else
+            {
+                return File(
+                    fileStream: await fileInfo.CreateReadStreamAsync(tc.IsSecret ? true : null),
+                    contentType: "application/octet-stream",
+                    fileDownloadName: $"p{Problem.Id}.t{testid}.{filetype}");
+            }
         }
     }
 }

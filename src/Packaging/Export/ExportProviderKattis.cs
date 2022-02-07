@@ -63,13 +63,13 @@ namespace Polygon.Packaging
                 var prefix = $"data/{(tc.IsSecret ? "secret" : "sample")}/{tc.Rank}";
 
                 var inputFile = await Facade.Testcases.GetInputAsync(tc);
-                using (var inputFile2 = inputFile.CreateReadStream())
+                using (var inputFile2 = await inputFile.CreateReadStreamAsync())
                 {
                     await zip.CreateEntryFromStream(inputFile2, prefix + ".in");
                 }
 
                 var outputFile = await Facade.Testcases.GetOutputAsync(tc);
-                using (var outputFile2 = outputFile.CreateReadStream())
+                using (var outputFile2 = await outputFile.CreateReadStreamAsync())
                 {
                     await zip.CreateEntryFromStream(outputFile2, prefix + ".ans");
                 }
@@ -129,7 +129,7 @@ namespace Polygon.Packaging
             {
                 var file = await Facade.Problems.GetFileAsync(problem, $"{mdname}.md");
                 if (!file.Exists) continue;
-                string mdContent = (await file.ReadAsync())!;
+                string mdContent = (await file.ReadAsStringAsync())!;
 
                 string news = await Files.ExportWithImagesAsync(Markdown, mdContent);
                 zip.CreateEntryFromString(news, $"problem_statement/{mdname}.md");

@@ -76,11 +76,12 @@ namespace SatelliteSite.PolygonModule.Controllers
         /// Read the file of problem repository.
         /// </summary>
         /// <param name="fileName">The file name.</param>
+        /// <param name="cached">Whether to cache.</param>
         /// <returns>The task for content.</returns>
-        protected async Task<string> ReadFileAsync(string fileName)
+        protected async Task<string> ReadFileAsync(string fileName, bool cached = false)
         {
             var fileInfo = await Facade.Problems.GetFileAsync(Problem.Id, fileName);
-            return await fileInfo.ReadAsync();
+            return await (cached ? fileInfo.ReadAsStringAsync() : fileInfo.ReadAsStringAndCacheAsync());
         }
 
         /// <inheritdoc />

@@ -145,7 +145,7 @@ namespace Polygon.Storages
         async Task<string?> IProblemStore.ReadCompiledHtmlAsync(int problemId)
         {
             var fileInfo = await ((IProblemStore)this).GetFileAsync(problemId, "view.html");
-            return await fileInfo.ReadAsync();
+            return await fileInfo.ReadAsStringAndCacheAsync();
         }
 
         Task IProblemStore.AuthorizeAsync(int problemId, int userId, AuthorLevel? level)

@@ -1,8 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 using Polygon.Judgement;
 using Polygon.Storages;
+using System;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Apis
@@ -55,9 +58,39 @@ namespace SatelliteSite.PolygonModule.Apis
             var tc = await testcases.FindAsync(id);
             if (tc is null) return NotFound();
 
-            var fileInfo = await testcases.GetFileAsync(tc, type);
+            IBlobInfo fileInfo = await testcases.GetFileAsync(tc, type);
             if (!fileInfo.Exists) return NotFound();
-            return this.Output(fileInfo);
+
+            // Decide which type to output
+            Response.Headers.Add("X-Content-Type-Options", "nosniff");
+            string[] accepts = Request.Headers.GetCommaSeparatedValues("accept");
+            string decidedOutput = accepts.Length == 0 ? "application/json" : null;
+
+            for (int i = 0; i < accepts.Length && decidedOutput != null; i++)
+            {
+                switch (accepts[i])
+                {
+                    case "application/x-http302-redirect":
+                    case "application/json":
+                    case "application/octet-stream":
+                    case "text/plain":
+                        decidedOutput ??= accepts[i];
+                        break;
+
+                    case "*/*":
+                    case "application/*":
+                        decidedOutput ??= "application/json";
+                        break;
+                }
+            }
+
+            return decidedOutput == null
+                ? new StatusCodeResult(StatusCodes.Status406NotAcceptable)
+                : decidedOutput == "application/x-http302-redirect" && fileInfo.HasDirectLink
+                ? new RedirectResult((await fileInfo.CreateDirectLinkAsync(TimeSpan.FromMinutes(10))).AbsoluteUri)
+                : decidedOutput == "application/json"
+                ? new Base64StreamResult(fileInfo)
+                : new FileStreamResult(await fileInfo.CreateReadStreamAsync(), decidedOutput);
         }
     }
 }

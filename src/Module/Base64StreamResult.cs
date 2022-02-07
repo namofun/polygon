@@ -2,6 +2,7 @@
 using System;
 using System.Buffers;
 using System.Buffers.Text;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Mvc
@@ -11,9 +12,20 @@ namespace Microsoft.AspNetCore.Mvc
     /// </summary>
     public class Base64StreamResult : ActionResult
     {
-        public IFileInfo FileInfo { get; set; }
+        private readonly long _length;
+        private readonly Func<Task<Stream>> _streamFactory;
 
-        public Base64StreamResult(IFileInfo file) => FileInfo = file;
+        public Base64StreamResult(IFileInfo file)
+        {
+            _length = file.Length;
+            _streamFactory = () => Task.FromResult(file.CreateReadStream());
+        }
+
+        public Base64StreamResult(IBlobInfo blob)
+        {
+            _length = blob.Length;
+            _streamFactory = () => blob.CreateReadStreamAsync();
+        }
 
         const int byteLen = 1024 * 3 * 256;
         const int charLen = 1024 * 4 * 256;
@@ -27,19 +39,19 @@ namespace Microsoft.AspNetCore.Mvc
             var cancellationToken = context.HttpContext.RequestAborted;
             response.StatusCode = 200;
             response.ContentType = "application/json";
-            response.ContentLength = (FileInfo.Length + 2) / 3 * 4 + 2;
-            using var f1 = FileInfo.CreateReadStream();
+            response.ContentLength = (_length + 2) / 3 * 4 + 2;
+            using var f1 = await _streamFactory();
 
             byte[] opt = opts.Rent(byteLen);
             byte[] res = ress.Rent(charLen);
             await response.BodyWriter.WriteAsync(qoute, cancellationToken);
-            long left = FileInfo.Length;
+            long left = _length;
 
             while (left > 0)
             {
                 int readLen = left > byteLen ? byteLen : checked((int)left);
                 for (int len = 0; len < readLen; )
-                    len += await f1.ReadAsync(opt, len, readLen - len);
+                    len += await f1.ReadAsync(opt.AsMemory(len, readLen - len));
                 var s = Base64.EncodeToUtf8(opt.AsSpan(0, readLen), res, out int len1, out int len2, true);
                 if (s != OperationStatus.Done || len1 != readLen)
                     throw new InvalidOperationException();

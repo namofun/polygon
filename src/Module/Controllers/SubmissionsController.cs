@@ -152,6 +152,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             {
                 var run = await Facade.Judgings.GetDetailAsync(Problem.Id, submitid, judgingid, runid);
                 if (run == null) return NotFound();
+
                 return File(
                     fileContents: Convert.FromBase64String(run.MetaData),
                     contentType: "text/plain",
@@ -162,10 +163,18 @@ namespace SatelliteSite.PolygonModule.Controllers
                 var fileInfo = await Facade.Judgings.GetRunFileAsync(judgingid, runid, type, submitid, Problem.Id);
                 if (!fileInfo.Exists) return NotFound();
 
-                return File(
-                    fileStream: fileInfo.CreateReadStream(),
-                    contentType: "application/octet-stream",
-                    fileDownloadName: $"j{judgingid}.r{runid}.{type}");
+                if (fileInfo.HasDirectLink)
+                {
+                    Uri url = await fileInfo.CreateDirectLinkAsync(TimeSpan.FromMinutes(10));
+                    return Redirect(url.AbsoluteUri);
+                }
+                else
+                {
+                    return File(
+                        fileStream: await fileInfo.CreateReadStreamAsync(),
+                        contentType: "application/octet-stream",
+                        fileDownloadName: $"j{judgingid}.r{runid}.{type}");
+                }
             }
         }
 

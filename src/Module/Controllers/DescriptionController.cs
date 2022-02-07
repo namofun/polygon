@@ -23,7 +23,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             ViewBag.Id = Problem.Id;
             ViewBag.Content = @new
                 ? HttpContext.GetService<IStatementWriter>().BuildHtml(await StatementAsync())
-                : (await ReadFileAsync("view.html") ?? string.Empty);
+                : (await ReadFileAsync("view.html", cached: true) ?? string.Empty);
 
             return View();
         }
@@ -36,7 +36,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             if (!ResourceDictionary.MarkdownFiles.Contains(target))
                 return NotFound();
 
-            var lastVersion = await ReadFileAsync($"{target}.md") ?? "";
+            var lastVersion = await ReadFileAsync($"{target}.md") ?? string.Empty;
             ViewBag.ProblemId = Problem.Id;
 
             return View(new MarkdownModel

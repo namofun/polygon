@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.FileProviders;
-using Polygon.Entities;
+﻿using Polygon.Entities;
 using Polygon.Models;
 using Polygon.Storages;
 using System;
@@ -23,7 +22,7 @@ namespace Polygon.Packaging
         private async Task<string> TryReadFileAsync(int problemId, string fileName)
         {
             var fileInfo = await Store.GetFileAsync(problemId, fileName);
-            return (await fileInfo.ReadAsync()) ?? string.Empty;
+            return (await fileInfo.ReadAsStringAsync()) ?? string.Empty;
         }
 
         public async Task<Statement> ReadAsync(Problem problem)
@@ -39,8 +38,8 @@ namespace Polygon.Packaging
 
             foreach (var item in testcases)
             {
-                var input = item.CustomInput ?? await (await Testcases.GetInputAsync(item)).ReadAsync();
-                var output = item.CustomOutput ?? await (await Testcases.GetOutputAsync(item)).ReadAsync();
+                var input = item.CustomInput ?? await (await Testcases.GetInputAsync(item)).ReadAsStringAsync();
+                var output = item.CustomOutput ?? await (await Testcases.GetOutputAsync(item)).ReadAsStringAsync();
                 if (input == null || output == null)
                 {
                     throw new InvalidOperationException($"Input or output invalid for testcase t{item.Id}.");

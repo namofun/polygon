@@ -11,9 +11,9 @@ namespace SatelliteSite
 {
     public class TestRole : IServiceRole
     {
-        private class InMemoryProblemFileProvider : InMemoryMutableFileProvider, IProblemFileProvider { }
+        private class InMemoryProblemFileProvider : InMemoryFileProvider, IProblemFileProvider { }
 
-        private class InMemoryJudgingFileProvider : InMemoryMutableFileProvider, IJudgingFileProvider { }
+        private class InMemoryJudgingFileProvider : InMemoryFileProvider, IJudgingFileProvider { }
 
         public void Configure(IServiceCollection services)
         {

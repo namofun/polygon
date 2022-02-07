@@ -279,6 +279,32 @@ namespace Polygon.Storages
         }
 
         /// <summary>
+        /// Read the content of file as string.
+        /// </summary>
+        /// <param name="file">The blob info.</param>
+        /// <returns>The task for reading content. <c>Null</c> if the file does not exist.</returns>
+        public static async Task<string?> ReadAsStringAsync(this IBlobInfo file)
+        {
+            if (!file.Exists) return null;
+            using var fs = await file.CreateReadStreamAsync();
+            using var sw = new StreamReader(fs);
+            return await sw.ReadToEndAsync();
+        }
+
+        /// <summary>
+        /// Read the content of file as string.
+        /// </summary>
+        /// <param name="file">The blob info.</param>
+        /// <returns>The task for reading content. <c>Null</c> if the file does not exist.</returns>
+        public static async Task<string?> ReadAsStringAndCacheAsync(this IBlobInfo file)
+        {
+            if (!file.Exists) return null;
+            using var fs = await file.CreateReadStreamAsync(true);
+            using var sw = new StreamReader(fs);
+            return await sw.ReadToEndAsync();
+        }
+
+        /// <summary>
         /// Set the testcase output file.
         /// </summary>
         /// <param name="store">The store.</param>

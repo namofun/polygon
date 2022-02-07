@@ -28,7 +28,6 @@ namespace SatelliteSite
                 .MarkDomain<Program>()
                 .AddModule<IdentityModule.IdentityModule<User, Role, DefaultContext>>()
                 .AddModule<PolygonModule.PolygonModule<Polygon.DefaultRole<DefaultContext, QueryCache<DefaultContext>>>>()
-                .AddModule<TelemetryModule.TelemetryModule>()
                 .AddModule<HostModule>()
                 .AddDatabase<DefaultContext>((c, b) => b.UseSqlServer(c.GetConnectionString("UserDbConnection"), b => b.UseBulk()))
                 .ConfigureSubstrateDefaults<DefaultContext>(builder =>
