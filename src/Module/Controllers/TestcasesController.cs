@@ -232,7 +232,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             var fileInfo = await Store.GetFileAsync(tc, filetype);
             if (!fileInfo.Exists) return NotFound();
 
-            if (!tc.IsSecret && fileInfo.HasDirectLink)
+            if (tc.IsSecret && fileInfo.HasDirectLink)
             {
                 Uri url = await fileInfo.CreateDirectLinkAsync(TimeSpan.FromMinutes(10));
                 return Redirect(url.AbsoluteUri);
@@ -240,7 +240,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             else
             {
                 return File(
-                    fileStream: await fileInfo.CreateReadStreamAsync(tc.IsSecret ? true : null),
+                    fileStream: await fileInfo.CreateReadStreamAsync(tc.IsSecret ? null : true),
                     contentType: "application/octet-stream",
                     fileDownloadName: $"p{Problem.Id}.t{testid}.{filetype}");
             }
