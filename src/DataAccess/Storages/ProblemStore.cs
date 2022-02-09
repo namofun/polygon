@@ -39,7 +39,7 @@ namespace Polygon.Storages
 
         Task<IBlobInfo> IProblemStore.GetFileAsync(int problemId, string fileName)
         {
-            return ProblemFiles.GetFileInfoAsync($"p{problemId}/{fileName}");
+            return ProblemFiles.GetStatementFileAsync(problemId, fileName);
         }
 
         Task<IPagedList<Problem>> IProblemStore.ListAsync(int page, int perCount, bool ascending, int? uid, AuthorLevel? leastLevel)
@@ -112,17 +112,7 @@ namespace Polygon.Storages
 
         Task<IBlobInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, string content)
         {
-            return ProblemFiles.WriteStringAsync($"p{problem.Id}/{fileName}", content);
-        }
-
-        Task<IBlobInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, byte[] content)
-        {
-            return ProblemFiles.WriteBinaryAsync($"p{problem.Id}/{fileName}", content);
-        }
-
-        Task<IBlobInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, Stream content)
-        {
-            return ProblemFiles.WriteStreamAsync($"p{problem.Id}/{fileName}", content);
+            return ProblemFiles.WriteStatementFileAsync(problem.Id, fileName, content);
         }
 
         Task<Dictionary<int, string>> IProblemStore.ListNameAsync(Expression<Func<Problem, bool>> condition)

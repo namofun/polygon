@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Options;
 using Polygon.Storages;
 using Polygon.Storages.Handlers;
@@ -43,13 +44,13 @@ namespace Polygon
             services.AddSingleton<IJudgingFileProvider>(sp =>
             {
                 var options = sp.GetRequiredService<IOptions<PolygonPhysicalOptions>>();
-                return options.Value.JudgingFileProvider ?? new PhysicalPolygonFileProvider(options.Value.JudgingDirectory);
+                return options.Value.JudgingFileProvider ?? new PolygonFileProvider(new PhysicalBlobProvider(options.Value.JudgingDirectory));
             });
 
             services.AddSingleton<IProblemFileProvider>(sp =>
             {
                 var options = sp.GetRequiredService<IOptions<PolygonPhysicalOptions>>();
-                return options.Value.ProblemFileProvider ?? new PhysicalPolygonFileProvider(options.Value.ProblemDirectory);
+                return options.Value.ProblemFileProvider ?? new PolygonFileProvider(new PhysicalBlobProvider(options.Value.ProblemDirectory));
             });
         }
     }

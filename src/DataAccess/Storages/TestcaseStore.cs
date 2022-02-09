@@ -113,7 +113,7 @@ namespace Polygon.Storages
 
         Task<IBlobInfo> ITestcaseStore.GetFileAsync(Testcase tc, string target)
         {
-            return ProblemFiles.GetFileInfoAsync($"p{tc.ProblemId}/t{tc.Id}.{target}");
+            return ProblemFiles.GetTestcaseFileAsync(tc.ProblemId, tc.Id, target);
         }
 
         Task<List<Testcase>> ITestcaseStore.ListAsync(int problemId, bool? secret)
@@ -127,7 +127,7 @@ namespace Polygon.Storages
 
         Task<IBlobInfo> ITestcaseStore.SetFileAsync(Testcase tc, string target, Stream source)
         {
-            return ProblemFiles.WriteStreamAsync($"p{tc.ProblemId}/t{tc.Id}.{target}", source);
+            return ProblemFiles.WriteTestcaseFileAsync(tc.ProblemId, tc.Id, target, source);
         }
 
         Task ITestcaseStore.UpdateAsync(Testcase entity) => UpdateEntityAsync(entity);

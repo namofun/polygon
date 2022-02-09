@@ -109,7 +109,7 @@ namespace Polygon.Storages
         async Task<IBlobInfo> IJudgingStore.GetRunFileAsync(int judgingid, int runid, string type, int? submitid, int? probid)
         {
             var notfound = new NotFoundBlobInfo($"j{judgingid}/r{runid}.{type}");
-            var fileInfo = await JudgingFiles.GetFileInfoAsync($"j{judgingid}/r{runid}.{type}");
+            var fileInfo = await JudgingFiles.GetJudgingRunOutputAsync(judgingid, runid, type);
             if (!fileInfo.Exists) return notfound;
 
             if (submitid.HasValue || probid.HasValue)
@@ -128,7 +128,7 @@ namespace Polygon.Storages
 
         Task<IBlobInfo> IJudgingStore.SetRunFileAsync(int judgingid, int runid, string type, byte[] content)
         {
-            return JudgingFiles.WriteBinaryAsync($"j{judgingid}/r{runid}.{type}", content);
+            return JudgingFiles.WriteJudgingRunOutputAsync(judgingid, runid, type, content);
         }
 
         Task<RunSummary> IJudgingStore.SummarizeAsync(int judgingId)
