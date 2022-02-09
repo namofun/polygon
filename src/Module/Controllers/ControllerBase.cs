@@ -72,18 +72,6 @@ namespace SatelliteSite.PolygonModule.Controllers
             return null;
         }
 
-        /// <summary>
-        /// Read the file of problem repository.
-        /// </summary>
-        /// <param name="fileName">The file name.</param>
-        /// <param name="cached">Whether to cache.</param>
-        /// <returns>The task for content.</returns>
-        protected async Task<string> ReadFileAsync(string fileName, bool cached = false)
-        {
-            var fileInfo = await Facade.Problems.GetFileAsync(Problem.Id, fileName);
-            return await (cached ? fileInfo.ReadAsStringAsync() : fileInfo.ReadAsStringAndCacheAsync());
-        }
-
         /// <inheritdoc />
         public override async Task OnActionExecutionAsync(
             ActionExecutingContext context,

@@ -53,9 +53,9 @@ namespace Polygon.Storages
         /// </summary>
         /// <param name="that">The store.</param>
         /// <param name="problem">The problem.</param>
-        /// <param name="fileName">The file name.</param>
+        /// <param name="sectionName">The section name.</param>
         /// <returns>The task for fetching the file, resulting in the <see cref="IBlobInfo"/>.</returns>
-        public static Task<IBlobInfo> GetFileAsync(this IProblemStore that, Problem problem, string fileName) => that.GetFileAsync(problem.Id, fileName);
+        public static Task<IBlobInfo> GetStatementSectionAsync(this IProblemStore that, Problem problem, string sectionName) => that.GetStatementSectionAsync(problem.Id, sectionName);
 
         /// <summary>
         /// Find the judging with judging ID.

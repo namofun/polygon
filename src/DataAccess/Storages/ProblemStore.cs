@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Polygon.Entities;
-using Polygon.Events;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -37,9 +35,9 @@ namespace Polygon.Storages
                 .SingleOrDefaultAsync();
         }
 
-        Task<IBlobInfo> IProblemStore.GetFileAsync(int problemId, string fileName)
+        Task<IBlobInfo> IProblemStore.GetStatementSectionAsync(int problemId, string sectionName)
         {
-            return ProblemFiles.GetStatementFileAsync(problemId, fileName);
+            return ProblemFiles.GetStatementSectionAsync(problemId, sectionName);
         }
 
         Task<IPagedList<Problem>> IProblemStore.ListAsync(int page, int perCount, bool ascending, int? uid, AuthorLevel? leastLevel)
@@ -110,9 +108,14 @@ namespace Polygon.Storages
                 .BatchUpdateAsync(p => new Problem { AllowSubmit = tobe });
         }
 
-        Task<IBlobInfo> IProblemStore.WriteFileAsync(Problem problem, string fileName, string content)
+        Task<IBlobInfo> IProblemStore.WriteStatementSectionAsync(Problem problem, string fileName, string content)
         {
-            return ProblemFiles.WriteStatementFileAsync(problem.Id, fileName, content);
+            return ProblemFiles.WriteStatementSectionAsync(problem.Id, fileName, content);
+        }
+
+        Task IProblemStore.WriteStatementAsync(Problem problem, string content)
+        {
+            return ProblemFiles.WriteStatementAsync(problem.Id, content);
         }
 
         Task<Dictionary<int, string>> IProblemStore.ListNameAsync(Expression<Func<Problem, bool>> condition)
@@ -134,7 +137,7 @@ namespace Polygon.Storages
 
         async Task<string?> IProblemStore.ReadCompiledHtmlAsync(int problemId)
         {
-            var fileInfo = await ((IProblemStore)this).GetFileAsync(problemId, "view.html");
+            var fileInfo = await ProblemFiles.GetStatementAsync(problemId);
             return await fileInfo.ReadAsStringAndCacheAsync();
         }
 

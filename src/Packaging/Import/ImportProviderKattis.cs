@@ -265,7 +265,7 @@ namespace Polygon.Packaging
 
         private IReadOnlyList<(string, string)> GetTexContent(string content)
         {
-            return new[] { ("description.md", content) };
+            return new[] { ("description", content) };
         }
 
         public override async Task<List<Problem>> ImportAsync(
@@ -331,7 +331,7 @@ namespace Polygon.Packaging
 
                 string tags = $"p{ctx.Id}";
                 string content = await Files.ImportWithImagesAsync(Markdown, mdcontent, tags);
-                await ctx.WriteAsync($"{mdfile}.md", content);
+                await ctx.WriteStatementSectionAsync(mdfile, content);
 
                 Log($"Adding statement section 'problem_statement/{mdfile}.md'.");
             }
@@ -345,7 +345,7 @@ namespace Polygon.Packaging
 
                     string texcontent = await entry.ReadAsStringAsync();
                     IReadOnlyList<(string, string)> contents = GetTexContent(texcontent);
-                    foreach (var (fn, ct) in contents) await ctx.WriteAsync(fn, ct);
+                    foreach (var (fn, ct) in contents) await ctx.WriteStatementSectionAsync(fn, ct);
 
                     Log($"Adding statement section 'problem_statement/{texfile}'.");
                     break;

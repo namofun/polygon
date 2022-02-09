@@ -17,14 +17,19 @@ namespace Polygon.Storages
 
         Task<IBlobInfo> WriteTestcaseFileAsync(int problemId, int testcaseId, string target, Stream source);
 
-        Task<IBlobInfo> GetStatementFileAsync(int problemId, string target);
+        Task<IBlobInfo> GetStatementAsync(int problemId);
 
-        Task<IBlobInfo> WriteStatementFileAsync(int problemId, string target, string content);
+        Task<IBlobInfo> WriteStatementAsync(int problemId, string content);
+
+        Task<IBlobInfo> GetStatementSectionAsync(int problemId, string section);
+
+        Task<IBlobInfo> WriteStatementSectionAsync(int problemId, string section, string content);
     }
 
     public delegate string JudgingOutputNameFormat(int judgingId, int runId, string type);
     public delegate string TestcaseNameFormat(int problemId, int testcaseId, string target);
-    public delegate string StatementNameFormat(int problemId, string target);
+    public delegate string StatementNameFormat(int problemId);
+    public delegate string StatementSectionNameFormat(int problemId, string section);
 
     public class PolygonFileProvider : IProblemFileProvider, IJudgingFileProvider
     {
@@ -32,17 +37,20 @@ namespace Polygon.Storages
         private readonly JudgingOutputNameFormat _judgingOutputNameFormat;
         private readonly TestcaseNameFormat _testcaseNameFormat;
         private readonly StatementNameFormat _statementNameFormat;
+        private readonly StatementSectionNameFormat _statementSectionNameFormat;
 
         public PolygonFileProvider(
             IBlobProvider blobProvider,
             JudgingOutputNameFormat? jonFormatter = null,
             TestcaseNameFormat? tnFormatter = null,
-            StatementNameFormat? snFormatter = null)
+            StatementNameFormat? snFormatter = null,
+            StatementSectionNameFormat? ssnFormatter = null)
         {
             _blobProvider = blobProvider;
             _judgingOutputNameFormat = jonFormatter ?? DefaultJudgingOutputNameFormat;
             _testcaseNameFormat = tnFormatter ?? DefaultTestcaseNameFormat;
             _statementNameFormat = snFormatter ?? DefaultStatementNameFormat;
+            _statementSectionNameFormat = ssnFormatter ?? DefaultStatementSectionNameFormat;
         }
 
         public static string DefaultJudgingOutputNameFormat(int judgingId, int runId, string type)
@@ -55,9 +63,14 @@ namespace Polygon.Storages
             return $"p{problemId}/t{testcaseId}.{target}";
         }
 
-        public static string DefaultStatementNameFormat(int problemId, string target)
+        public static string DefaultStatementNameFormat(int problemId)
         {
-            return $"p{problemId}/{target}";
+            return $"p{problemId}/view.html";
+        }
+
+        public static string DefaultStatementSectionNameFormat(int problemId, string section)
+        {
+            return $"p{problemId}/{section}.md";
         }
 
         public Task<IBlobInfo> GetJudgingRunOutputAsync(int judgingId, int runId, string type)
@@ -80,14 +93,24 @@ namespace Polygon.Storages
             return _blobProvider.WriteStreamAsync(_testcaseNameFormat(problemId, testcaseId, target), source);
         }
 
-        public Task<IBlobInfo> GetStatementFileAsync(int problemId, string target)
+        public Task<IBlobInfo> GetStatementAsync(int problemId)
         {
-            return _blobProvider.GetFileInfoAsync(_statementNameFormat(problemId, target));
+            return _blobProvider.GetFileInfoAsync(_statementNameFormat(problemId));
         }
 
-        public Task<IBlobInfo> WriteStatementFileAsync(int problemId, string target, string content)
+        public Task<IBlobInfo> WriteStatementAsync(int problemId, string content)
         {
-            return _blobProvider.WriteStringAsync(_statementNameFormat(problemId, target), content);
+            return _blobProvider.WriteStringAsync(_statementNameFormat(problemId), content);
+        }
+
+        public Task<IBlobInfo> GetStatementSectionAsync(int problemId, string section)
+        {
+            return _blobProvider.GetFileInfoAsync(_statementSectionNameFormat(problemId, section));
+        }
+
+        public Task<IBlobInfo> WriteStatementSectionAsync(int problemId, string section, string content)
+        {
+            return _blobProvider.WriteStringAsync(_statementSectionNameFormat(problemId, section), content);
         }
     }
 }

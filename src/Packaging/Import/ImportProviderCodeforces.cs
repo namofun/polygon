@@ -181,7 +181,7 @@ namespace Polygon.Packaging
                 var entry = zip.GetEntry($"statement-sections/{lang}/{filename}");
                 if (entry == null) continue;
                 string mdcontent = await entry.ReadAsStringAsync();
-                await ctx.WriteAsync($"{mdfile}.md", mdcontent);
+                await ctx.WriteStatementSectionAsync(mdfile, mdcontent);
                 Log($"Adding statement section 'statement-sections/{lang}/{filename}'.");
             }
         }

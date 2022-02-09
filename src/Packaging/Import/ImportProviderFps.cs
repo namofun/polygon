@@ -21,10 +21,10 @@ namespace Polygon.Packaging
 
         static readonly Dictionary<string, string> nodes = new()
         {
-            ["description"] = "description.md",
-            ["input"] = "inputdesc.md",
-            ["output"] = "outputdesc.md",
-            ["hint"] = "hint.md",
+            ["description"] = "description",
+            ["input"] = "inputdesc",
+            ["output"] = "outputdesc",
+            ["hint"] = "hint",
         };
 
         static readonly (string, bool, string)[] testcaseGroups = new[]
@@ -70,7 +70,7 @@ namespace Polygon.Packaging
                 {
                     string content = doc.Element(nodeName)?.Value;
                     if (string.IsNullOrEmpty(content)) continue;
-                    await ctx.WriteAsync(fileName, content);
+                    await ctx.WriteStatementSectionAsync(fileName, content);
                 }
 
                 // Add testcases.

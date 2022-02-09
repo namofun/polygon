@@ -137,18 +137,26 @@ namespace Polygon.Storages
         /// Write file to problem repository.
         /// </summary>
         /// <param name="problem">The problem.</param>
-        /// <param name="fileName">The file name.</param>
+        /// <param name="sectionName">The section name.</param>
         /// <param name="content">The content.</param>
         /// <returns>The task for storing files, resulting in <see cref="IBlobInfo"/>.</returns>
-        Task<IBlobInfo> WriteFileAsync(Problem problem, string fileName, string content);
+        Task<IBlobInfo> WriteStatementSectionAsync(Problem problem, string sectionName, string content);
+
+        /// <summary>
+        /// Write file to problem repository.
+        /// </summary>
+        /// <param name="problem">The problem.</param>
+        /// <param name="content">The content.</param>
+        /// <returns>The task for storing statement.</returns>
+        Task WriteStatementAsync(Problem problem, string content);
 
         /// <summary>
         /// Get the problem file.
         /// </summary>
         /// <param name="problemId">The problem ID.</param>
-        /// <param name="fileName">The file name.</param>
+        /// <param name="sectionName">The file name.</param>
         /// <returns>The task for fetching the file, resulting in the <see cref="IBlobInfo"/>.</returns>
-        Task<IBlobInfo> GetFileAsync(int problemId, string fileName);
+        Task<IBlobInfo> GetStatementSectionAsync(int problemId, string sectionName);
 
         /// <summary>
         /// Rebuild the submission statistics.

@@ -18,10 +18,10 @@ namespace Polygon.Packaging
 
         static readonly Dictionary<string, string> nodes = new Dictionary<string, string>
         {
-            ["description"] = "description.md",
-            ["input"] = "inputdesc.md",
-            ["output"] = "outputdesc.md",
-            ["hint"] = "hint.md",
+            ["description"] = "description",
+            ["input"] = "inputdesc",
+            ["output"] = "outputdesc",
+            ["hint"] = "hint",
         };
 
         static readonly (string, bool)[] testcaseGroups = new[] { ("samples", false), ("test_cases", true) };
@@ -73,7 +73,7 @@ namespace Polygon.Packaging
                 string mdcontent = element.Value;
                 var tags = $"p{ctx.Id}";
                 string content = await Files.ImportWithImagesAsync(Markdown, mdcontent, tags);
-                await ctx.WriteAsync(fileName, content);
+                await ctx.WriteStatementSectionAsync(fileName, content);
             }
 
             // Add testcases.

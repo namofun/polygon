@@ -2,6 +2,7 @@
 using Polygon;
 using Polygon.Events;
 using Polygon.Packaging;
+using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
 using System.IO;
@@ -23,7 +24,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             ViewBag.Id = Problem.Id;
             ViewBag.Content = @new
                 ? HttpContext.GetService<IStatementWriter>().BuildHtml(await StatementAsync())
-                : (await ReadFileAsync("view.html", cached: true) ?? string.Empty);
+                : (await Facade.Problems.ReadCompiledHtmlAsync(Problem.Id) ?? string.Empty);
 
             return View();
         }
@@ -36,7 +37,8 @@ namespace SatelliteSite.PolygonModule.Controllers
             if (!ResourceDictionary.MarkdownFiles.Contains(target))
                 return NotFound();
 
-            var lastVersion = await ReadFileAsync($"{target}.md") ?? string.Empty;
+            var stateSection = await Facade.Problems.GetStatementSectionAsync(Problem, target);
+            var lastVersion = await stateSection.ReadAsStringAsync() ?? string.Empty;
             ViewBag.ProblemId = Problem.Id;
 
             return View(new MarkdownModel
@@ -59,7 +61,7 @@ namespace SatelliteSite.PolygonModule.Controllers
                 return BadRequest();
             model.Markdown ??= string.Empty;
 
-            await Facade.Problems.WriteFileAsync(Problem, $"{target}.md", model.Markdown);
+            await Facade.Problems.WriteStatementSectionAsync(Problem, target, model.Markdown);
             StatusMessage = "Description saved.";
             return RedirectToAction();
         }
@@ -71,7 +73,7 @@ namespace SatelliteSite.PolygonModule.Controllers
             [FromServices] IStatementWriter writer)
         {
             var content = writer.BuildHtml(await StatementAsync());
-            await Facade.Problems.WriteFileAsync(Problem, "view.html", content);
+            await Facade.Problems.WriteStatementAsync(Problem, content);
             await Mediator.Publish(new ProblemModifiedEvent(Problem));
             StatusMessage = "Problem description saved successfully.";
             return RedirectToAction(nameof(Preview), new { @new = false });
