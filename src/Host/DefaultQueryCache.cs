@@ -16,8 +16,14 @@ namespace SatelliteSite
         where TContext : IdentityDbContext<User, Role, int>, IPolygonDbContext
     {
         public QueryCache()
-            : base(
+            : this(
                   (start, end) => EF.Functions.DateDiffMillisecond(start, end) / 1000.0)
+        {
+        }
+
+        protected QueryCache(
+            Expression<Func<DateTimeOffset, DateTimeOffset, double>> durationExpression)
+            : base(durationExpression)
         {
         }
 

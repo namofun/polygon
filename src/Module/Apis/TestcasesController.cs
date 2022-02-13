@@ -66,7 +66,7 @@ namespace SatelliteSite.PolygonModule.Apis
             string[] accepts = Request.Headers.GetCommaSeparatedValues("accept");
             string decidedOutput = accepts.Length == 0 ? "application/json" : null;
 
-            for (int i = 0; i < accepts.Length && decidedOutput != null; i++)
+            for (int i = 0; i < accepts.Length && decidedOutput == null; i++)
             {
                 switch (accepts[i])
                 {

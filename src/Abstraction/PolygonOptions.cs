@@ -10,9 +10,9 @@ namespace Polygon
     /// </summary>
     public class PolygonOptions
     {
-        private readonly List<(string, string, Func<IServiceProvider, IImportProvider>)> _imports = new List<(string, string, Func<IServiceProvider, IImportProvider>)>();
-        private readonly List<(string, string)> _importNames = new List<(string, string)>();
-        private readonly Dictionary<string, Func<IServiceProvider, IImportProvider>> _importFactories = new Dictionary<string, Func<IServiceProvider, IImportProvider>>();
+        private readonly List<(string, string, Func<IServiceProvider, IImportProvider>)> _imports = new();
+        private readonly List<(string, string)> _importNames = new();
+        private readonly Dictionary<string, Func<IServiceProvider, IImportProvider>> _importFactories = new();
         private bool _readonly;
 
         /// <summary>

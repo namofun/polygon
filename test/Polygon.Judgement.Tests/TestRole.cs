@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Polygon;
-using Polygon.Entities;
 using Polygon.Storages;
 using Polygon.Storages.Handlers;
 using SatelliteSite.Tests;
@@ -11,10 +10,6 @@ namespace SatelliteSite
 {
     public class TestRole : IServiceRole
     {
-        private class InMemoryProblemFileProvider : InMemoryFileProvider, IProblemFileProvider { }
-
-        private class InMemoryJudgingFileProvider : InMemoryFileProvider, IJudgingFileProvider { }
-
         public void Configure(IServiceCollection services)
         {
             services.AddDbModelSupplier<TestContext, PolygonEntityConfiguration<TestContext>>();
@@ -25,8 +20,8 @@ namespace SatelliteSite
             services.AddMarkdown();
 
             services.AddMediatRAssembly(typeof(Auditlogging).Assembly);
-            services.AddSingleton<IJudgingFileProvider, InMemoryJudgingFileProvider>();
-            services.AddSingleton<IProblemFileProvider, InMemoryProblemFileProvider>();
+            services.AddSingleton<IJudgingFileProvider>(new PolygonFileProvider(new InMemoryFileProvider()));
+            services.AddSingleton<IProblemFileProvider>(new PolygonFileProvider(new InMemoryFileProvider()));
         }
     }
 }
