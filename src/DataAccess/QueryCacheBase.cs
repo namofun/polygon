@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Polygon.Entities;
+using Polygon.Events;
 using Polygon.Models;
 using System;
 using System.Collections.Generic;
@@ -17,9 +18,41 @@ namespace Polygon.Storages
     /// This service should be <see cref="ServiceLifetime.Singleton"/>, and can't rely on any scoped services.
     /// If you want to utilize other scoped services, it is preferred to take action with IHttpContextAccessor.
     /// </remarks>
-    public abstract class QueryCacheBase<TContext> where TContext : DbContext, IPolygonDbContext
+    public abstract class QueryCacheBase<TContext> : IDbModelSupplier<TContext> where TContext : DbContext, IPolygonDbContext
     {
-        private Func<TContext, IAsyncEnumerable<JudgehostLoad>>? _judgehostLoad;
+        private readonly Func<TContext, IAsyncEnumerable<JudgehostLoad>> _judgehostLoad;
+        private readonly IConcurrencyGuard _judgementDequeueGuard;
+
+        /// <summary>
+        /// Initialize the QueryCacheBase.
+        /// </summary>
+        /// <param name="durationExpression">
+        /// Expression to calculate the duration seconds between two <see cref="DateTimeOffset"/> that can be translated by Entity Framework Core.
+        /// <list type="bullet">For SqlServer, it may be <c>(start, end) => EF.Functions.DateDiffMillisecond(start, end) / 1000.0</c>.</list>
+        /// <list type="bullet">For InMemory, it may be <c>(start, end) => (end - start).TotalSeconds</c>.</list>
+        /// <list type="bullet">For PostgreSQL, it may be <c>(start, end) => PostgresTimeDiff.ExtractEpochFromAge(end, start)</c> with customized DbFunctions.</list>
+        /// </param>
+        /// <param name="judgementDequeueGuard">
+        /// The concurrency guard used when dequeue judgements.
+        /// </param>
+        public QueryCacheBase(
+            Expression<Func<DateTimeOffset, DateTimeOffset, double>> durationExpression,
+            IConcurrencyGuard? judgementDequeueGuard = null)
+        {
+            _judgehostLoad = EF.CompileAsyncQuery(CreateJudgehostLoadQuery(durationExpression));
+            _judgementDequeueGuard = judgementDequeueGuard ?? new AsyncLockConcurrencyGuard();
+        }
+
+        /// <inheritdoc cref="IDbModelSupplier{TContext}.Configure(ModelBuilder, TContext)" />
+        protected virtual void ConfigureModel(ModelBuilder builder, TContext context)
+        {
+        }
+
+        /// <inheritdoc />
+        void IDbModelSupplier<TContext>.Configure(ModelBuilder builder, TContext context)
+        {
+            ConfigureModel(builder, context);
+        }
 
         /// <summary>
         /// Create a task to fetch <see cref="JudgehostLoad"/>s.
@@ -28,8 +61,6 @@ namespace Polygon.Storages
         /// <returns>The judgehost load models.</returns>
         public virtual async Task<List<JudgehostLoad>> FetchJudgehostLoadAsync(TContext context)
         {
-            _judgehostLoad ??= EF.CompileAsyncQuery(CreateJudgehostLoadQuery(CalculateDuration));
-
             var results = new List<JudgehostLoad>();
             await foreach (var item in _judgehostLoad(context))
             {
@@ -59,22 +90,49 @@ namespace Polygon.Storages
         public abstract Task<List<SolutionAuthor>> FetchSolutionAuthorAsync(TContext context, Expression<Func<Submission, bool>> predicate);
 
         /// <summary>
-        /// Create an expression to calculate the duration seconds between two <see cref="DateTimeOffset"/>.
-        /// </summary>
-        /// <remarks>
-        /// Usually, it can be expressed in several ways.
-        /// <list type="bullet">For SqlServer, it may be <c>(start, end) => EF.Functions.DateDiffMillisecond(start, end) / 1000.0</c>.</list>
-        /// <list type="bullet">For InMemory, it may be <c>(start, end) => (end - start).TotalSeconds</c>.</list>
-        /// </remarks>
-        protected abstract Expression<Func<DateTimeOffset, DateTimeOffset, double>> CalculateDuration { get; }
-
-        /// <summary>
         /// Create a task to fetch permitted users of one problem.
         /// </summary>
         /// <param name="context">The query database context.</param>
         /// <param name="probid">The problem ID.</param>
         /// <returns>The user information list.</returns>
         public abstract Task<IEnumerable<(int UserId, string UserName, AuthorLevel Level)>> FetchPermittedUserAsync(TContext context, int probid);
+
+        /// <summary>
+        /// Dequeue the next judging.
+        /// </summary>
+        /// <param name="context">The query database context.</param>
+        /// <param name="judgehostName">The judgehost name.</param>
+        /// <param name="extraCondition">The extra condition to attach.</param>
+        /// <returns>The next judging or null.</returns>
+        public virtual async Task<JudgingBeginEvent?> DequeueNextJudgingAsync(TContext context, string judgehostName, Expression<Func<Judging, bool>>? extraCondition = null)
+        {
+            using var guard = await _judgementDequeueGuard.EnterCriticalSectionAsync();
+
+            JudgingBeginEvent? r = await context.Judgings
+                .Where(j => j.Status == Verdict.Pending && j.s.l.AllowJudge && j.s.p.AllowJudge && !j.s.Ignored)
+                .WhereIf(extraCondition != null, extraCondition)
+                .OrderBy(j => j.Id)
+                .Select(j => new JudgingBeginEvent(j, j.s.p, j.s.l, j.s.ContestId, j.s.TeamId, j.s.RejudgingId))
+                .FirstOrDefaultAsync();
+
+            if (r == null) return null;
+
+            var judging = r.Judging;
+            judging.Status = Verdict.Running;
+            judging.Server = judgehostName;
+            judging.StartTime = DateTimeOffset.Now;
+
+            await context.Judgings
+                .Where(j => j.Id == judging.Id)
+                .BatchUpdateAsync(j => new Judging
+                {
+                    Status = Verdict.Running,
+                    Server = judging.Server,
+                    StartTime = judging.StartTime,
+                });
+
+            return r;
+        }
 
 
 
@@ -128,9 +186,9 @@ namespace Polygon.Storages
             protected override Expression VisitParameter(ParameterExpression node)
             {
                 if (node == _innerStart)
-                    return _lhs ?? throw new ArgumentNullException("Where is left hand side?");
+                    return _lhs ?? throw new ArgumentNullException(nameof(_lhs), "Where is left hand side?");
                 if (node == _innerEnd)
-                    return _rhs ?? throw new ArgumentNullException("Where is right hand side?");
+                    return _rhs ?? throw new ArgumentNullException(nameof(_rhs), "Where is right hand side?");
                 return base.VisitParameter(node);
             }
 

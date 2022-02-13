@@ -142,5 +142,13 @@ namespace Polygon.Storages
         /// <param name="limit">The count of selects.</param>
         /// <returns>The task for fetching judging runs.</returns>
         Task<IEnumerable<T>> GetDetailsAsync<T>(Expression<Func<Testcase, JudgingRun, T>> selector, Expression<Func<Testcase, JudgingRun, bool>>? predicate = null, int? limit = null);
+
+        /// <summary>
+        /// Dequeue a judging request.
+        /// </summary>
+        /// <param name="judgehostName">The judgehost name.</param>
+        /// <param name="extraCondition">The extra condition to attach.</param>
+        /// <returns>The task for dequeue.</returns>
+        Task<Events.JudgingBeginEvent?> DequeueAsync(string judgehostName, Expression<Func<Judging, bool>>? extraCondition = null);
     }
 }

@@ -166,5 +166,10 @@ namespace Polygon.Storages
                 .AsNoTracking()
                 .ToLookupAsync(jr => jr.JudgingId, jr => jr);
         }
+
+        Task<Events.JudgingBeginEvent?> IJudgingStore.DequeueAsync(string judgehostName, Expression<Func<Judging, bool>>? extraCondition)
+        {
+            return QueryCache.DequeueNextJudgingAsync(Context, judgehostName, extraCondition);
+        }
     }
 }

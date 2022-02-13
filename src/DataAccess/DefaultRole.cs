@@ -25,6 +25,7 @@ namespace Polygon
             services.AddDbModelSupplier<TContext, PolygonEntityConfiguration<TContext>>();
             services.AddPolygonStorage<PolygonFacade<TContext, TQueryCache>>();
             services.AddSingleton<TQueryCache>();
+            services.AddSingletonUpcast<IDbModelSupplier<TContext>, TQueryCache>();
             services.AddMediatRAssembly(typeof(Auditlogging).Assembly);
 
             services.AddOptions<PolygonPhysicalOptions>()

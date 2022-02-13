@@ -15,6 +15,12 @@ namespace SatelliteSite
     public class QueryCache<TContext> : QueryCacheBase<TContext>
         where TContext : IdentityDbContext<User, Role, int>, IPolygonDbContext
     {
+        public QueryCache()
+            : base(
+                  (start, end) => EF.Functions.DateDiffMillisecond(start, end) / 1000.0)
+        {
+        }
+
         public override Task<List<SolutionAuthor>> FetchSolutionAuthorAsync(TContext context, Expression<Func<Submission, bool>> predicate)
         {
             var query =
@@ -36,8 +42,5 @@ namespace SatelliteSite
                 select new { u.Id, u.UserName, u.NickName, pa.Level };
             return (await query.ToListAsync()).Select(a => (a.Id, a.UserName, a.Level));
         }
-
-        protected override Expression<Func<DateTimeOffset, DateTimeOffset, double>> CalculateDuration { get; }
-            = (start, end) => EF.Functions.DateDiffMillisecond(start, end) / 1000.0;
     }
 }
