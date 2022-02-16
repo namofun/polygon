@@ -30,6 +30,7 @@ namespace SatelliteSite
             Host.CreateDefaultBuilder(args)
                 .MarkDomain<Program>()
                 .AddModule<IdentityModule.IdentityModule<User, Role, DefaultContext>>()
+                .EnableIdentityModuleBasicAuthentication()
                 .AddModule<PolygonModule.PolygonModule<Polygon.DefaultRole<DefaultContext, QueryCache<DefaultContext>>>>()
                 .AddModule<HostModule>()
                 .AddDatabase<DefaultContext>((c, b) => b.UseSqlServer(c.GetConnectionString("UserDbConnection"), b => b.UseBulk()))
@@ -40,7 +41,11 @@ namespace SatelliteSite
                     {
                         services.AddMarkdown();
                         services.AddDbModelSupplier<DefaultContext, PolygonIdentityEntityConfiguration<User, DefaultContext>>();
-                        //services.AddDbModelSupplier<DefaultContext, SeedConfiguration<DefaultContext>>();
+
+                        if (bool.Parse(context.Configuration["UseSeeds"]))
+                        {
+                            services.AddDbModelSupplier<DefaultContext, SeedConfiguration<DefaultContext>>();
+                        }
 
                         if (bool.Parse(context.Configuration["UseAzureConvergence"]))
                         {
@@ -77,17 +82,18 @@ namespace SatelliteSite
                             });
                         }
 
-                        /*
-                        services.AddFakeJudgehost()
-                            .AddJudgehost<FakeJudgeActivity>("judgehost-0")
-                            .AddHttpClientFactory(sp =>
-                            {
-                                return new System.Net.Http.HttpClient()
+                        if (bool.Parse(context.Configuration["UseFakeJudgehost"]))
+                        {
+                            services.AddFakeJudgehost()
+                                .AddJudgehost<FakeJudgeActivity>("judgehost-0")
+                                .AddHttpClientFactory(sp =>
                                 {
-                                    BaseAddress = new System.Uri("https://localhost:41359/api/")
-                                };
-                            });
-                        //*/
+                                    return new System.Net.Http.HttpClient()
+                                    {
+                                        BaseAddress = new System.Uri("https://localhost:41359/api/")
+                                    };
+                                });
+                        }
                     });
                 });
 

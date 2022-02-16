@@ -85,12 +85,15 @@ namespace SatelliteSite.PolygonModule.Apis
             }
 
             return decidedOutput == null
-                ? new StatusCodeResult(StatusCodes.Status406NotAcceptable)
+                ? StatusCode(StatusCodes.Status406NotAcceptable)
                 : decidedOutput == "application/x-http302-redirect" && fileInfo.HasDirectLink
-                ? new RedirectResult((await fileInfo.CreateDirectLinkAsync(TimeSpan.FromMinutes(10))).AbsoluteUri)
+                ? Redirect(await fileInfo.CreateDirectLinkAsync(TimeSpan.FromMinutes(10), desiredContentType: "application/octet-stream"))
                 : decidedOutput == "application/json"
-                ? new Base64StreamResult(fileInfo)
-                : new FileStreamResult(await fileInfo.CreateReadStreamAsync(), decidedOutput);
+                ? Base64(fileInfo)
+                : File(await fileInfo.CreateReadStreamAsync(), decidedOutput);
+
+            static RedirectResult Redirect(Uri url) => new(url.AbsoluteUri);
+            static Base64StreamResult Base64(IBlobInfo blob) => new(blob);
         }
     }
 }

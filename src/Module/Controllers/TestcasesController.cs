@@ -234,8 +234,11 @@ namespace SatelliteSite.PolygonModule.Controllers
 
             if (tc.IsSecret && fileInfo.HasDirectLink)
             {
-                Uri url = await fileInfo.CreateDirectLinkAsync(TimeSpan.FromMinutes(10));
-                return Redirect(url.AbsoluteUri);
+                return Redirect(
+                    await fileInfo.CreateDirectLinkAsync(
+                        validPeriod: TimeSpan.FromMinutes(10),
+                        desiredContentType: "application/octet-stream",
+                        desiredDownloadName: $"p{Problem.Id}.t{testid}.{filetype}"));
             }
             else
             {
@@ -243,6 +246,11 @@ namespace SatelliteSite.PolygonModule.Controllers
                     fileStream: await fileInfo.CreateReadStreamAsync(tc.IsSecret ? null : true),
                     contentType: "application/octet-stream",
                     fileDownloadName: $"p{Problem.Id}.t{testid}.{filetype}");
+            }
+
+            static RedirectResult Redirect(Uri url)
+            {
+                return new(url.AbsoluteUri);
             }
         }
     }

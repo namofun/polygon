@@ -15,24 +15,27 @@ namespace SatelliteSite.PolygonModule
         {
             if (notification.Type != "p") return;
 
-            if (!(notification.Id is int probid) ||
+            if (notification.Id is not int probid ||
                 !int.TryParse(notification.Context.User.GetUserId(), out int userid))
             {
-                notification.Handled = false;
+                notification.Reject();
                 return;
             }
 
-            if (notification.Context.User.IsInRole("Administrator"))
+            if (!notification.Context.User.IsInRole("Administrator"))
             {
-                notification.Handled = true;
-                return;
+                AuthorLevel? level = await notification.Context.RequestServices
+                    .GetRequiredService<IProblemStore>()
+                    .CheckPermissionAsync(probid, userid);
+
+                if (!level.HasValue || level.Value < AuthorLevel.Writer)
+                {
+                    notification.Reject();
+                    return;
+                }
             }
 
-            var level = await notification.Context.RequestServices
-                .GetRequiredService<IProblemStore>()
-                .CheckPermissionAsync(probid, userid);
-
-            notification.Handled = level.HasValue && level.Value >= AuthorLevel.Writer;
+            notification.Accept("problem");
         }
     }
 }
