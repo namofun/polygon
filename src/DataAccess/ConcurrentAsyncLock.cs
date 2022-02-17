@@ -32,4 +32,19 @@ namespace Polygon.Storages
             return _locks[hashCode % _locks.Length].LockAsync();
         }
     }
+
+    /// <summary>
+    /// The locker implementation that doesn't actually makes a lock.
+    /// </summary>
+    public sealed class NoAsyncLock : IAsyncLock
+    {
+        public void Dispose()
+        {
+        }
+
+        public Task<IDisposable> LockAsync()
+        {
+            return Task.FromResult<IDisposable>(this);
+        }
+    }
 }

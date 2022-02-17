@@ -21,7 +21,7 @@ namespace Polygon.Storages
     public abstract class QueryCacheBase<TContext> : IDbModelSupplier<TContext> where TContext : DbContext, IPolygonDbContext
     {
         private readonly Func<TContext, IAsyncEnumerable<JudgehostLoad>> _judgehostLoad;
-        private readonly IConcurrencyGuard _judgementDequeueGuard;
+        private readonly IAsyncLock _judgementDequeueGuard;
 
         /// <summary>
         /// Initialize the QueryCacheBase.
@@ -37,10 +37,10 @@ namespace Polygon.Storages
         /// </param>
         public QueryCacheBase(
             Expression<Func<DateTimeOffset, DateTimeOffset, double>> durationExpression,
-            IConcurrencyGuard? judgementDequeueGuard = null)
+            IAsyncLock? judgementDequeueGuard = null)
         {
             _judgehostLoad = EF.CompileAsyncQuery(CreateJudgehostLoadQuery(durationExpression));
-            _judgementDequeueGuard = judgementDequeueGuard ?? new AsyncLockConcurrencyGuard();
+            _judgementDequeueGuard = judgementDequeueGuard ?? new AsyncLock();
         }
 
         /// <inheritdoc cref="IDbModelSupplier{TContext}.Configure(ModelBuilder, TContext)" />
@@ -106,7 +106,7 @@ namespace Polygon.Storages
         /// <returns>The next judging or null.</returns>
         public virtual async Task<JudgingBeginEvent?> DequeueNextJudgingAsync(TContext context, string judgehostName, Expression<Func<Judging, bool>>? extraCondition = null)
         {
-            using var guard = await _judgementDequeueGuard.EnterCriticalSectionAsync();
+            using var guard = await _judgementDequeueGuard.LockAsync();
 
             JudgingBeginEvent? r = await context.Judgings
                 .Where(j => j.Status == Verdict.Pending && j.s.l.AllowJudge && j.s.p.AllowJudge && !j.s.Ignored)
