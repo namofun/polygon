@@ -178,20 +178,28 @@ WHERE ((([p].[Status] = 8) AND ([p1].[AllowJudge] = CAST(1 AS bit))) AND ([p2].[
             }
             else if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
             {
-                /*
-                    UPDATE server_info
-                    SET    status = 'active' 
-                    WHERE  server_ip = (
-                        SELECT server_ip
-                        FROM   server_info
-                        WHERE  status = 'standby'
-                        LIMIT  1
-                        FOR    UPDATE SKIP LOCKED
-                    )
-                    RETURNING server_ip;
-                */
+                DateTimeOffset now = DateTimeOffset.Now;
+                FormattableString sql =
+$@"UPDATE ""PolygonJudgings"" AS p
+SET ""Server"" = {judgehostName}, ""StartTime"" = {now}, ""Status"" = {(int)Verdict.Running}
+WHERE p.""JudgingId"" = (
+	SELECT p.""JudgingId""
+	FROM ""PolygonJudgings"" AS p
+	INNER JOIN ""PolygonSubmissions"" AS p0 ON p.""SubmissionId"" = p0.""SubmissionId""
+	INNER JOIN ""PolygonLanguages"" AS p1 ON p0.""Language"" = p1.""LangId""
+	INNER JOIN ""PolygonProblems"" AS p2 ON p0.""ProblemId"" = p2.""ProblemId""
+	WHERE (((p.""Status"" = 8) AND p1.""AllowJudge"") AND p2.""AllowJudge"") AND NOT (p0.""Ignored"")
+	ORDER BY p.""JudgingId""
+	LIMIT 1
+	FOR UPDATE SKIP LOCKED
+)
+RETURNING ""JudgingId""";
 
-                throw new NotImplementedException();
+                var results = await context.Set<SingleEntry>()
+                    .FromSqlInterpolated(sql)
+                    .ToListAsync();
+
+                return results.SingleOrDefault()?.Id;
             }
             else
             {
