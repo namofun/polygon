@@ -17,7 +17,7 @@ namespace SatelliteSite.PolygonModule.Apis
     /// The functions to connect to DOMjudge Judgehosts.
     /// </summary>
     [Area("Api")]
-    [Authorize(AuthenticationSchemes = "Basic")]
+    [AuthenticateWithAllSchemes]
     [Authorize(Roles = "Judgehost")]
     [Route("[area]/[controller]")]
     [Produces("application/json")]

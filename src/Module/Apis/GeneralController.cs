@@ -17,7 +17,7 @@ namespace SatelliteSite.PolygonModule.Apis
     /// The meta data for judging system.
     /// </summary>
     [Area("Api")]
-    [Authorize(AuthenticationSchemes = "Basic")]
+    [AuthenticateWithAllSchemes]
     [Route("[area]/[action]")]
     [Produces("application/json")]
     public class GeneralController : ApiControllerBase

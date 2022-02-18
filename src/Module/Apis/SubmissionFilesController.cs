@@ -14,7 +14,7 @@ namespace SatelliteSite.PolygonModule.Apis
     /// </summary>
     [Area("Api")]
     [Route("[area]/contests/{cid}/submissions")]
-    [Authorize(AuthenticationSchemes = "Basic")]
+    [AuthenticateWithAllSchemes]
     [Authorize(Roles = "Administrator,Judgehost,CDS")]
     public class SubmissionFilesController : ApiControllerBase
     {

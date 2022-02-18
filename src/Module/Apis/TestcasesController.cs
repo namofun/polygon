@@ -14,7 +14,7 @@ namespace SatelliteSite.PolygonModule.Apis
     /// The controller for fetching testcases.
     /// </summary>
     [Area("Api")]
-    [Authorize(AuthenticationSchemes = "Basic")]
+    [AuthenticateWithAllSchemes]
     [Authorize(Roles = "Judgehost")]
     [Route("[area]/[controller]")]
     [Produces("application/json")]

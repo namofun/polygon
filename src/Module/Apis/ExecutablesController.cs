@@ -10,7 +10,7 @@ namespace SatelliteSite.PolygonModule.Apis
     /// The controller for executable RESTful API.
     /// </summary>
     [Area("Api")]
-    [Authorize(AuthenticationSchemes = "Basic")]
+    [AuthenticateWithAllSchemes]
     [Route("[area]/[controller]")]
     [Produces("application/json")]
     public class ExecutablesController : ApiControllerBase
