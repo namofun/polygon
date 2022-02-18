@@ -57,12 +57,14 @@ namespace Polygon.Storages
         /// <param name="rejudging">The rejudging entity.</param>
         /// <param name="fullTest">Whether to take a full test.</param>
         /// <param name="immediateApply">Whether to apply the rejudging immediately.</param>
+        /// <param name="stageAsRunning">Whether to stage the rejudging as running state.</param>
         /// <returns>The task for batch rejudge submissions, returning the count of submissions being rejudged.</returns>
         Task<int> BatchRejudgeAsync(
             Expression<Func<Submission, Judging, bool>> predicate,
             Rejudging rejudging,
             bool fullTest = false,
-            bool immediateApply = false);
+            bool immediateApply = false,
+            bool stageAsRunning = false);
 
         /// <summary>
         /// Count the undone rejudgings for certain contest.

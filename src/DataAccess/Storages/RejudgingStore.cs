@@ -67,7 +67,8 @@ namespace Polygon.Storages
             Expression<Func<Submission, Judging, bool>> predicate,
             Rejudging rejudging,
             bool fullTest,
-            bool immediateApply)
+            bool immediateApply,
+            bool stageAsRunning)
         {
             int cid = rejudging.ContestId ?? 0;
             var selectionQuery = Context.Submissions
@@ -87,6 +88,7 @@ namespace Polygon.Storages
 
             if (count == 0) return 0;
 
+            Verdict targetVerdict = stageAsRunning ? Verdict.Running : Verdict.Pending;
             var newRj = await Context.Submissions
                 .Where(s => s.RejudgingId == rejid)
                 .Join(
@@ -98,7 +100,7 @@ namespace Polygon.Storages
                         Active = false,
                         SubmissionId = s.Id,
                         FullTest = fullTest ? true : j.FullTest,
-                        Status = Verdict.Pending,
+                        Status = targetVerdict,
                         RejudgingId = rejid,
                         PreviousJudgingId = j.Id,
                         PolygonVersion = 1,
