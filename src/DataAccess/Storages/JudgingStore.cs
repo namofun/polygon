@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Polygon.Entities;
+using Polygon.Events;
 using Polygon.Models;
 using System;
 using System.Collections.Generic;
@@ -167,9 +168,15 @@ namespace Polygon.Storages
                 .ToLookupAsync(jr => jr.JudgingId, jr => jr);
         }
 
-        Task<Events.JudgingBeginEvent?> IJudgingStore.DequeueAsync(string judgehostName, Expression<Func<Judging, bool>>? extraCondition)
+        async Task<JudgingBeginEvent?> IJudgingStore.DequeueAsync(string judgehostName, Expression<Func<Judging, bool>>? extraCondition)
         {
-            return QueryCache.DequeueNextJudgingAsync(Context, judgehostName, extraCondition);
+            int? judgingId = await QueryCache.DequeueNextJudgingAsync(Context, judgehostName, extraCondition);
+            if (judgingId == null) return null;
+
+            return await Context.Judgings
+                .Where(j => j.Id == judgingId && j.Server == judgehostName && j.Status == Verdict.Running)
+                .Select(j => new JudgingBeginEvent(j, j.s.p, j.s.l, j.s.ContestId, j.s.TeamId, j.s.RejudgingId))
+                .SingleAsync();
         }
     }
 }

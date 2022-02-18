@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Polygon.FakeJudgehost;
@@ -15,6 +16,7 @@ namespace SatelliteSite.Tests
             Host.CreateDefaultBuilder()
                 .MarkTest(this)
                 .AddModule<IdentityModule.IdentityModule<User, Role, TestContext>>()
+                .EnableIdentityModuleBasicAuthentication()
                 .AddModule<PolygonModule.PolygonModule<TestRole>>()
                 .AddDatabase<TestContext>(b => b.UseInMemoryDatabase("0x8c", b => b.UseBulk()))
                 .ConfigureSubstrateDefaults<TestContext>(b =>

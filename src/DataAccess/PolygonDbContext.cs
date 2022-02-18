@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Polygon.Entities;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -85,5 +88,18 @@ namespace Polygon.Storages
         /// <exception cref="DbUpdateException">An error is encountered while saving to the database.</exception>
         /// <exception cref="DbUpdateConcurrencyException">A concurrency violation is encountered while saving to the database. A concurrency violation occurs when an unexpected number of rows are affected during save. This is usually because the data in the database has been modified since it was loaded into memory.</exception>
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Gets the pending judgings as a queryable.
+        /// </summary>
+        /// <param name="extraCondition">The extra conditions.</param>
+        /// <returns>The queryable of judgement entity.</returns>
+        public IQueryable<Judging> GetPendingQueryable(Expression<Func<Judging, bool>>? extraCondition = null)
+        {
+            return Judgings
+                .Where(j => j.Status == Verdict.Pending && j.s.l.AllowJudge && j.s.p.AllowJudge && !j.s.Ignored)
+                .WhereIf(extraCondition != null, extraCondition)
+                .OrderBy(j => j.Id);
+        }
     }
 }

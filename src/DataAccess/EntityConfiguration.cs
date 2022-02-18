@@ -19,6 +19,7 @@ namespace Polygon.Storages
         IEntityTypeConfiguration<Language>,
         IEntityTypeConfiguration<Problem>,
         IEntityTypeConfiguration<Rejudging>,
+        IEntityTypeConfiguration<SingleEntry>,
         IEntityTypeConfiguration<Submission>,
         IEntityTypeConfiguration<SubmissionStatistics>,
         IEntityTypeConfiguration<Testcase>,
@@ -380,5 +381,16 @@ namespace Polygon.Storages
             //     .OnDelete(DeleteBehavior.Cascade);
             entity.HasIndex(e => e.UserId);
         }
+
+        void IEntityTypeConfiguration<SingleEntry>.Configure(EntityTypeBuilder<SingleEntry> entity)
+        {
+            entity.HasNoKey();
+            entity.ToTable(default(string));
+        }
+    }
+
+    internal class SingleEntry
+    {
+        public int Id { get; set; }
     }
 }

@@ -103,35 +103,100 @@ namespace Polygon.Storages
         /// <param name="context">The query database context.</param>
         /// <param name="judgehostName">The judgehost name.</param>
         /// <param name="extraCondition">The extra condition to attach.</param>
-        /// <returns>The next judging or null.</returns>
-        public virtual async Task<JudgingBeginEvent?> DequeueNextJudgingAsync(TContext context, string judgehostName, Expression<Func<Judging, bool>>? extraCondition = null)
+        /// <returns>The next judging ID or null.</returns>
+        public virtual async Task<int?> DequeueNextJudgingAsync(TContext context, string judgehostName, Expression<Func<Judging, bool>>? extraCondition = null)
         {
             using var guard = await _judgementDequeueGuard.LockAsync();
+            return await DequeueWithoutConcurrencyGuardAsync(context, judgehostName, extraCondition);
+        }
 
-            JudgingBeginEvent? r = await context.Judgings
-                .Where(j => j.Status == Verdict.Pending && j.s.l.AllowJudge && j.s.p.AllowJudge && !j.s.Ignored)
-                .WhereIf(extraCondition != null, extraCondition)
-                .OrderBy(j => j.Id)
-                .Select(j => new JudgingBeginEvent(j, j.s.p, j.s.l, j.s.ContestId, j.s.TeamId, j.s.RejudgingId))
+        /// <summary>
+        /// Process dequeue with non-atomic SQL operations.
+        /// </summary>
+        /// <param name="context">The database context.</param>
+        /// <param name="judgehostName">The name of judgehost.</param>
+        /// <param name="extraCondition">The extra condition to filter.</param>
+        /// <returns>The next judging ID or null.</returns>
+        protected async Task<int?> DequeueWithoutConcurrencyGuardAsync(TContext context, string judgehostName, Expression<Func<Judging, bool>>? extraCondition = null)
+        {
+            var r = await context.GetPendingQueryable(extraCondition)
+                .Select(j => new { j.Id })
                 .FirstOrDefaultAsync();
 
             if (r == null) return null;
 
-            var judging = r.Judging;
-            judging.Status = Verdict.Running;
-            judging.Server = judgehostName;
-            judging.StartTime = DateTimeOffset.Now;
-
+            DateTimeOffset now = DateTimeOffset.Now;
             await context.Judgings
-                .Where(j => j.Id == judging.Id)
+                .Where(j => j.Id == r.Id)
                 .BatchUpdateAsync(j => new Judging
                 {
                     Status = Verdict.Running,
-                    Server = judging.Server,
-                    StartTime = judging.StartTime,
+                    Server = judgehostName,
+                    StartTime = now,
                 });
 
-            return r;
+            return r.Id;
+        }
+
+        /// <summary>
+        /// Process dequeue with one atomic SQL operation.
+        /// </summary>
+        /// <param name="context">The database context.</param>
+        /// <param name="judgehostName">The name of judgehost.</param>
+        /// <param name="extraCondition">The extra condition to filter.</param>
+        /// <returns>The next judging ID or null.</returns>
+        protected async Task<int?> DequeueWithServerSideQueryAsync(TContext context, string judgehostName, Expression<Func<Judging, bool>>? extraCondition = null)
+        {
+            if (context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+            {
+                // In-memory provider doesn't support SQL sentences.
+                using var guard = await _judgementDequeueGuard.LockAsync();
+                return await DequeueWithoutConcurrencyGuardAsync(context, judgehostName, extraCondition);
+            }
+            else if (extraCondition != null)
+            {
+                throw new NotImplementedException("This is upcoming feature, currently not supported.");
+            }
+            else if (context.Database.ProviderName == "Microsoft.EntityFrameworkCore.SqlServer")
+            {
+                DateTimeOffset now = DateTimeOffset.Now;
+                FormattableString sql =
+$@"UPDATE TOP(1) [p]
+SET [p].[Server] = {judgehostName}, [p].[StartTime] = {now}, [p].[Status] = {(int)Verdict.Running}
+OUTPUT INSERTED.[JudgingId] AS [Id]
+FROM [PolygonJudgings] AS [p]
+INNER JOIN [PolygonSubmissions] AS [p0] ON [p].[SubmissionId] = [p0].[SubmissionId]
+INNER JOIN [PolygonLanguages] AS [p1] ON [p0].[Language] = [p1].[LangId]
+INNER JOIN [PolygonProblems] AS [p2] ON [p0].[ProblemId] = [p2].[ProblemId]
+WHERE ((([p].[Status] = 8) AND ([p1].[AllowJudge] = CAST(1 AS bit))) AND ([p2].[AllowJudge] = CAST(1 AS bit))) AND ([p0].[Ignored] = CAST(0 AS bit))";
+
+                var results = await context.Set<SingleEntry>()
+                    .FromSqlInterpolated(sql)
+                    .ToListAsync();
+
+                return results.SingleOrDefault()?.Id;
+            }
+            else if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+            {
+                /*
+                    UPDATE server_info
+                    SET    status = 'active' 
+                    WHERE  server_ip = (
+                        SELECT server_ip
+                        FROM   server_info
+                        WHERE  status = 'standby'
+                        LIMIT  1
+                        FOR    UPDATE SKIP LOCKED
+                    )
+                    RETURNING server_ip;
+                */
+
+                throw new NotImplementedException();
+            }
+            else
+            {
+                throw new NotImplementedException("This database provider hasn't been supported.");
+            }
         }
 
 

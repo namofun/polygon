@@ -48,5 +48,10 @@ namespace SatelliteSite
                 select new { u.Id, u.UserName, u.NickName, pa.Level };
             return (await query.ToListAsync()).Select(a => (a.Id, a.UserName, a.Level));
         }
+
+        public override Task<int?> DequeueNextJudgingAsync(TContext context, string judgehostName, Expression<Func<Judging, bool>> extraCondition = null)
+        {
+            return base.DequeueWithServerSideQueryAsync(context, judgehostName, extraCondition);
+        }
     }
 }
