@@ -51,24 +51,18 @@ namespace Polygon.Storages
         Task<IEnumerable<RejudgingDifference>> ViewAsync(Rejudging rejudge, Expression<Func<Judging, Judging, Submission, bool>>? filter = null);
 
         /// <summary>
-        /// Rejudge one submission without creating rejudging entity.
-        /// </summary>
-        /// <param name="submission">The submission entity.</param>
-        /// <param name="fullTest">Whether to take a full test.</param>
-        /// <returns>The task for creating new judging.</returns>
-        Task RejudgeAsync(Submission submission, bool fullTest = false);
-
-        /// <summary>
-        /// Rejudging several submissions with or without existing rejudging entity.
+        /// Rejudging several submissions with existing rejudging entity.
         /// </summary>
         /// <param name="predicate">The submissions to rejudge.</param>
-        /// <param name="rejudge">The rejudging entity. If <c>null</c>, the submission won't be added to a rejudging.</param>
+        /// <param name="rejudging">The rejudging entity.</param>
         /// <param name="fullTest">Whether to take a full test.</param>
+        /// <param name="immediateApply">Whether to apply the rejudging immediately.</param>
         /// <returns>The task for batch rejudge submissions, returning the count of submissions being rejudged.</returns>
         Task<int> BatchRejudgeAsync(
             Expression<Func<Submission, Judging, bool>> predicate,
-            Rejudging? rejudge = null,
-            bool fullTest = false);
+            Rejudging rejudging,
+            bool fullTest = false,
+            bool immediateApply = false);
 
         /// <summary>
         /// Count the undone rejudgings for certain contest.

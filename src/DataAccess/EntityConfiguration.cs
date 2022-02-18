@@ -241,8 +241,6 @@ namespace Polygon.Storages
             entity.Property(e => e.Id)
                 .HasColumnName("RejudgingId");
 
-            entity.HasIndex(e => e.ContestId);
-
             // entity.HasOne<Contest>()
             //     .WithMany()
             //     .HasForeignKey(e => e.ContestId)

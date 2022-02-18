@@ -15,7 +15,7 @@ namespace Polygon.Entities
         /// <summary>
         /// The contest ID
         /// </summary>
-        public int ContestId { get; set; }
+        public int? ContestId { get; set; }
 
         /// <summary>
         /// The reason for rejudging

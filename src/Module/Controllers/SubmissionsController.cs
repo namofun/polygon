@@ -124,13 +124,32 @@ namespace SatelliteSite.PolygonModule.Controllers
         public async Task<IActionResult> RejudgeOne(int submitid)
         {
             var sub = await Facade.Submissions.FindAsync(submitid);
-            if (sub == null || sub.ProblemId != Problem.Id)
-                return NotFound();
+            if (sub == null || sub.ProblemId != Problem.Id) return NotFound();
 
             if (sub.ContestId != 0)
+            {
                 StatusMessage = "Error contest submissions should be rejudged by jury.";
-            else
-                await Facade.Rejudgings.RejudgeAsync(sub, fullTest: true);
+                return RedirectToAction(nameof(Detail));
+            }
+
+            var rejudging = await Facade.Rejudgings.CreateAsync(new()
+            {
+                Reason = "Adhoc rejudging for submission " + submitid,
+                StartTime = DateTimeOffset.Now,
+                IssuedBy = int.Parse(User.GetUserId()),
+                OperatedBy = int.Parse(User.GetUserId()),
+                Applied = true,
+                EndTime = DateTimeOffset.Now,
+            });
+
+            await Facade.Rejudgings.BatchRejudgeAsync(
+                (s, j) => s.ExpectedResult != null
+                       && s.Id == submitid
+                       && s.ProblemId == Problem.Id
+                       && s.ContestId == 0,
+                rejudging, fullTest: true, immediateApply: true);
+
+            StatusMessage = "Submission is being rejudged.";
             return RedirectToAction(nameof(Detail));
         }
 
@@ -199,10 +218,21 @@ namespace SatelliteSite.PolygonModule.Controllers
         [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Rejudge(bool _ = true)
         {
+            var rejudging = await Facade.Rejudgings.CreateAsync(new()
+            {
+                Reason = "Adhoc rejudging for STDs in problem " + Problem.Id,
+                StartTime = DateTimeOffset.Now,
+                IssuedBy = int.Parse(User.GetUserId()),
+                OperatedBy = int.Parse(User.GetUserId()),
+                Applied = true,
+                EndTime = DateTimeOffset.Now,
+            });
+
             await Facade.Rejudgings.BatchRejudgeAsync(
                 (s, j) => s.ExpectedResult != null
                        && s.ProblemId == Problem.Id
-                       && s.ContestId == 0);
+                       && s.ContestId == 0,
+                rejudging, fullTest: true, immediateApply: true);
 
             StatusMessage = "All submissions are being rejudged.";
             return RedirectToAction(nameof(List));

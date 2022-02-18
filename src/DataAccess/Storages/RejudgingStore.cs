@@ -12,8 +12,6 @@ namespace Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : IRejudgingStore
     {
-        private static readonly ConcurrentAsyncLock _beingRejudged = new();
-
         async Task IRejudgingStore.ApplyAsync(Rejudging rejudge, int uid)
         {
             int rejid = rejudge.Id;
@@ -65,53 +63,75 @@ namespace Polygon.Storages
             await Mediator.Publish(new RejudgingAppliedEvent(rejudge));
         }
 
-        async Task<int> IRejudgingStore.BatchRejudgeAsync(Expression<Func<Submission, Judging, bool>> predicate, Rejudging? rejudge, bool fullTest)
+        async Task<int> IRejudgingStore.BatchRejudgeAsync(
+            Expression<Func<Submission, Judging, bool>> predicate,
+            Rejudging rejudging,
+            bool fullTest,
+            bool immediateApply)
         {
-            int cid = rejudge?.ContestId ?? 0;
+            int cid = rejudging.ContestId ?? 0;
             var selectionQuery = Context.Submissions
                 .Where(s => s.ContestId == cid && s.RejudgingId == null)
-                .Join(Context.Judgings, s => s.Id, j => j.SubmissionId, (s, j) => new { s, j });
+                .Join(
+                    inner: Context.Judgings,
+                    outerKeySelector: s => new { s.Id, Active = true },
+                    innerKeySelector: j => new { Id = j.SubmissionId, j.Active },
+                    resultSelector: (s, j) => new { s, j })
+                .Where(predicate.Combine(new { s = default(Submission)!, j = default(Judging)! }, a => a.s, a => a.j))
+                .Select(a => a.s.Id);
 
-            var _predicate = predicate.Combine(
-                objectTemplate: new { s = default(Submission)!, j = default(Judging)! },
-                place1: a => a.s, place2: a => a.j);
-            selectionQuery = selectionQuery.Where(_predicate!);
+            int rejid = rejudging.Id;
+            int count = await Context.Submissions
+                .Where(s => selectionQuery.Contains(s.Id))
+                .BatchUpdateAsync(s => new Submission { RejudgingId = rejid });
 
-            var sublist_0 = selectionQuery.Select(a => a.s.Id).Distinct();
-            var sublist = Context.Submissions.Where(s => sublist_0.Contains(s.Id));
+            if (count == 0) return 0;
 
-            if (rejudge == null)
+            var newRj = await Context.Submissions
+                .Where(s => s.RejudgingId == rejid)
+                .Join(
+                    inner: Context.Judgings,
+                    outerKeySelector: s => new { s.Id, Active = true },
+                    innerKeySelector: j => new { Id = j.SubmissionId, j.Active },
+                    resultSelector: (s, j) => new Judging
+                    {
+                        Active = false,
+                        SubmissionId = s.Id,
+                        FullTest = fullTest ? true : j.FullTest,
+                        Status = Verdict.Pending,
+                        RejudgingId = rejid,
+                        PreviousJudgingId = j.Id,
+                        PolygonVersion = 1,
+                    })
+                .BatchInsertIntoAsync(Context.Judgings);
+
+            if (immediateApply)
             {
-                // TODO: Optimize here
-                var items = await sublist.ToListAsync();
-                foreach (var sub in items)
-                    await ((IRejudgingStore)this).RejudgeAsync(sub, fullTest);
-                return items.Count;
-            }
-            else
-            {
-                int rejid = rejudge.Id;
-                int count = await sublist.BatchUpdateAsync(s => new Submission { RejudgingId = rejid });
-                if (count == 0) return 0;
+                await Context.SubmissionStatistics.BatchUpdateJoinAsync(
+                    inner: from s in Context.Submissions
+                           where s.RejudgingId == rejid
+                           join j in Context.Judgings
+                                  on new { s.Id, Active = true }
+                                  equals new { Id = j.SubmissionId, j.Active }
+                           select new { s.ContestId, s.ProblemId, s.TeamId, j.Status },
+                    outerKeySelector: s => new { s.ContestId, s.TeamId, s.ProblemId },
+                    innerKeySelector: s => new { s.ContestId, s.TeamId, s.ProblemId },
+                    updateSelector: (stat, inner) => new()
+                    {
+                        AcceptedSubmission = stat.AcceptedSubmission - (inner.Status == Verdict.Accepted ? 1 : 0),
+                        TotalSubmission = stat.TotalSubmission - (inner.Status < Verdict.Pending ? 1 : 0),
+                    });
 
-                return await Context.Submissions
+                await Context.Judgings
+                    .Where(j => j.s.RejudgingId == rejid && (j.Active || j.RejudgingId == rejid))
+                    .BatchUpdateAsync(j => new Judging { Active = j.RejudgingId == rejid });
+
+                await Context.Submissions
                     .Where(s => s.RejudgingId == rejid)
-                    .Join(
-                        inner: Context.Judgings,
-                        outerKeySelector: s => new { s.Id, Active = true },
-                        innerKeySelector: j => new { Id = j.SubmissionId, j.Active },
-                        resultSelector: (s, j) => new Judging
-                        {
-                            Active = false,
-                            SubmissionId = s.Id,
-                            FullTest = fullTest ? true : j.FullTest,
-                            Status = Verdict.Pending,
-                            RejudgingId = rejid,
-                            PreviousJudgingId = j.Id,
-                            PolygonVersion = 1,
-                        })
-                    .BatchInsertIntoAsync(Context.Judgings);
+                    .BatchUpdateAsync(s => new() { RejudgingId = null });
             }
+
+            return newRj;
         }
 
         async Task IRejudgingStore.CancelAsync(Rejudging rejudge, int uid)
@@ -179,47 +199,6 @@ namespace Polygon.Storages
             return model;
         }
 
-        async Task IRejudgingStore.RejudgeAsync(Submission sub, bool fullTest)
-        {
-            if (sub.ExpectedResult != null) fullTest = true;
-            Judging currentJudging;
-
-            using (await _beingRejudged.LockAsync(sub.Id))
-            {
-                currentJudging = await Context.Judgings
-                    .Where(j => j.SubmissionId == sub.Id && j.Active)
-                    .SingleAsync();
-
-                currentJudging.Active = false;
-                fullTest = fullTest || currentJudging.FullTest;
-                Context.Judgings.Update(currentJudging);
-
-                Context.Judgings.Add(new Judging
-                {
-                    SubmissionId = sub.Id,
-                    FullTest = fullTest,
-                    Active = true,
-                    Status = Verdict.Pending,
-                    PreviousJudgingId = currentJudging.Id,
-                    PolygonVersion = 1,
-                });
-
-                await Context.SaveChangesAsync();
-            }
-
-            var (cid, teamid, probid, accepted) = (
-                sub.ContestId, sub.TeamId, sub.ProblemId,
-                currentJudging.Status == Verdict.Accepted ? 1 : 0);
-
-            await Context.SubmissionStatistics
-                .Where(s => s.TeamId == teamid && s.ContestId == cid && s.ProblemId == probid)
-                .BatchUpdateAsync(s => new SubmissionStatistics
-                {
-                    TotalSubmission = s.TotalSubmission - 1,
-                    AcceptedSubmission = s.AcceptedSubmission - accepted,
-                });
-        }
-
         async Task<IEnumerable<RejudgingDifference>> IRejudgingStore.ViewAsync(Rejudging rejudge, Expression<Func<Judging, Judging, Submission, bool>>? filter)
         {
             var query =
@@ -229,6 +208,7 @@ namespace Polygon.Storages
                 join j2 in Context.Judgings on j.PreviousJudgingId equals j2.Id
                 orderby s.Time descending
                 select new RejudgingDifference(j2, j, s.ProblemId, s.Language, s.Time, s.TeamId, s.ContestId);
+
             return await query.ToListAsync();
         }
     }
