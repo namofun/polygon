@@ -3,7 +3,7 @@
   <PropertyGroup>
     <GitRepositoryDirectory>$(MSBuildThisFileDirectory).git</GitRepositoryDirectory>
     <SubstrateVersion>1.1.44</SubstrateVersion>
-    <PreviewBuild>20</PreviewBuild>
+    <PreviewBuild>21</PreviewBuild>
     <AspNetCoreVersion>6.0.0</AspNetCoreVersion>
     <EFCoreBulkVersion>6.0.29</EFCoreBulkVersion>
   </PropertyGroup>
