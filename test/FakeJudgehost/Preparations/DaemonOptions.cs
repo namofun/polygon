@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace Polygon.FakeJudgehost
+namespace Xylab.Polygon.Judgement.Daemon.Fake
 {
     /// <summary>
     /// Options to configure the judgedaemon.

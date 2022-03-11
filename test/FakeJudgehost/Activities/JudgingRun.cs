@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using System.Text.Json.Serialization;
 
-namespace Polygon.FakeJudgehost
+namespace Xylab.Polygon.Judgement.Daemon.Fake
 {
     /// <summary>
     /// The judging run to send to domserver.

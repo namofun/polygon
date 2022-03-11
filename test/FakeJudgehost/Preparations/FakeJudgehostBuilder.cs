@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Polygon.FakeJudgehost;
 using System;
 using System.Net.Http;
+using Xylab.Polygon.Judgement.Daemon.Fake;
 
-namespace Polygon
+namespace Xylab.Polygon
 {
     /// <summary>
     /// The builder for fake judgehost.

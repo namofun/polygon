@@ -2,15 +2,12 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Polygon.Judgement;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Polygon.FakeJudgehost
+namespace Xylab.Polygon.Judgement.Daemon.Fake
 {
     /// <summary>
     /// The judgedaemon to host judgehost actions.

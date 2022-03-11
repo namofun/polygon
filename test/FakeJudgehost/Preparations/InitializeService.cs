@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Polygon.FakeJudgehost
+namespace Xylab.Polygon.Judgement.Daemon.Fake
 {
     internal interface IInitializeFakeJudgehostService
     {
