@@ -1,15 +1,15 @@
 ﻿using Markdig;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using Polygon.Entities;
-using Polygon.Models;
-using Polygon.Storages;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     public sealed class XmlImportProvider : ImportProviderBase
     {

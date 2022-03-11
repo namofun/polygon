@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     internal static class MarkdownConvertingExtensions
     {

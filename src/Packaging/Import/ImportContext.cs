@@ -1,15 +1,15 @@
 ﻿using Microsoft.Extensions.FileProviders;
-using Polygon.Entities;
-using Polygon.Models;
-using Polygon.Storages;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     public class ImportContext
     {

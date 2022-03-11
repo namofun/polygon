@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
-using Polygon.Entities;
-using Polygon.Storages;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     public abstract class ImportProviderBase : IImportProvider
     {

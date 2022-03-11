@@ -3,15 +3,15 @@ using Markdig.Renderers.LaTeX;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using Microsoft.Extensions.FileProviders;
-using Polygon.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Encodings.Web;
+using Xylab.Polygon.Models;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     public class MarkdownStatementWriter : IStatementWriter
     {

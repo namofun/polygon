@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Polygon.Entities;
-using Polygon.Storages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,8 +7,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     public sealed class CodeforcesImportProvider : ImportProviderBase
     {
@@ -71,7 +71,7 @@ namespace Polygon.Packaging
             {
                 var f = newzip.CreateEntryFromByteArray(contents, "main" + ext);
                 f.ExternalAttributes = LINUX644;
-                using var testlib = Assembly.GetExecutingAssembly().GetManifestResourceStream("Polygon.Packaging.Resources.testlib.h")!;
+                using var testlib = Assembly.GetExecutingAssembly().GetManifestResourceStream("Xylab.Polygon.Packaging.Resources.testlib.h")!;
                 var f2 = await newzip.CreateEntryFromStream(testlib, "testlib.h");
                 f2.ExternalAttributes = LINUX644;
             }

@@ -1,16 +1,16 @@
 ﻿using Markdig;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using Polygon.Entities;
-using Polygon.Storages;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     public sealed class KattisImportProvider : ImportProviderBase
     {

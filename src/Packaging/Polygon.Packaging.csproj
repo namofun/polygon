@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>Xylab.Polygon.Packaging</RootNamespace>
+    <AssemblyName>Xylab.Polygon.Packaging</AssemblyName>
     <DescriptionAttach>The import and export package definitions</DescriptionAttach>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
