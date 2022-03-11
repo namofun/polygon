@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
+    <AssemblyName>Xylab.$(AssemblyName)</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,8 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Host\SatelliteSite.Host.csproj" />
-    <ProjectReference Include="..\FakeJudgehost.DataExtensions\Polygon.FakeJudgehost.DataExtensions.csproj" />
-    <ProjectReference Include="..\FakeJudgehost\Polygon.FakeJudgehost.csproj" />
+    <ProjectReference Include="..\FakeJudgehost.DataExtensions\Polygon.Judgement.Daemon.FakeSeed.csproj" />
+    <ProjectReference Include="..\FakeJudgehost\Polygon.Judgement.Daemon.Fake.csproj" />
   </ItemGroup>
 
 </Project>

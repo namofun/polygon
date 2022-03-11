@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
-using Polygon.FakeJudgehost;
 using SatelliteSite.IdentityModule.Entities;
 using System.Reflection;
+using Xylab.Polygon.Judgement.Daemon.Fake;
 
 namespace SatelliteSite.Tests
 {

@@ -39,11 +39,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Seeds", "src\Seeds\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.TagHelpers", "src\TagHelpers\Polygon.TagHelpers.csproj", "{75ACD3B7-57C3-4438-AEF2-B7CD363F1D51}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.FakeJudgehost", "test\FakeJudgehost\Polygon.FakeJudgehost.csproj", "{1DCD22FD-1818-4C77-A024-DC5E5E6482D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Judgement.Daemon.Fake", "test\FakeJudgehost\Polygon.Judgement.Daemon.Fake.csproj", "{1DCD22FD-1818-4C77-A024-DC5E5E6482D4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Judgement.Tests", "test\Polygon.Judgement.Tests\Polygon.Judgement.Tests.csproj", "{03D01FCD-A55A-4332-88FA-659744E1FA44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Judgement.Integration.Tests", "test\Polygon.Judgement.Tests\Polygon.Judgement.Integration.Tests.csproj", "{03D01FCD-A55A-4332-88FA-659744E1FA44}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.FakeJudgehost.DataExtensions", "test\FakeJudgehost.DataExtensions\Polygon.FakeJudgehost.DataExtensions.csproj", "{B8AFA199-0F4A-4103-9888-2C6D54AAE867}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Judgement.Daemon.FakeSeed", "test\FakeJudgehost.DataExtensions\Polygon.Judgement.Daemon.FakeSeed.csproj", "{B8AFA199-0F4A-4103-9888-2C6D54AAE867}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

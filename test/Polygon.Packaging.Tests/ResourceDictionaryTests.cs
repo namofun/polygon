@@ -1,6 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Polygon.Packaging.Tests
+namespace Xylab.Polygon.Packaging.Tests
 {
     [TestClass]
     public class ResourceDictionaryTests
@@ -9,7 +9,7 @@ namespace Polygon.Packaging.Tests
         public void TestlibExistence()
         {
             var stream = typeof(CodeforcesImportProvider).Assembly
-                .GetManifestResourceStream("Polygon.Packaging.Resources.testlib.h");
+                .GetManifestResourceStream("Xylab.Polygon.Packaging.Resources.testlib.h");
             Assert.IsNotNull(stream);
             stream.Dispose();
         }

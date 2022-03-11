@@ -1,9 +1,9 @@
 ﻿using Markdig;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Polygon;
-using Polygon.Storages;
-using Polygon.Storages.Handlers;
+using Xylab.Polygon;
+using Xylab.Polygon.Storages;
+using Xylab.Polygon.Storages.Handlers;
 using SatelliteSite.Tests;
 
 namespace SatelliteSite

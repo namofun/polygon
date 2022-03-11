@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Polygon;
-using Polygon.Entities;
-using Polygon.FakeJudgehost;
-using Polygon.Storages;
 using System.Threading.Tasks;
 using Xunit;
+using Xylab.Polygon;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Judgement.Daemon.Fake;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.Tests
 {
