@@ -1,10 +1,10 @@
 ﻿using MediatR;
-using Polygon.Entities;
-using Polygon.Events;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Events;
 
-namespace Polygon.Storages.Handlers
+namespace Xylab.Polygon.Storages.Handlers
 {
     /// <summary>
     /// Handler for statistics submission

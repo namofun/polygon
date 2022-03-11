@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Linq;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     public static class PostgresTimeDiff
     {

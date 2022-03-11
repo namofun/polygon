@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Polygon.Entities;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     /// <summary>
     /// The marker interface to add polygon <see cref="DbSet{TEntity}"/>s.

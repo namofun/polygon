@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <RootNamespace>Polygon.Storages</RootNamespace>
+    <RootNamespace>Xylab.Polygon.Storages</RootNamespace>
+    <AssemblyName>Xylab.Polygon.DataAccess</AssemblyName>
     <DescriptionAttach>The storage implementations in EFCore</DescriptionAttach>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

@@ -1,6 +1,6 @@
-﻿using Polygon.Storages;
+﻿using Xylab.Polygon.Storages;
 
-namespace Polygon
+namespace Xylab.Polygon
 {
     /// <summary>
     /// The physical storage path of polygon files.

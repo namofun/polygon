@@ -2,11 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Options;
-using Polygon.Storages;
-using Polygon.Storages.Handlers;
 using System.IO;
+using Xylab.Polygon.Storages;
+using Xylab.Polygon.Storages.Handlers;
 
-namespace Polygon
+namespace Xylab.Polygon
 {
     public class DefaultRole<TContext, TQueryCache> : IServiceRole
         where TContext : DbContext, IPolygonDbContext

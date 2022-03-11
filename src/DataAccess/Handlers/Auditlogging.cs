@@ -1,12 +1,12 @@
 ﻿using MediatR;
-using Polygon.Events;
 using SatelliteSite;
 using SatelliteSite.Services;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Polygon.Events;
 
-namespace Polygon.Storages.Handlers
+namespace Xylab.Polygon.Storages.Handlers
 {
     /// <summary>
     /// Handlers that works for auditlogging.

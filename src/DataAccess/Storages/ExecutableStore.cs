@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Polygon.Entities;
-using Polygon.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,8 +7,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : IExecutableStore
     {

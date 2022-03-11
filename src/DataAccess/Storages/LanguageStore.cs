@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Polygon.Entities;
-using Polygon.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Events;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     public partial class PolygonFacade<TContext, TQueryCache> : ILanguageStore
     {

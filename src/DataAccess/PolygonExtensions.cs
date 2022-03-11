@@ -1,5 +1,5 @@
-﻿using Polygon;
-using System;
+﻿using System;
+using Xylab.Polygon;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
