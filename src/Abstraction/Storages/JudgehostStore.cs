@@ -1,10 +1,8 @@
-﻿using Polygon.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     /// <summary>
     /// The store interface for <see cref="Judgehost"/>.

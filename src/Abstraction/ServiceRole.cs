@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Polygon
+namespace Xylab.Polygon
 {
     /// <summary>
     /// Configure the service role for polygon.

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Polygon.Models
+namespace Xylab.Polygon.Models
 {
     /// <summary>
     /// The model class for submission file.

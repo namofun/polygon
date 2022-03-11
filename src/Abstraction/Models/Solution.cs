@@ -1,9 +1,9 @@
-﻿using Polygon.Entities;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Models
+namespace Xylab.Polygon.Models
 {
     /// <summary>
     /// The model class for solutions.

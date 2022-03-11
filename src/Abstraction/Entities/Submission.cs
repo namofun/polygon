@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Polygon.Entities
+namespace Xylab.Polygon.Entities
 {
     /// <summary>
     /// The entity class for submissions.

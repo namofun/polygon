@@ -1,7 +1,7 @@
-﻿using Polygon.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Models
+namespace Xylab.Polygon.Models
 {
     /// <summary>
     /// The model class for problem statements.

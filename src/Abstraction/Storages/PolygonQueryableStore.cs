@@ -1,7 +1,7 @@
-﻿using Polygon.Entities;
+﻿using Xylab.Polygon.Entities;
 using System.Linq;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     /// <summary>
     /// The marker interface to gets the <see cref="IQueryable{T}"/>s.

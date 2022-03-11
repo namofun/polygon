@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     /// <summary>
     /// The model class for package export result.

@@ -1,10 +1,10 @@
-﻿using Polygon.Entities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     /// <summary>
     /// The provider interface for importing problems into system.

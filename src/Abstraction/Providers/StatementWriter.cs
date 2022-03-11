@@ -1,8 +1,8 @@
-﻿using Polygon.Models;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using System.Text;
+using Xylab.Polygon.Models;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     /// <summary>
     /// The statement writer interface, which provide features to convert the statement to HTML or TeX files.

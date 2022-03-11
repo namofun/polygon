@@ -1,8 +1,8 @@
-﻿using Polygon.Entities;
-using Polygon.Models;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     /// <summary>
     /// The statement provider interface.

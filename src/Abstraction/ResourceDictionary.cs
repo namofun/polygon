@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Polygon.Entities;
-using Polygon.Packaging;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Packaging;
 
-namespace Polygon
+namespace Xylab.Polygon
 {
     /// <summary>
     /// The static resource dictionary.

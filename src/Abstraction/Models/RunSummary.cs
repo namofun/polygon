@@ -1,6 +1,6 @@
-﻿using Polygon.Entities;
+﻿using Xylab.Polygon.Entities;
 
-namespace Polygon.Models
+namespace Xylab.Polygon.Models
 {
     /// <summary>
     /// The model class for judging run summary.

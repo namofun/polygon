@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using Polygon.Entities;
 using System;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Events
+namespace Xylab.Polygon.Events
 {
     public class JudgingFinishedEvent : INotification
     {

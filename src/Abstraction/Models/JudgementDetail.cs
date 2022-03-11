@@ -1,7 +1,7 @@
-﻿using Polygon.Entities;
-using System;
+﻿using System;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Models
+namespace Xylab.Polygon.Models
 {
     /// <summary>
     /// The interface class for judgements, which is aimed at reducing data transferring.

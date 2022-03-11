@@ -1,4 +1,4 @@
-﻿namespace Polygon.Models
+﻿namespace Xylab.Polygon.Models
 {
     /// <summary>
     /// The model class for testcases in memory.

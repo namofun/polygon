@@ -1,8 +1,7 @@
-﻿using Polygon.Models;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Xylab.Polygon.Models;
 
-namespace Polygon.Entities
+namespace Xylab.Polygon.Entities
 {
     /// <summary>
     /// The entity class for judgings.

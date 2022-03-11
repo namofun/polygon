@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     /// <summary>
     /// The big facade interface.

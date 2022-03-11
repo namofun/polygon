@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Polygon.Entities;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Events
+namespace Xylab.Polygon.Events
 {
     public class LanguageModifiedEvent : INotification
     {

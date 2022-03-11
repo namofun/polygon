@@ -1,7 +1,7 @@
-﻿using Polygon.Entities;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Packaging
+namespace Xylab.Polygon.Packaging
 {
     /// <summary>
     /// The provider interface for exporting problems from system.

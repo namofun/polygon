@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Polygon.Packaging;
 using System;
 using System.Collections.Generic;
+using Xylab.Polygon.Packaging;
 
-namespace Polygon
+namespace Xylab.Polygon
 {
     /// <summary>
     /// The options class for polygon.

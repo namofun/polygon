@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.FileProviders;
-using Polygon.Entities;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     /// <summary>
     /// The store interface for <see cref="Problem"/>.

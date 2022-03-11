@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Polygon.Entities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,8 +7,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     /// <summary>
     /// Extension methods for storage related class.

@@ -1,4 +1,4 @@
-﻿namespace Polygon.Entities
+﻿namespace Xylab.Polygon.Entities
 {
     /// <summary>
     /// The entity class for relationship between <see cref="Problem"/> and those authorized user.

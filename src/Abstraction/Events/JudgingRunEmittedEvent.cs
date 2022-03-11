@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using Polygon.Entities;
 using System;
 using System.Collections.Generic;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Events
+namespace Xylab.Polygon.Events
 {
     public class JudgingRunEmittedEvent : INotification
     {

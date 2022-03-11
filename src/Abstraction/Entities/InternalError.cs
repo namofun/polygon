@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Polygon.Entities
+namespace Xylab.Polygon.Entities
 {
     /// <summary>
     /// The status enum for internal errors.

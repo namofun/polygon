@@ -1,9 +1,9 @@
-﻿using Polygon.Entities;
-using Polygon.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     /// <summary>
     /// The store interface for <see cref="InternalError"/>.
