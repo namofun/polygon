@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Polygon.FakeJudgehost
+namespace Xylab.Polygon.Judgement.Daemon.Fake
 {
     /// <summary>
     /// The builder extensions for fake judgehost.

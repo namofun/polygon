@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Polygon.Entities;
 using System;
+using Xylab.Polygon.Entities;
 
-namespace Polygon
+namespace Xylab.Polygon
 {
     public class FakeSeedConfiguration<TContext> :
         EntityTypeConfigurationSupplier<TContext>,
