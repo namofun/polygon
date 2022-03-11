@@ -67,7 +67,7 @@ namespace Xylab.Polygon.Storages
         {
             var executables = new List<Executable>();
 
-            const string prefix = "Polygon.Seeds.Executables.";
+            const string prefix = "Xylab.Polygon.Seeds.Executables.";
             var assembly = typeof(SeedResource).Assembly;
             foreach (var fileName in assembly.GetManifestResourceNames())
             {

@@ -54,7 +54,7 @@ namespace SatelliteSite.Tests
             await _factory.RunScoped(async sp =>
             {
                 var stream = typeof(IntegratedServerTests).Assembly
-                    .GetManifestResourceStream("Polygon.Judgement.Tests.pkg.zip");
+                    .GetManifestResourceStream("Xylab.Polygon.Judgement.Integration.Tests.pkg.zip");
                 Assert.NotNull(stream);
 
                 var options = sp.GetRequiredService<IOptions<PolygonOptions>>();

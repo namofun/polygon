@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <AssemblyName>Xylab.$(AssemblyName)</AssemblyName>
+    <AssemblyName>Xylab.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Xylab.$(MSBuildProjectName)</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

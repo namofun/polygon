@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <DescriptionAttach>The fake judgehost data to make tests</DescriptionAttach>
-    <AssemblyName>Xylab.$(AssemblyName)</AssemblyName>
+    <AssemblyName>Xylab.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Xylab.$(MSBuildProjectName)</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
