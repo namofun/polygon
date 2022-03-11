@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <DescriptionAttach>The database seeds</DescriptionAttach>
+    <RootNamespace>Xylab.Polygon.Seeds</RootNamespace>
+    <AssemblyName>Xylab.Polygon.Seeds</AssemblyName>
   </PropertyGroup>
 
   <Import Project="..\..\build\NugetPackage.Backend.props" />

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Polygon.Entities;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     public class SeedConfiguration<TContext> :
         EntityTypeConfigurationSupplier<TContext>,

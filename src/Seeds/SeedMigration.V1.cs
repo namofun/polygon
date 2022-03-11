@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Polygon.Storages
+namespace Xylab.Polygon.Storages
 {
     public static class SeedMigrationV1
     {
