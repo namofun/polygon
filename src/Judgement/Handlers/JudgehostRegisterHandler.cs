@@ -1,12 +1,12 @@
 ﻿using MediatR;
-using Polygon.Entities;
 using SatelliteSite;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public partial class DOMjudgeLikeHandlers : IRequestHandler<JudgehostRegisterRequest, List<UnfinishedJudging>>
     {

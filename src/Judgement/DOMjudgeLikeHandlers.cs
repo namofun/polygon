@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Polygon.Storages;
 using SatelliteSite.Services;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public partial class DOMjudgeLikeHandlers
     {

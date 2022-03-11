@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using Polygon.Events;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Polygon.Events;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public partial class DOMjudgeLikeHandlers : IRequestHandler<NextJudgingRequest, NextJudging?>
     {

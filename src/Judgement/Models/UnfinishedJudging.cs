@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public class UnfinishedJudging
     {

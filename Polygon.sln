@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30503.244
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{71ABC5AB-083D-4FAB-80B8-F344BC633100}"
 	ProjectSection(SolutionItems) = preProject
@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Packaging", "src\Pa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Packaging.Tests", "test\Polygon.Packaging.Tests\Polygon.Packaging.Tests.csproj", "{6A57912B-2A19-4EFE-BCDE-755FBA54BB3D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Judgement", "src\Judgement\Polygon.Judgement.csproj", "{97429320-0017-4356-92DF-CAE200F04BA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Judgement.Requests", "src\Judgement\Polygon.Judgement.Requests.csproj", "{97429320-0017-4356-92DF-CAE200F04BA1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polygon.Seeds", "src\Seeds\Polygon.Seeds.csproj", "{03F09C87-D08C-4316-AACA-248862655640}"
 EndProject

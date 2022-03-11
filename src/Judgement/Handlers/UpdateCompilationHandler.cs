@@ -1,11 +1,11 @@
 ﻿using MediatR;
-using Polygon.Entities;
-using Polygon.Storages;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public partial class DOMjudgeLikeHandlers : IRequestHandler<UpdateCompilationRequest, Judging?>
     {

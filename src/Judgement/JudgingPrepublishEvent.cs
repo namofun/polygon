@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using Polygon.Judgement;
+using Xylab.Polygon.Judgement;
 
-namespace Polygon.Events
+namespace Xylab.Polygon.Events
 {
     public class JudgingPrepublishEvent : INotification
     {

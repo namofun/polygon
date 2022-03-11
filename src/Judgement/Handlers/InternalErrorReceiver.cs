@@ -1,12 +1,12 @@
 ﻿using MediatR;
-using Polygon.Entities;
-using Polygon.Models;
-using Polygon.Storages;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public partial class DOMjudgeLikeHandlers : IRequestHandler<InternalErrorOccurrence, (InternalError, InternalErrorDisable)>
     {

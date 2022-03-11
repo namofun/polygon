@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public class JudgehostRegisterRequest : IRequest<List<UnfinishedJudging>>
     {

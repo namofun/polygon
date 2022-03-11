@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using Polygon.Entities;
-using Polygon.Events;
 using System;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Events;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public class ReturnToQueueRequest : IRequest
     {

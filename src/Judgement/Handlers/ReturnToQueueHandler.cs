@@ -1,10 +1,10 @@
 ﻿using MediatR;
-using Polygon.Entities;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public partial class DOMjudgeLikeHandlers : IRequestHandler<ReturnToQueueRequest>
     {

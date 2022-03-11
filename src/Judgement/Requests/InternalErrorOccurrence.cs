@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using Polygon.Entities;
-using Polygon.Models;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public class InternalErrorOccurrence : IRequest<(InternalError, InternalErrorDisable)>
     {

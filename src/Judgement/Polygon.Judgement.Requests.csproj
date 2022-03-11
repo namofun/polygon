@@ -3,7 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <DescriptionAttach>The judgedaemon functional implements</DescriptionAttach>
+    <RootNamespace>Xylab.Polygon.Judgement</RootNamespace>
+    <AssemblyName>Xylab.Polygon.Judgement.Requests</AssemblyName>
+    <DescriptionAttach>The domserver functional implements</DescriptionAttach>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

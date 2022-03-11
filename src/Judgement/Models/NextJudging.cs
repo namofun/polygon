@@ -1,10 +1,10 @@
-﻿using Polygon.Entities;
-using Polygon.Events;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Events;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public class NextJudging
     {

@@ -1,7 +1,7 @@
-﻿using Polygon.Entities;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public class TestcaseToJudge
     {

@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public class NextToJudgeRequest : IRequest<TestcaseToJudge?>
     {

@@ -1,9 +1,9 @@
-﻿using Polygon.Entities;
-using Polygon.Events;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Events;
 
-namespace Polygon.Judgement
+namespace Xylab.Polygon.Judgement
 {
     public partial class DOMjudgeLikeHandlers
     {
