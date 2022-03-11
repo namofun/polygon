@@ -1,14 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Polygon;
-using Polygon.Events;
-using Polygon.Packaging;
-using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
+using Xylab.Polygon;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Events;
+using Xylab.Polygon.Packaging;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Controllers
 {
@@ -31,7 +32,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet("{target}")]
-        [AtLeastLevel(Polygon.Entities.AuthorLevel.Writer)]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Markdown(string target)
         {
             if (!ResourceDictionary.MarkdownFiles.Contains(target))
@@ -52,7 +53,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
         [HttpPost("{target}")]
         [ValidateAntiForgeryToken]
-        [AtLeastLevel(Polygon.Entities.AuthorLevel.Writer)]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Markdown(string target, MarkdownModel model)
         {
             if (!ResourceDictionary.MarkdownFiles.Contains(target))
@@ -68,7 +69,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
-        [AtLeastLevel(Polygon.Entities.AuthorLevel.Writer)]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> Generate(
             [FromServices] IStatementWriter writer)
         {
@@ -81,7 +82,7 @@ namespace SatelliteSite.PolygonModule.Controllers
 
 
         [HttpGet]
-        [AtLeastLevel(Polygon.Entities.AuthorLevel.Writer)]
+        [AtLeastLevel(AuthorLevel.Writer)]
         public async Task<IActionResult> GenerateLatex(
             [FromServices] IStatementWriter writer)
         {

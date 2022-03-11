@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
-using Polygon.Entities;
 using System;
+using Xylab.Polygon.Entities;
 
 namespace Microsoft.AspNetCore.Mvc
 {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Polygon.Entities;
-using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Dashboards
 {

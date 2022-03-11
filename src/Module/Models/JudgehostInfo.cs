@@ -1,5 +1,5 @@
-﻿using Polygon.Entities;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Xylab.Polygon.Entities;
 
 namespace SatelliteSite.PolygonModule.Models
 {

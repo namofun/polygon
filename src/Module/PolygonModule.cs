@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Polygon;
-using Polygon.Packaging;
 using SatelliteSite;
+using Xylab.Polygon;
+using Xylab.Polygon.Packaging;
 
 [assembly: RoleDefinition(10, "Judgehost", "judgehost", "(Internal/System) Judgehost")]
 [assembly: RoleDefinition(11, "ProblemCreator", "prob", "Problem Provider")]
@@ -50,7 +50,7 @@ namespace SatelliteSite.PolygonModule
             services.AddScoped<IStatementProvider, MarkdownStatementProvider>();
             services.AddScoped<IStatementWriter, MarkdownStatementWriter>();
 
-            services.AddMediatRAssembly(typeof(Polygon.Judgement.DOMjudgeLikeHandlers).Assembly);
+            services.AddMediatRAssembly(typeof(Xylab.Polygon.Judgement.DOMjudgeLikeHandlers).Assembly);
 
             services.AddImportProvider<KattisImportProvider>("kattis", "Kattis Package");
             // services.AddImportProvider<XmlImportProvider>("xysxml", "XiaoYang's XML");
@@ -59,7 +59,7 @@ namespace SatelliteSite.PolygonModule
             services.AddImportProvider<DataImportProvider>("data", "Data (.in and .out/.ans)");
 
             new TRole().Configure(services);
-            services.EnsureScoped<Polygon.Storages.IPolygonFacade>();
+            services.EnsureScoped<Xylab.Polygon.Storages.IPolygonFacade>();
 
             services.PostConfigure<PolygonOptions>(o => o.FinalizeSettings());
 

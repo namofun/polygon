@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Polygon.Entities;
-using Polygon.Storages;
 using SatelliteSite.Substrate.Dashboards;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule
 {

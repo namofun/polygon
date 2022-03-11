@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Polygon.Entities;
-using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Controllers
 {

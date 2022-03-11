@@ -1,15 +1,15 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Polygon.Entities;
-using Polygon.Judgement;
-using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Judgement;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Apis
 {
@@ -115,7 +115,7 @@ namespace SatelliteSite.PolygonModule.Apis
         {
             var result = await mediator.Send(new NextJudgingRequest(hostname));
             if (result == null) return new JsonResult("");
-            await mediator.Publish(new Polygon.Events.JudgingPrepublishEvent(result));
+            await mediator.Publish(new Xylab.Polygon.Events.JudgingPrepublishEvent(result));
             return result;
         }
 

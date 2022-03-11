@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using Polygon.Storages;
 using System;
 using System.Threading.Tasks;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Dashboards
 {

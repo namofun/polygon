@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Polygon.Models;
+using Xylab.Polygon.Models;
 using System.Threading.Tasks;
 
 namespace SatelliteSite.PolygonModule.Components.SubmissionDetail

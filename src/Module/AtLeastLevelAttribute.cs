@@ -1,5 +1,5 @@
-﻿using Polygon.Entities;
-using System;
+﻿using System;
+using Xylab.Polygon.Entities;
 
 namespace SatelliteSite.PolygonModule
 {

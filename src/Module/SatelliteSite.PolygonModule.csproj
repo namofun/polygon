@@ -24,7 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />
     <ProjectReference Include="..\Packaging\Polygon.Packaging.csproj" />
-    <ProjectReference Include="..\Judgement\Polygon.Judgement.csproj" />
+    <ProjectReference Include="..\Judgement\Polygon.Judgement.Requests.csproj" />
     <ProjectReference Include="..\TagHelpers\Polygon.TagHelpers.csproj" />
   </ItemGroup>
 

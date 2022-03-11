@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Polygon.Entities;
-using Polygon.Models;
 using System.Collections.Generic;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
 
 namespace SatelliteSite.PolygonModule.Models
 {

@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Polygon.Entities;
-using Polygon.Events;
-using Polygon.Packaging;
-using Polygon.Storages;
 using SatelliteSite.PolygonModule.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Events;
+using Xylab.Polygon.Packaging;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Controllers
 {

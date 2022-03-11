@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Polygon.Entities;
-using Polygon.Models;
-using Polygon.Packaging;
-using Polygon.Storages;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
+using Xylab.Polygon.Packaging;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Controllers
 {
@@ -37,7 +37,7 @@ namespace SatelliteSite.PolygonModule.Controllers
         /// <summary>
         /// The context author level
         /// </summary>
-        protected AuthorLevel AuthorLevel { get; private set; }
+        protected AuthorLevel CurrentAuthorLevel { get; private set; }
 
         /// <summary>
         /// Validate the problem is ok.
@@ -60,13 +60,13 @@ namespace SatelliteSite.PolygonModule.Controllers
             }
 
             ViewData["ProblemItself"] = Problem = feature.Problem;
-            ViewData["AuthorLevel"] = AuthorLevel = feature.AuthorLevel;
+            ViewData["AuthorLevel"] = CurrentAuthorLevel = feature.AuthorLevel;
             ViewData["BigTitle"] = "Polygon";
-            ViewData["NavbarName"] = Polygon.ResourceDictionary.MenuNavbar;
+            ViewData["NavbarName"] = Xylab.Polygon.ResourceDictionary.MenuNavbar;
             ViewData["BigUrl"] = Url.Action("Overview", "Editor");
 
             var atLeast = HttpContext.GetEndpoint().Metadata.GetMetadata<AtLeastLevelAttribute>();
-            if (atLeast != null && atLeast.Level > AuthorLevel) return StatusCode(403);
+            if (atLeast != null && atLeast.Level > CurrentAuthorLevel) return StatusCode(403);
 
             return null;
         }

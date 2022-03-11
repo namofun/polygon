@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Polygon.Entities;
-using Polygon.Storages;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite
 {
@@ -55,7 +55,7 @@ namespace SatelliteSite
                         .Reverse()
                         .SkipWhile(a => !a.Verdict.HasValue)
                         .Reverse()
-                        .Select(a => Polygon.ResourceDictionary.ConvertToChar(a.Verdict))
+                        .Select(a => Xylab.Polygon.ResourceDictionary.ConvertToChar(a.Verdict))
                         .ToArray());
 
                     await facade.Judgings.UpdateAsync(
