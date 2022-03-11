@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
-using Polygon.Storages;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.TagHelpers
+namespace Xylab.Polygon.TagHelpers
 {
     [HtmlTargetElement("snippet")]
     public class SnippetTagHelper : JudgingResultTagHelperBase

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
-using Polygon.Entities;
+using Xylab.Polygon.Entities;
 
-namespace Polygon.TagHelpers
+namespace Xylab.Polygon.TagHelpers
 {
     /// <summary>
     /// Show badge icons for verdict.

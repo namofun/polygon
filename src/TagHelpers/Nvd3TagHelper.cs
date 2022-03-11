@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
-namespace Polygon.TagHelpers
+namespace Xylab.Polygon.TagHelpers
 {
     [HtmlTargetElement("nvd3", TagStructure = TagStructure.NormalOrSelfClosing)]
     public class Nvd3TagHelper : XysTagHelper

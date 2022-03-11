@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;
 
-namespace Polygon.TagHelpers
+namespace Xylab.Polygon.TagHelpers
 {
     /// <summary>
     /// Text icon for misc things

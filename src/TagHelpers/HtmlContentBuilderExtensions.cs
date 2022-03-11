@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Text.Encodings.Web;
 
-namespace Polygon.TagHelpers
+namespace Xylab.Polygon.TagHelpers
 {
     public class IndentHtmlContentBuilderWrapper : IHtmlContentBuilder, IDisposable
     {

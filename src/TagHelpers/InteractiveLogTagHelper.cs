@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Razor.TagHelpers;
-using Polygon.Storages;
 using System;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.TagHelpers
+namespace Xylab.Polygon.TagHelpers
 {
     [HtmlTargetElement("interactive")]
     public class InteractiveLogTagHelper : JudgingResultTagHelperBase

@@ -1,13 +1,13 @@
 ﻿#nullable enable
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.FileProviders;
-using Polygon.Storages;
 using System;
 using System.Buffers;
 using System.Text;
 using System.Threading.Tasks;
+using Xylab.Polygon.Storages;
 
-namespace Polygon.TagHelpers
+namespace Xylab.Polygon.TagHelpers
 {
     public abstract class JudgingResultTagHelperBase : XysTagHelper
     {

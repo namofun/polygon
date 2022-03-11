@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Polygon.Models;
 using System.Threading.Tasks;
+using Xylab.Polygon.Models;
 
-namespace Polygon.TagHelpers
+namespace Xylab.Polygon.TagHelpers
 {
     [HtmlTargetElement("submission-detail", TagStructure = TagStructure.WithoutEndTag)]
     public class SubmissionDetailTagHelper : XysTagHelper

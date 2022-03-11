@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>Xylab.Polygon.TagHelpers</RootNamespace>
+    <AssemblyName>Xylab.Polygon.TagHelpers</AssemblyName>
     <DescriptionAttach>The tag helpers likes verdict and snippets</DescriptionAttach>
   </PropertyGroup>
 
