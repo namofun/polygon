@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using SatelliteSite.Services;
 using Xylab.Polygon.Storages;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public partial class DOMjudgeLikeHandlers
     {

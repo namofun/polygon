@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Xylab.Polygon.Entities;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public class UpdateCompilationRequest : IRequest<Judging?>
     {

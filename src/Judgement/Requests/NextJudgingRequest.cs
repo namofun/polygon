@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public class NextJudgingRequest : IRequest<NextJudging?>
     {

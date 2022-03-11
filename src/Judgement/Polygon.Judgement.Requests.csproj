@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <RootNamespace>Xylab.Polygon.Judgement</RootNamespace>
+    <RootNamespace>Xylab.Polygon.Judgement.Requests</RootNamespace>
     <AssemblyName>Xylab.Polygon.Judgement.Requests</AssemblyName>
     <DescriptionAttach>The domserver functional implements</DescriptionAttach>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

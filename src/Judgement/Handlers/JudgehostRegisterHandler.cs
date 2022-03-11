@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xylab.Polygon.Entities;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public partial class DOMjudgeLikeHandlers : IRequestHandler<JudgehostRegisterRequest, List<UnfinishedJudging>>
     {

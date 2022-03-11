@@ -2,7 +2,7 @@
 using Xylab.Polygon.Entities;
 using Xylab.Polygon.Models;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public class InternalErrorOccurrence : IRequest<(InternalError, InternalErrorDisable)>
     {

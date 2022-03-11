@@ -3,7 +3,7 @@ using System;
 using Xylab.Polygon.Entities;
 using Xylab.Polygon.Events;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public class ReturnToQueueRequest : IRequest
     {

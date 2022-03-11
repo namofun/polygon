@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Xylab.Polygon.Entities;
 using Xylab.Polygon.Events;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public partial class DOMjudgeLikeHandlers
     {

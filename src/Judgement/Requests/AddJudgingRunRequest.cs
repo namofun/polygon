@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using Xylab.Polygon.Entities;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public class AddJudgingRunRequest : IRequest<bool>
     {

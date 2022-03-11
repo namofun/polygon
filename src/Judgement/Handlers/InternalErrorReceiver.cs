@@ -6,7 +6,7 @@ using Xylab.Polygon.Entities;
 using Xylab.Polygon.Models;
 using Xylab.Polygon.Storages;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public partial class DOMjudgeLikeHandlers : IRequestHandler<InternalErrorOccurrence, (InternalError, InternalErrorDisable)>
     {

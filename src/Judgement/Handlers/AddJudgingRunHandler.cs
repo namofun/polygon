@@ -9,7 +9,7 @@ using Xylab.Polygon.Entities;
 using Xylab.Polygon.Events;
 using Xylab.Polygon.Storages;
 
-namespace Xylab.Polygon.Judgement
+namespace Xylab.Polygon.Judgement.Requests
 {
     public partial class DOMjudgeLikeHandlers : IRequestHandler<AddJudgingRunRequest, bool>
     {
