@@ -7,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.AzureBlob;
 using Microsoft.Extensions.Hosting;
-using Polygon.FakeJudgehost;
-using Polygon.Storages;
 using SatelliteSite.IdentityModule.Entities;
 using System.IO;
+using Xylab.Polygon.Judgement.Daemon.Fake;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite
 {
@@ -31,7 +31,7 @@ namespace SatelliteSite
                 .MarkDomain<Program>()
                 .AddModule<IdentityModule.IdentityModule<User, Role, DefaultContext>>()
                 .EnableIdentityModuleBasicAuthentication()
-                .AddModule<PolygonModule.PolygonModule<Polygon.DefaultRole<DefaultContext, QueryCache<DefaultContext>>>>()
+                .AddModule<PolygonModule.PolygonModule<Xylab.Polygon.DefaultRole<DefaultContext, QueryCache<DefaultContext>>>>()
                 .AddModule<HostModule>()
                 .AddDatabase<DefaultContext>((c, b) => b.UseSqlServer(c.GetConnectionString("UserDbConnection"), b => b.UseBulk()))
                 .AddApplicationInsights()

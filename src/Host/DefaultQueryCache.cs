@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Polygon.Entities;
-using Polygon.Models;
-using Polygon.Storages;
 using SatelliteSite.IdentityModule.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite
 {

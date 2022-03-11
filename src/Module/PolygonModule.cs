@@ -50,7 +50,7 @@ namespace SatelliteSite.PolygonModule
             services.AddScoped<IStatementProvider, MarkdownStatementProvider>();
             services.AddScoped<IStatementWriter, MarkdownStatementWriter>();
 
-            services.AddMediatRAssembly(typeof(Xylab.Polygon.Judgement.DOMjudgeLikeHandlers).Assembly);
+            services.AddMediatRAssembly(typeof(Xylab.Polygon.Judgement.Requests.DOMjudgeLikeHandlers).Assembly);
 
             services.AddImportProvider<KattisImportProvider>("kattis", "Kattis Package");
             // services.AddImportProvider<XmlImportProvider>("xysxml", "XiaoYang's XML");

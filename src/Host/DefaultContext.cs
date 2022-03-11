@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Polygon.Entities;
-using Polygon.Storages;
 using SatelliteSite.IdentityModule.Entities;
+using Xylab.Polygon.Entities;
+using Xylab.Polygon.Storages;
 
 namespace SatelliteSite
 {

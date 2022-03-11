@@ -6,6 +6,7 @@ using Microsoft.Extensions.FileProviders;
 using System;
 using System.Threading.Tasks;
 using Xylab.Polygon.Judgement;
+using Xylab.Polygon.Judgement.Requests;
 using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Apis

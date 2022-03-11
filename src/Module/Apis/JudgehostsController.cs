@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xylab.Polygon.Entities;
 using Xylab.Polygon.Judgement;
+using Xylab.Polygon.Judgement.Requests;
 using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Apis
