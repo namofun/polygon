@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Abstraction\Polygon.Abstraction.csproj" />
-    <ProjectReference Include="..\..\src\Judgement\Polygon.Judgement.Requests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
