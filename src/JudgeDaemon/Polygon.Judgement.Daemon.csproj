@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Xylab.Polygon.Judgement.Daemon</RootNamespace>
+    <AssemblyName>Xylab.Polygon.Judgement.Daemon</AssemblyName>
+    <DescriptionAttach>The judgehost daemon framework and implements</DescriptionAttach>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <Import Project="..\..\build\NugetPackage.Backend.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />
+  </ItemGroup>
+
+</Project>
