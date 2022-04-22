@@ -16,5 +16,7 @@ namespace Xylab.Polygon.Judgement.Daemon
         public bool Errorred { get; set; }
 
         public DateTimeOffset? LastAttempt { get; set; }
+
+        public DomClient Client { get; set; }
     }
 }

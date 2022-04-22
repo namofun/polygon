@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Management.Services;
 
 namespace Xylab.Polygon.Judgement.Daemon
 {
@@ -18,6 +19,54 @@ namespace Xylab.Polygon.Judgement.Daemon
         private readonly IReadOnlyList<string> _endpointIDs;
         private readonly string _myhost;
         private readonly ILogger<JudgeService> _logger;
+        private readonly ISystemUtilities _system;
+
+        private async Task registerJudgehost(string endpointId, Endpoint endpoint, string myhost)
+        {
+            // Only try to register every 30s.
+            var now = DateTimeOffset.Now;
+            if (now - endpoint.LastAttempt < TimeSpan.FromSeconds(30))
+            {
+                endpoint.Waiting = true;
+                return;
+            }
+
+            endpoint.LastAttempt = now;
+
+            _logger.LogInformation("Registering judgehost on endpoint {endpointID}: {url}", endpointId, endpoint.Url);
+            endpoint.Client = setup_curl_handle(endpoint.UserName, endpoint.Password);
+
+            // Create directory where to test submissions
+            var workdirpath = $"{_options.JUDGEDIR}/{myhost}/endpoint-{endpointId}";
+            try
+            {
+                Directory.CreateDirectory(workdirpath + "/testcase");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogError(ex, "Could not create {workdirpath}", workdirpath);
+            }
+
+            _system.ChangeMode(Path.Combine(workdirpath, "testcase"), 0700);
+
+            // Auto-register judgehost.
+            // If there are any unfinished judgings in the queue in my name,
+            // they will not be finished. Give them back.
+            var unfinished = request('judgehosts', 'POST', 'hostname='.urlencode($myhost), false);
+            if (unfinished == null)
+            {
+                _logger.LogWarning("Registering judgehost on endpoint {endpointID} failed.", endpointId);
+            }
+            else
+            {
+                foreach (var jud in unfinished)
+                {
+                    var workdir = judging_directory($workdirpath, $jud);
+                    _system.ChangeMode(workdir, 0700);
+                    _logger.LogWarning("Found unfinished judging j{id} in my name; given back", jud.judgingid);
+                }
+            }
+        }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -32,7 +81,7 @@ namespace Xylab.Polygon.Judgement.Daemon
                     if (endpoint.Errorred)
                     {
                         endpointID = id;
-                        registerJudgehost(@myhost);
+                        await registerJudgehost(id, endpoint, myhost);
                     }
 
                     if (!endpoint.Waiting)
@@ -78,7 +127,7 @@ namespace Xylab.Polygon.Judgement.Daemon
                         string free_abs = $"{free_space / (double)(1024 * 1024 * 1024):F2}GB";
                         _logger.LogError("Low on disk space: {free_abs} free, clean up or change 'diskspace error' value in config before resolving this error.", free_abs);
 
-                        int error_id = await domClient.FireInternalErrorAsync(
+                        int error_id = await domClient.FireInternalError(
                             $"low on disk space on {_myhost}",
                             judgehostlog,
                             DisableTarget.Judgehost(_myhost));
@@ -89,7 +138,7 @@ namespace Xylab.Polygon.Judgement.Daemon
 
                 // Request open submissions to judge. Any errors will be treated as
                 // non-fatal: we will just keep on retrying in this loop.
-                NextJudging row = await domClient.FetchNextJudgingAsync(_myhost);
+                NextJudging row = await domClient.FetchNextJudging(_myhost);
 
                 // nothing returned -> no open submissions for us
                 if (row == null)

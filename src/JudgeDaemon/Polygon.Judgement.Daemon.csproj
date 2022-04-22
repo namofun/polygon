@@ -13,6 +13,7 @@
   <Import Project="..\..\build\NugetPackage.Backend.props" />
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\jethub\src\Management.Interop\Management.Interop.csproj" />
     <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />
   </ItemGroup>
 
