@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <SubstrateVersion>1.1.44</SubstrateVersion>
-    <PreviewBuild>22</PreviewBuild>
+    <PreviewBuild>23</PreviewBuild>
     <CIRevision></CIRevision>
     <AspNetCoreVersion>6.0.0</AspNetCoreVersion>
     <EFCoreBulkVersion>6.0.29</EFCoreBulkVersion>
