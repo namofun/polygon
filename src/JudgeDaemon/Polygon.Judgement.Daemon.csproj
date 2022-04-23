@@ -7,6 +7,7 @@
     <AssemblyName>Xylab.Polygon.Judgement.Daemon</AssemblyName>
     <DescriptionAttach>The judgehost daemon framework and implements</DescriptionAttach>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <Import Project="..\..\build\NugetPackage.Backend.props" />
