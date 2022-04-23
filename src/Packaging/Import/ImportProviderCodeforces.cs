@@ -61,6 +61,12 @@ namespace Xylab.Polygon.Packaging
         {
         }
 
+        public static Stream GetTestlib()
+        {
+            const string Fqfn = "Xylab.Polygon.Packaging.Resources.testlib.h";
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream(Fqfn)!;
+        }
+
         private async Task<Executable> CreateExecutableAsync(
             ImportContext ctx, byte[] contents, string ext, bool cmp)
         {
@@ -71,7 +77,7 @@ namespace Xylab.Polygon.Packaging
             {
                 var f = newzip.CreateEntryFromByteArray(contents, "main" + ext);
                 f.ExternalAttributes = LINUX644;
-                using var testlib = Assembly.GetExecutingAssembly().GetManifestResourceStream("Xylab.Polygon.Packaging.Resources.testlib.h")!;
+                using var testlib = GetTestlib();
                 var f2 = await newzip.CreateEntryFromStream(testlib, "testlib.h");
                 f2.ExternalAttributes = LINUX644;
             }

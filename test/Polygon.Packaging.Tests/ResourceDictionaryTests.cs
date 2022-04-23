@@ -8,8 +8,7 @@ namespace Xylab.Polygon.Packaging.Tests
         [TestMethod]
         public void TestlibExistence()
         {
-            var stream = typeof(CodeforcesImportProvider).Assembly
-                .GetManifestResourceStream("Xylab.Polygon.Packaging.Resources.testlib.h");
+            var stream = CodeforcesImportProvider.GetTestlib();
             Assert.IsNotNull(stream);
             stream.Dispose();
         }
