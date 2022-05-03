@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -13,8 +13,11 @@
   <Import Project="..\..\build\NugetPackage.Backend.props" />
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\jethub\src\Management.Interop\Management.Interop.csproj" />
     <ProjectReference Include="..\Abstraction\Polygon.Abstraction.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Xylab.Management.Interop" Version="$(JetHubVersion)" />
   </ItemGroup>
 
 </Project>

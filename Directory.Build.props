@@ -12,6 +12,7 @@
     <CIRevision></CIRevision>
     <AspNetCoreVersion>6.0.0</AspNetCoreVersion>
     <EFCoreBulkVersion>6.0.29</EFCoreBulkVersion>
+    <JetHubVersion>1.2.0</JetHubVersion>
   </PropertyGroup>
 
   <PropertyGroup>

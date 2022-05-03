@@ -5,6 +5,8 @@ namespace Xylab.Polygon.Judgement.Daemon
 {
     public class Endpoint
     {
+        public string Name { get; set; }
+
         public string Url { get; set; }
 
         public string UserName { get; set; }
@@ -17,6 +19,6 @@ namespace Xylab.Polygon.Judgement.Daemon
 
         public DateTimeOffset? LastAttempt { get; set; }
 
-        public DomClient Client { get; set; }
+        public PolygonClient Client { get; set; }
     }
 }

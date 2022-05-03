@@ -1,7 +1,16 @@
-﻿namespace Xylab.Polygon.Judgement.Daemon
+﻿using System;
+using System.Collections.Generic;
+
+namespace Xylab.Polygon.Judgement.Daemon
 {
     public class DaemonOptions
     {
+        public TimeSpan WaitTime { get; set; } = TimeSpan.FromSeconds(5);
+
+        public string HostName { get; set; } = Environment.MachineName;
+
+        public List<Endpoint> Endpoints { get; set; } = new();
+
         public string DOMJUDGE_VERSION { get; set; }
 
         public string BINDIR { get; set; }

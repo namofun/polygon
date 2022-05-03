@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.IO;
+using System.Text.Json.Serialization;
 
 namespace Xylab.Polygon.Judgement
 {
@@ -12,5 +13,10 @@ namespace Xylab.Polygon.Judgement
 
         [JsonPropertyName("cid")]
         public int ContestId { get; set; }
+
+        public string GetJudgehostPath(string workdirPath)
+        {
+            return Path.Combine(workdirPath, $"{ContestId}/{SubmissionId}/{JudgingId}");
+        }
     }
 }
