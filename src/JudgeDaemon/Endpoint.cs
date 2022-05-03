@@ -1,10 +1,14 @@
 ﻿#nullable disable
 using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Xylab.Polygon.Judgement.Daemon
 {
-    public class Endpoint
+    public sealed class Endpoint : IAsyncDisposable
     {
+        public HttpClient HttpClient { get; set; }
+
         public string Name { get; set; }
 
         public string Url { get; set; }
@@ -19,6 +23,11 @@ namespace Xylab.Polygon.Judgement.Daemon
 
         public DateTimeOffset? LastAttempt { get; set; }
 
-        public PolygonClient Client { get; set; }
+        public ValueTask DisposeAsync()
+        {
+            HttpClient?.Dispose();
+            HttpClient = null;
+            return ValueTask.CompletedTask;
+        }
     }
 }

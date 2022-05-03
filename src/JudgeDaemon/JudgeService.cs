@@ -30,7 +30,7 @@ namespace Xylab.Polygon.Judgement.Daemon
 
                 // Request open submissions to judge. Any errors will be treated as
                 // non-fatal: we will just keep on retrying in this loop.
-                NextJudging? row = await endpoint.Client.FetchNextJudging(_options.HostName);
+                NextJudging? row = await endpoint.FetchNextJudging(_options.HostName);
 
                 // nothing returned -> no open submissions for us
                 if (row == null)

@@ -46,7 +46,18 @@ namespace Xylab.Polygon.Judgement.Daemon
             endpoint.LastAttempt = now;
 
             _logger.LogInformation("Registering judgehost on endpoint {endpointID}: {url}", endpoint.Name, endpoint.Url);
-            endpoint.Client = PolygonClient.Create(_httpClientFactory, endpoint);
+            try
+            {
+                HttpClient client = _httpClientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new("Basic", $"{endpoint.UserName}:{endpoint.Password}".ToBase64());
+                client.DefaultRequestHeaders.UserAgent.Add(new("PolygonClient", typeof(Endpoint).Assembly.GetName().Version!.ToString()));
+                endpoint.HttpClient = client;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected exception happened during creating http client.");
+                throw;
+            }
 
             // Create directory where to test submissions
             string workdirpath = Path.Combine(_options.JUDGEDIR, _options.HostName, $"endpoint-{endpoint.Name}");
@@ -64,7 +75,7 @@ namespace Xylab.Polygon.Judgement.Daemon
             // Auto-register judgehost.
             // If there are any unfinished judgings in the queue in my name,
             // they will not be finished. Give them back.
-            var unfinished = await endpoint.Client.RegisterJudgehost(_options.HostName);
+            var unfinished = await endpoint.RegisterJudgehost(_options.HostName);
             if (unfinished == null)
             {
                 _logger.LogWarning("Registering judgehost on endpoint {endpointID} failed.", endpoint.Name);
@@ -84,11 +95,7 @@ namespace Xylab.Polygon.Judgement.Daemon
         {
             foreach (Endpoint endpoint in _endpoints)
             {
-                if (endpoint.Client != null)
-                {
-                    await endpoint.Client.DisposeAsync();
-                    endpoint.Client = null;
-                }
+                await endpoint.DisposeAsync();
             }
         }
 
@@ -133,13 +140,13 @@ namespace Xylab.Polygon.Judgement.Daemon
                 {
                     // Check for available disk space
                     long free_space = _fileSystem.GetFreeSpace(_options.JUDGEDIR);
-                    long allowed_free_space = endpoint.Client.GetConfiguration<long>("diskspace_error"); // in kB
+                    long allowed_free_space = endpoint.GetConfiguration<long>("diskspace_error"); // in kB
                     if (free_space < 1024 * allowed_free_space)
                     {
                         string free_abs = $"{free_space / (double)(1024 * 1024 * 1024):F2}GB";
                         _logger.LogError("Low on disk space: {free_abs} free, clean up or change 'diskspace error' value in config before resolving this error.", free_abs);
 
-                        int error_id = await endpoint.Client.FireInternalError(
+                        int error_id = await endpoint.FireInternalError(
                             $"low on disk space on {_options.HostName}",
                             "kusto query",
                             DisableTarget.Judgehost(_options.HostName));
