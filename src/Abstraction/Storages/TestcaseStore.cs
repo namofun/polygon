@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
 
 namespace Xylab.Polygon.Storages
 {
@@ -66,7 +67,7 @@ namespace Xylab.Polygon.Storages
         /// </summary>
         /// <param name="testcase">The testcase to delete.</param>
         /// <returns>The task for delete.</returns>
-        Task<int> CascadeDeleteAsync(Testcase testcase);
+        Task<TestcaseDeleteResult> CascadeDeleteAsync(Testcase testcase);
 
         /// <summary>
         /// Change the rank of testcase.

@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Xylab.Polygon.Entities;
 using Xylab.Polygon.Events;
+using Xylab.Polygon.Models;
 using Xylab.Polygon.Storages;
 
 namespace SatelliteSite.PolygonModule.Controllers
@@ -195,12 +196,12 @@ namespace SatelliteSite.PolygonModule.Controllers
             var tc = await Store.FindAsync(testid, Problem.Id);
             if (tc == null) return NotFound();
 
-            int dts = await Store.CascadeDeleteAsync(tc);
+            TestcaseDeleteResult dts = await Store.CascadeDeleteAsync(tc);
             await Mediator.Publish(new ProblemModifiedEvent(Problem));
-            await HttpContext.AuditAsync("deleted", $"p{Problem.Id}t{testid}");
+            await HttpContext.AuditAsync("deleted", $"p{Problem.Id}t{testid}", extra: dts.Succeeded ? null : "but failed");
 
-            StatusMessage = dts < 0
-                ? "Error occurred during the deletion."
+            StatusMessage = !dts.Succeeded
+                ? $"Error occurred during the deletion: {dts.ErrorMessage}"
                 : $"Testcase {testid} with {dts} runs deleted.";
             return RedirectToAction(nameof(Testcases));
         }

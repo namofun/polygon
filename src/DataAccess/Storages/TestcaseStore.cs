@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Xylab.Polygon.Entities;
+using Xylab.Polygon.Models;
 
 namespace Xylab.Polygon.Storages
 {
@@ -19,15 +20,20 @@ namespace Xylab.Polygon.Storages
                 .BatchUpdateAsync(t => new Testcase { Point = score });
         }
 
-        async Task<int> ITestcaseStore.CascadeDeleteAsync(Testcase testcase)
+        async Task<TestcaseDeleteResult> ITestcaseStore.CascadeDeleteAsync(Testcase testcase)
         {
+            if (await Context.Judgings
+                .Where(j => j.s.ProblemId == testcase.ProblemId && j.Status == Verdict.Running)
+                .AnyAsync())
+                return TestcaseDeleteResult.Fail(
+                    "Some judging tasks are running for this problem, cannot delete now.");
+
             await using var tran = await Context.Database.BeginTransactionAsync();
-            int dts;
 
             try
             {
                 // details are set ON DELETE NO ACTION, so we have to delete it before
-                dts = await Context.JudgingRuns
+                int dts = await Context.JudgingRuns
                     .Where(d => d.TestcaseId == testcase.Id)
                     .BatchDeleteAsync();
 
@@ -41,13 +47,15 @@ namespace Xylab.Polygon.Storages
                     .BatchUpdateAsync(t => new Testcase { Rank = t.Rank - 1 });
 
                 await tran.CommitAsync();
-            }
-            catch
-            {
-                dts = -1;
-            }
 
-            return dts;
+                return TestcaseDeleteResult.Succeed(dts);
+            }
+            catch (Exception ex)
+            {
+                await tran.RollbackAsync();
+
+                return TestcaseDeleteResult.Fail(ex.Message);
+            }
         }
 
         async Task ITestcaseStore.ChangeRankAsync(int probid, int testid, bool up)
