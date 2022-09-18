@@ -37,6 +37,10 @@ namespace Xylab.Polygon.Judgement.Daemon
 
         public string RUNGROUP { get; set; }
 
+        public bool CREATE_WRITABLE_TEMP_DIR { get; set; }
+
+        public int? daemonid { get; set; }
+
         public DaemonOptions()
         {
             DOMJUDGE_VERSION = "7.3.3";

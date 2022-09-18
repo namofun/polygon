@@ -16,5 +16,8 @@ namespace Xylab.Polygon.Judgement.Daemon
 
         public static DisableTarget Judgehost(string hostname)
             => Of("judgehost", "hostname", hostname);
+
+        public static DisableTarget Language(string langid)
+            => Of("language", "langid", langid);
     }
 }

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Xylab.Polygon.Models;
 
 namespace Xylab.Polygon.Judgement.Daemon
 {
@@ -59,6 +60,12 @@ namespace Xylab.Polygon.Judgement.Daemon
             return _httpClient.PostAsync(requestUri, content);
         }
 
+        private Task<HttpResponseMessage> PutAsync(string requestUri, HttpContent content)
+        {
+            ArgumentNullException.ThrowIfNull(_httpClient, "Endpoint hasn't been initialized.");
+            return _httpClient.PutAsync(requestUri, content);
+        }
+
         public async Task<UnfinishedJudging[]?> RegisterJudgehost(string hostname)
         {
             using var resp = await PostAsync(
@@ -94,11 +101,12 @@ namespace Xylab.Polygon.Judgement.Daemon
         public async Task<byte[]?> GetExecutable(string target)
         {
             using var resp = await GetAsync("executables/" + UrlEncoder.Default.Encode(target));
-            if (!resp.IsSuccessStatusCode)
+            if (resp.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 return null;
             }
 
+            resp.EnsureSuccessStatusCode();
             string? base64encoded = await resp.Content.ReadFromJsonAsync<string>();
             if (base64encoded == null)
             {
@@ -106,6 +114,13 @@ namespace Xylab.Polygon.Judgement.Daemon
             }
 
             return Convert.FromBase64String(base64encoded);
+        }
+
+        public async Task<SubmissionFile[]> GetSourceCode(int cid, int submitid)
+        {
+            using var resp = await GetAsync($"contests/{cid}/submissions/{submitid}/source-code");
+            resp.EnsureSuccessStatusCode();
+            return (await resp.Content.ReadFromJsonAsync<SubmissionFile[]>())!;
         }
 
         public async Task<NextJudging?> FetchNextJudging(string hostname)
@@ -116,6 +131,19 @@ namespace Xylab.Polygon.Judgement.Daemon
 
             resp.EnsureSuccessStatusCode();
             return await resp.Content.ReadFromJsonAsync<NextJudging>();
+        }
+
+        public async Task UpdateJudging(string hostname, int judgingId, int compile_success, string output_compile)
+        {
+            using var resp = await PutAsync(
+                "judgehosts/update-judging/" + UrlEncoder.Default.Encode(hostname) + "/" + judgingId,
+                new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    { nameof(compile_success), compile_success.ToString() },
+                    { nameof(output_compile), output_compile.ToBase64() },
+                }));
+
+            resp.EnsureSuccessStatusCode();
         }
 
         public async Task RefreshConfiguration()

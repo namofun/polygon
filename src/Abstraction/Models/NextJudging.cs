@@ -74,6 +74,14 @@ namespace Xylab.Polygon.Judgement
         [JsonPropertyName("testcases")]
         public Dictionary<string, TestcaseToJudge> Testcases { get; set; }
 
+        [JsonPropertyName("filter_compiler_files")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool? FilterCompilerFiles { get; set; }
+
+        [JsonPropertyName("language_extensions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string[]? LanguageExtensions { get; set; }
+
 #pragma warning disable CS8618
         public NextJudging()
         {
