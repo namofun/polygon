@@ -48,10 +48,7 @@ namespace Xylab.Polygon.Judgement.Daemon
             _logger.LogInformation("Registering judgehost on endpoint {endpointID}: {url}", endpoint.Name, endpoint.Url);
             try
             {
-                HttpClient client = _httpClientFactory.CreateClient();
-                client.DefaultRequestHeaders.Authorization = new("Basic", $"{endpoint.UserName}:{endpoint.Password}".ToBase64());
-                client.DefaultRequestHeaders.UserAgent.Add(new("PolygonClient", typeof(Endpoint).Assembly.GetName().Version!.ToString()));
-                endpoint.HttpClient = client;
+                endpoint.Initialize(_httpClientFactory);
             }
             catch (Exception ex)
             {
@@ -140,7 +137,7 @@ namespace Xylab.Polygon.Judgement.Daemon
                 {
                     // Check for available disk space
                     long free_space = _fileSystem.GetFreeSpace(_options.JUDGEDIR);
-                    long allowed_free_space = endpoint.GetConfiguration<long>("diskspace_error"); // in kB
+                    long allowed_free_space = await endpoint.GetConfiguration(c => c.DiskSpaceError); // in kB
                     if (free_space < 1024 * allowed_free_space)
                     {
                         string free_abs = $"{free_space / (double)(1024 * 1024 * 1024):F2}GB";
