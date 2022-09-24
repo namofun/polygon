@@ -6,6 +6,8 @@ namespace Xylab.Polygon.Judgement.Daemon
     {
         bool CreateDirectory(string path, bool recursive = true);
 
+        Task DeleteDirectoryRecursive(string path);
+
         void ChangeMode(string path, uint mode);
 
         long GetFreeSpace(string path);
@@ -14,6 +16,10 @@ namespace Xylab.Polygon.Judgement.Daemon
 
         bool Rename(string oldPath, string newPath);
 
-        Task<bool> WriteFileAsync(string path, byte[] fileContent);
+        Task<bool> WriteFile(string path, byte[] fileContent);
+
+        Task<bool> WriteFile(string path, string fileContent);
+
+        Task<string> ReadFileContent(string path);
     }
 }

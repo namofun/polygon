@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xylab.Polygon.Models;
@@ -80,6 +81,7 @@ namespace Xylab.Polygon.Judgement.Daemon
         }
 
         private async Task<(string? runpath, string? error)> FetchExecutable(
+            Endpoint endpoint,
             string workdirpath,
             string execid,
             string md5sum,
@@ -96,6 +98,83 @@ namespace Xylab.Polygon.Judgement.Daemon
                 return (null, $"unknown executable '{execid}' specified");
             }
 
+            if (!_fileSystem.FileExists(execpath)
+                || !_fileSystem.FileExists(execmd5path)
+                || !_fileSystem.FileExists(execdeploypath)
+                || md5sum != await _fileSystem.ReadFileContent(execmd5path))
+            {
+                _logger.LogInformation("Fetching new executable '{execid}'", execid);
+                await _fileSystem.DeleteDirectoryRecursive(execpath);
+                if (!_fileSystem.CreateDirectory(execpath, true))
+                {
+                    throw new ApplicationException($"Could not create directory '{execpath}'");
+                }
+
+                byte[] content = await endpoint.GetExecutable(execid);
+                if (!await _fileSystem.WriteFile(execzippath, content))
+                {
+                    throw new ApplicationException($"Could not create executable zip file in {execpath}");
+                }
+
+                if (!string.Equals(content.ToMD5().ToHexDigest(), md5sum))
+                {
+                    throw new ApplicationException("Zip file corrupted during download.");
+                }
+
+                if (!await _fileSystem.WriteFile(execmd5path, md5sum))
+                {
+                    throw new ApplicationException("Could not write md5sum to file.");
+                }
+
+                _logger.LogDebug("Unzipping");
+                /*        system("unzip -Z $execzippath | grep -q ^l", $retval);
+        if ($retval===0) {
+            error("Zipfile $execzippath contains symlinks");
+        }
+        system("unzip -j -q -d $execpath $execzippath", $retval);
+        if ($retval!=0) {
+            error("Could not unzip zipfile in $execpath");
+        }*/
+
+                bool do_compile = true;
+                if (!_fileSystem.FileExists(execbuildpath))
+                {
+                    if (_fileSystem.FileExists(execrunpath))
+                    {
+                        _logger.LogDebug("'run' exists without 'build', we are done");
+                        do_compile = false;
+                    }
+                    else
+                    {
+                        Dictionary<string, string[]> langexts = new()
+                        {
+                            ["c"] = new[] { "c" },
+                            ["cpp"] = new[] { "cpp", "C", "cc" },
+                            ["java"] = new[] { "java" },
+                            ["py"] = new[] { "py", "py2", "py3" },
+                        };
+
+                        StringBuilder buildScript = new();
+                        
+                    }
+                }
+
+                if (do_compile)
+                {
+                    _logger.LogDebug("Compiling");
+                    string olddir = Environment.CurrentDirectory;
+                    Environment.CurrentDirectory = execpath;
+                    _fileSystem.ChangeMode("./build", 0750);
+
+                    /*            system("./build >> " . LOGFILE . " 2>&1", $retval);
+            if ($retval!=0) {
+                return array(null, "Could not run ./build in $execpath.");
+            }*/
+
+                    _fileSystem.ChangeMode(execrunpath, 0755);
+                    Environment.CurrentDirectory = olddir;
+                }
+            }
             throw new NotImplementedException();
         }
 
@@ -182,7 +261,7 @@ namespace Xylab.Polygon.Judgement.Daemon
                     files.Add(source.FileName);
                 }
 
-                if (!await _fileSystem.WriteFileAsync(srcfile, Convert.FromBase64String(source.SourceCode)))
+                if (!await _fileSystem.WriteFile(srcfile, Convert.FromBase64String(source.SourceCode)))
                 {
                     throw new ApplicationException($"Could not create {srcfile}");
                 }
@@ -212,7 +291,7 @@ namespace Xylab.Polygon.Judgement.Daemon
                 throw new ApplicationException($"No compile script specified for language {row.LanguageId}.");
             }
 
-            var (execrunpath, error) = await FetchExecutable(workdirpath, row.Compile, row.CompareMd5sum);
+            var (execrunpath, error) = await FetchExecutable(endpoint, workdirpath, row.Compile, row.CompareMd5sum);
             if (error != null)
             {
                 _logger.LogError("fetching executable failed for compile script '{compile_script}': {error}", row.Compile, error);
@@ -225,6 +304,8 @@ namespace Xylab.Polygon.Judgement.Daemon
                 //disable('language', 'langid', $row['langid'], $description, $row['judgingid'], (string)$row['cid']);
                 return;
             }
+
+
             throw new NotImplementedException();
         }
     }
