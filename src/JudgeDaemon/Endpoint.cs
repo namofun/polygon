@@ -8,7 +8,42 @@ using Xylab.Polygon.Models;
 
 namespace Xylab.Polygon.Judgement.Daemon
 {
-    public sealed class Endpoint : IAsyncDisposable
+    public interface IEndpoint : IAsyncDisposable
+    {
+        bool Waiting { get; set; }
+
+        string Name { get; }
+
+        void Initialize(IHttpClientFactory httpClientFactory);
+
+        Task<int> FireInternalError(
+            string description,
+            string judgehostlog,
+            DisableTarget disableTarget,
+            NextJudging? currentJudgingTask = null,
+            string? extraLog = null);
+
+        Task<UnfinishedJudging[]?> RegisterJudgehost(string hostname);
+
+        Task<byte[]?> GetExecutable(string target);
+
+        Task<SubmissionFile[]> GetSourceCode(int cid, int submitid);
+
+        Task<NextJudging?> FetchNextJudging(string hostname);
+
+        Task UpdateJudging(
+            string hostname,
+            int judgingId,
+            bool isCompileSuccess,
+            string compilerOutput,
+            string? entryPoint = null);
+
+        Task RefreshConfiguration();
+
+        Task<T> GetConfiguration<T>(Func<EndpointConfiguration, T> configSelector);
+    }
+
+    public sealed class Endpoint : IAsyncDisposable, IEndpoint
     {
         private HttpClient? _httpClient;
         private EndpointConfiguration? _endpointConfiguration;
@@ -83,17 +118,32 @@ namespace Xylab.Polygon.Judgement.Daemon
         public async Task<int> FireInternalError(
             string description,
             string judgehostlog,
-            DisableTarget disableTarget)
+            DisableTarget disableTarget,
+            NextJudging? currentJudgingTask = null,
+            string? extraLog = null)
         {
-            HttpContent content = new FormUrlEncodedContent(
-                new KeyValuePair<string, string>[]
-                {
-                    new(nameof(description), description),
-                    new(nameof(judgehostlog), judgehostlog.ToBase64()),
-                    new("disabled", disableTarget.ToJson()),
-                });
+            if (!string.IsNullOrEmpty(extraLog))
+            {
+                judgehostlog += "\n\n"
+                    + "--------------------------------------------------------------------------------"
+                    + "\n\n"
+                    + extraLog;
+            }
 
-            using var resp = await PostAsync("judgehosts/internal-error", content);
+            Dictionary<string, string> content = new()
+            {
+                { nameof(description), description },
+                { nameof(judgehostlog), judgehostlog.ToBase64() },
+                { "disabled", disableTarget.ToJson() },
+            };
+
+            if (currentJudgingTask != null)
+            {
+                content["cid"] = currentJudgingTask.ContestId.ToString();
+                content["judgingid"] = currentJudgingTask.JudgingId.ToString();
+            }
+
+            using var resp = await PostAsync("judgehosts/internal-error", new FormUrlEncodedContent(content));
             resp.EnsureSuccessStatusCode();
             return await resp.Content.ReadFromJsonAsync<int>();
         }
@@ -133,15 +183,22 @@ namespace Xylab.Polygon.Judgement.Daemon
             return await resp.Content.ReadFromJsonAsync<NextJudging>();
         }
 
-        public async Task UpdateJudging(string hostname, int judgingId, int compile_success, string output_compile)
+        public async Task UpdateJudging(string hostname, int judgingId, bool compile_success, string output_compile, string? entry_point = null)
         {
+            Dictionary<string, string> parameter = new()
+            {
+                { nameof(compile_success), compile_success ? "1" : "0" },
+                { nameof(output_compile), output_compile.ToBase64() },
+            };
+
+            if (entry_point != null)
+            {
+                parameter.Add(nameof(entry_point), entry_point);
+            }
+
             using var resp = await PutAsync(
                 "judgehosts/update-judging/" + UrlEncoder.Default.Encode(hostname) + "/" + judgingId,
-                new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    { nameof(compile_success), compile_success.ToString() },
-                    { nameof(output_compile), output_compile.ToBase64() },
-                }));
+                new FormUrlEncodedContent(parameter));
 
             resp.EnsureSuccessStatusCode();
         }

@@ -19,5 +19,8 @@ namespace Xylab.Polygon.Judgement.Daemon
 
         public static DisableTarget Language(string langid)
             => Of("language", "langid", langid);
+
+        public static DisableTarget Problem(int probid)
+            => Of("problem", "probid", probid.ToString());
     }
 }

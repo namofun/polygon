@@ -10,7 +10,12 @@ using System.Threading.Tasks;
 
 namespace Xylab.Polygon.Judgement.Daemon
 {
-    public sealed class EndpointManager : IAsyncDisposable
+    public interface IEndpointManager : IAsyncDisposable
+    {
+        ValueTask<IEndpoint> MoveNextAsync(CancellationToken cancellationToken);
+    }
+
+    public sealed class EndpointManager : IAsyncDisposable, IEndpointManager
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly DaemonOptions _options;
@@ -156,6 +161,11 @@ namespace Xylab.Polygon.Judgement.Daemon
 
                 return endpoint;
             }
+        }
+
+        async ValueTask<IEndpoint> IEndpointManager.MoveNextAsync(CancellationToken cancellationToken)
+        {
+            return await this.MoveNextAsync(cancellationToken);
         }
     }
 }

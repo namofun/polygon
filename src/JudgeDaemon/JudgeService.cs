@@ -1,40 +1,48 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Xylab.Management.Models;
+using Xylab.Management.Services;
+using Xylab.Polygon.Entities;
 using Xylab.Polygon.Models;
 
 namespace Xylab.Polygon.Judgement.Daemon
 {
     public class JudgeService : BackgroundService
     {
-        private readonly EndpointManager _endpoints;
+        private readonly IEndpointManager _endpoints;
         private readonly DaemonOptions _options;
         private readonly ILogger<JudgeService> _logger;
         private readonly IFileSystem _fileSystem;
+        private readonly ITaskRunner _taskRunner;
 
         public JudgeService(
             IOptions<DaemonOptions> options,
             ILogger<JudgeService> logger,
             IFileSystem fileSystem,
-            EndpointManager endpoints)
+            ITaskRunner taskRunner,
+            IEndpointManager endpoints)
         {
             _options = options.Value;
             _logger = logger;
             _endpoints = endpoints;
             _fileSystem = fileSystem;
+            _taskRunner = taskRunner;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (true)
             {
-                Endpoint endpoint = await _endpoints.MoveNextAsync(stoppingToken);
+                IEndpoint endpoint = await _endpoints.MoveNextAsync(stoppingToken);
 
                 // Request open submissions to judge. Any errors will be treated as
                 // non-fatal: we will just keep on retrying in this loop.
@@ -80,8 +88,28 @@ namespace Xylab.Polygon.Judgement.Daemon
             await _endpoints.DisposeAsync();
         }
 
+        private async Task<Dictionary<string, string>?> read_metadata(string filename)
+        {
+            if (!_fileSystem.IsReadable(filename)) return null;
+
+            // Don't quite treat it as YAML, but simply key/value pairs.
+            string[] contents = await _fileSystem.ReadFileAsLines(filename);
+            Dictionary<string, string> res = new();
+            foreach (var line in contents)
+            {
+                int strpos = line.IndexOf(':');
+                if (strpos != -1)
+                {
+                    res.Add(line[0..strpos], line[(strpos + 1)..].Trim());
+                }
+            }
+
+            return res;
+        }
+
+
         private async Task<(string? runpath, string? error)> FetchExecutable(
-            Endpoint endpoint,
+            IEndpoint endpoint,
             string workdirpath,
             string execid,
             string md5sum,
@@ -155,8 +183,81 @@ namespace Xylab.Polygon.Judgement.Daemon
                         };
 
                         StringBuilder buildScript = new();
-                        
+                        buildScript.Append("#!/bin/sh\n\n");
+                        string? execlang = null;
+                        string source = "";
+
+                        foreach (var (lang, langext) in langexts)
+                        {
+                            /*if (($handle = opendir($execpath)) === false) {
+                        error("Could not open $execpath");
                     }
+                    while (($file = readdir($handle)) !== false) {
+                        $ext = pathinfo($file, PATHINFO_EXTENSION);
+                        if (in_array($ext, $langext)) {
+                            $execlang = $lang;
+                            $source = $file;
+                            break;
+                        }
+                    }
+                    closedir($handle);
+                    if ($execlang !== false) {
+                        break;
+                    }
+                             */
+                        }
+
+                        if (execlang == null)
+                        {
+                            return (null, "executable must either provide an executable file named 'build' or a C/C++/Java or Python file.");
+                        }
+
+                        switch (execlang)
+                        {
+                            case "c":
+                                buildScript.Append($"gcc -Wall -O2 -std=gnu11 '{source}' -o {execrunpath} -lm\n");
+                                break;
+
+                            case "cpp":
+                                buildScript.Append($"g++ -Wall -O2 -std=gnu++17 '{source}' -o {execrunpath}\n");
+                                break;
+
+                            case "java":
+                                //source = basename(source, ".java");
+                                buildScript.Append($"javac -cp {execpath} -d {execpath} '{source}'.java\n");
+                                buildScript.Append("echo '#!/bin/sh' > run\n");
+                                // no main class detection here
+                                buildScript.Append($"echo 'java -cp {execpath} '{source} >> run\n");
+                                break;
+
+                            case "py":
+                                buildScript.Append("echo '#!/bin/sh' > run\n");
+                                // TODO: Check if it's 'python' or 'python3'
+                                buildScript.Append($"echo 'python '{source} >> run\n");
+                                break;
+                        }
+
+                        if (combined_run_compare)
+                        {
+                            string run_runjury = null;
+                            buildScript.Append(run_runjury);
+                        }
+
+                        try
+                        {
+                            await _fileSystem.WriteFile(execbuildpath, buildScript.ToString());
+                        }
+                        catch (IOException ex)
+                        {
+                            throw new ApplicationException($"Could not write file 'build' in {execpath}", ex);
+                        }
+
+                        _fileSystem.ChangeMode(execbuildpath, 0755);
+                    }
+                }
+                else if (!_fileSystem.IsExecutable(execbuildpath))
+                {
+                    return (null, "Invalid executable, file 'build' exists but is not executable.");
                 }
 
                 if (do_compile)
@@ -166,19 +267,29 @@ namespace Xylab.Polygon.Judgement.Daemon
                     Environment.CurrentDirectory = execpath;
                     _fileSystem.ChangeMode("./build", 0750);
 
-                    /*            system("./build >> " . LOGFILE . " 2>&1", $retval);
-            if ($retval!=0) {
-                return array(null, "Could not run ./build in $execpath.");
-            }*/
+                    var result = await _taskRunner.BuildAtCurrentDirectory();
+                    if (result.ExitCode != 0)
+                    {
+                        return (null, "Could not run ./build in $execpath.");
+                    }
 
                     _fileSystem.ChangeMode(execrunpath, 0755);
                     Environment.CurrentDirectory = olddir;
                 }
+
+                if (!_fileSystem.FileExists(execrunpath) || !_fileSystem.IsExecutable(execrunpath))
+                {
+                    return (null, "Invalid build file, must produce an executable file 'run'.");
+                }
             }
-            throw new NotImplementedException();
+
+            // Create file to mark executable successfully deployed.
+            await _fileSystem.WriteFile(execdeploypath, Array.Empty<byte>());
+
+            return (execrunpath, null);
         }
 
-        private async Task Judge(Endpoint endpoint, NextJudging row)
+        private async Task Judge(IEndpoint endpoint, NextJudging row)
         {
             string workdirpath = Path.Combine(_options.JUDGEDIR, _options.HostName, $"endpoint-{endpoint.Name}");
 
@@ -195,7 +306,7 @@ namespace Xylab.Polygon.Judgement.Daemon
             Environment.SetEnvironmentVariable("PROCLIMIT", await endpoint.GetConfiguration(c => c.ProcessLimit.ToString()));
             Environment.SetEnvironmentVariable("ENTRY_POINT", row.EntryPoint);
 
-            long outputStorageLimit = await endpoint.GetConfiguration(c => c.OutputStorageLimit);
+            int outputStorageLimit = await endpoint.GetConfiguration(c => c.OutputStorageLimit);
             string cpusetOption = _options.daemonid.HasValue ? $"-n {_options.daemonid}" : string.Empty;
 
             // create workdir for judging
@@ -225,8 +336,14 @@ namespace Xylab.Polygon.Judgement.Daemon
             // Will be revoked again after this run finished.
             _fileSystem.ChangeMode(workdir, 0755);
 
-            Environment.CurrentDirectory = workdir;
-            // if (!chdir(workdir)) error("Could not chdir to '$workdir'");
+            try
+            {
+                Environment.CurrentDirectory = workdir;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Could not chdir to '{workdir}'", ex);
+            }
 
             // Get the source code from the DB and store in local file(s)
             var sources = await endpoint.GetSourceCode(row.ContestId, row.SubmissionId);
@@ -272,7 +389,7 @@ namespace Xylab.Polygon.Judgement.Daemon
                 await endpoint.UpdateJudging(
                     _options.HostName,
                     row.JudgingId,
-                    0,
+                    false,
                     "No files with allowed extensions found to pass to compiler. Allowed extensions: " + string.Join(", ", row.LanguageExtensions!));
 
                 // revoke readablity for domjudge-run user to this workdir
@@ -302,6 +419,85 @@ namespace Xylab.Polygon.Judgement.Daemon
                     "kusto query",
                     DisableTarget.Language(row.LanguageId));
                 //disable('language', 'langid', $row['langid'], $description, $row['judgingid'], (string)$row['cid']);
+                return;
+            }
+
+            // Compile the program.
+            ProcessResult compileResult = await _taskRunner.Compile(cpusetOption, execrunpath, workdir, files);
+
+            int retval = compileResult.ExitCode;
+            string compile_output = "";
+            if (_fileSystem.IsReadable(Path.Combine(workdir, "compile.out")))
+            {
+                compile_output = await _fileSystem.ReadFileWithLimit(Path.Combine(workdir, "/compile.out"), 50000);
+            }
+            if (string.IsNullOrEmpty(compile_output) && _fileSystem.IsReadable(Path.Combine(workdir, "compile.tmp")))
+            {
+                compile_output = await _fileSystem.ReadFileWithLimit(Path.Combine(workdir, "/compile.tmp"), 50000);
+            }
+
+            // Try to read metadata from file
+            Dictionary<string, string> metadata = await read_metadata(Path.Combine(workdir, "/compile.meta"));
+            if (metadata.ContainsKey("internal-error"))
+            {
+                //alert('error');
+                string internalError = metadata["internal-error"];
+                string description;
+                compile_output += "\n--------------------------------------------------------------------------------\n\n"
+                                + "Internal errors reported:\n"
+                                + internalError;
+
+                if (internalError.Contains("compile script: "))
+                {
+                    internalError = internalError.Replace("compile script: ", string.Empty);
+                    description = $"The compile script returned an error: {internalError}";
+                    await endpoint.FireInternalError(description, "kusto", DisableTarget.Language(row.LanguageId), row, compile_output);
+                }
+                else
+                {
+                    description = $"Running compile.sh caused an error/crash: {internalError}";
+                    await endpoint.FireInternalError(description, "kusto", DisableTarget.Judgehost(_options.HostName), row, compile_output);
+                }
+
+                _logger.LogError(description);
+                // revoke readablity for domjudge-run user to this workdir
+                _fileSystem.ChangeMode(workdir, 0700);
+                return;
+            }
+
+            // What does the exitcode mean?
+            if (!Enum.GetValues<ExitCodes>().Any(e => (int)e == retval))
+            {
+                //alert('error');
+                _logger.LogError("Unknown exitcode from compile.sh for s{submitid}: {retval}", row.SubmissionId, retval);
+
+                await endpoint.FireInternalError(
+                    $"compile script '{row.Compile}' returned exit code {retval}",
+                    "kusto query",
+                    DisableTarget.Language(row.LanguageId),
+                    row,
+                    compile_output);
+                
+                // revoke readablity for domjudge-run user to this workdir
+                _fileSystem.ChangeMode(workdir, 0700);
+                return;
+            }
+            bool compile_success = (ExitCodes)retval == ExitCodes.Correct;
+
+            // pop the compilation result back into the judging table
+            await endpoint.UpdateJudging(
+                _options.HostName,
+                row.JudgingId,
+                compile_success,
+                await _fileSystem.ReadFileWithLimit(Path.Combine(workdir, "compile.out"), outputStorageLimit),
+                metadata.GetValueOrDefault("entry_point"));
+
+            // compile error: our job here is done
+            if (!compile_success)
+            {
+                // revoke readablity for domjudge-run user to this workdir
+                _fileSystem.ChangeMode(workdir, 0700);
+                _logger.LogInformation("Judging s{submitid}/j{judgingid}: compile error", row.SubmissionId, row.JudgingId);
                 return;
             }
 

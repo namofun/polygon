@@ -46,7 +46,7 @@ namespace Xylab.Polygon.Judgement.Daemon
         /// Maximum size of error/system output stored in the database (in bytes); use "-1" to disable any limits.
         /// </summary>
         [JsonPropertyName("output_storage_limit")]
-        public long OutputStorageLimit { get; set; }
+        public int OutputStorageLimit { get; set; }
 
         /// <summary>
         /// Time that submissions are kept running beyond timelimit before being killed.

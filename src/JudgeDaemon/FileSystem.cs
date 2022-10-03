@@ -16,10 +16,18 @@ namespace Xylab.Polygon.Judgement.Daemon
 
         bool Rename(string oldPath, string newPath);
 
+        bool IsExecutable(string path);
+
+        bool IsReadable(string path);
+
         Task<bool> WriteFile(string path, byte[] fileContent);
 
         Task<bool> WriteFile(string path, string fileContent);
 
         Task<string> ReadFileContent(string path);
+
+        Task<string[]> ReadFileAsLines(string path);
+
+        Task<string> ReadFileWithLimit(string path, int maxSize);
     }
 }
